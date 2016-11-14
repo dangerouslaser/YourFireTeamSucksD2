@@ -1,0 +1,237 @@
+
+html, body {
+	position: relative;
+	width:100%;
+	height:100%;
+	background: #12171c;
+	color:#adadad;
+}
+
+input{
+    position: relative;
+    width: 75%;
+    padding: 10px;
+    border-radius: 3px;
+    border: 1px solid #3e577d;
+    background: #181d25;
+    color: #adadad;
+    display: inline-block;
+    margin-bottom: 5px;
+    outline:none;
+}
+
+input:focus{
+    outline:none;
+    border-color:#6d9fea;
+    box-shadow:0 0 10px #6d9fea;
+}
+
+button{
+    position: relative;
+    padding: 10px;
+    background: #2c3646;
+    border: 1px solid #64666b;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-block;
+    color: #ccc;
+}
+
+button:hover{
+    outline:none;
+    border-color:#6d9fea;
+    box-shadow:0 0 10px #6d9fea;
+}
+
+ul, li{
+    list-style-type: none;
+    padding: 0px;
+    border:none;
+    margin:0px;
+}
+
+table{
+    margin:0;
+    padding:0;
+    border-collapse: collapse;
+}
+
+.search-player-container{
+	position: relative;
+	margin:0 auto;
+	width:30%;
+}
+
+.character-selection-container{
+	position: relative;
+	padding: 10px;
+}
+
+.character-selection-container .character-selection{
+    position: relative;
+    display: inline-block;
+    padding: 10px;
+    width: 26%;
+    border-radius: 3px;
+    background: #2a3240;
+    box-shadow: 0 0 5px #20417b;
+    border: 1px solid #20417b;
+    margin: 1.5%;
+    cursor: pointer;
+}
+
+.light-level{
+	color: yellow;
+}
+
+.character-level-container{
+	float: right;
+	text-align: right;
+}
+
+.character-level-container .base-level{
+	font-size:25px;
+}
+.character-level-container .light-level{
+	font-size:14px;
+}
+
+.character-level-container span{
+	display: block;
+}
+
+
+.main-container{
+	padding-top:50px;
+	position: relative;
+	width:90%;
+	height:100%;
+	margin:0 auto;
+	background: rgb(24, 29, 37);
+}
+
+
+.post-game-carnage-player-stats-container{
+    position: relative;
+    margin:10px;
+    padding:5px;
+    display: inline-block;
+    float:left;
+    background: #2A333E;
+    border-color:#6d9fea;
+    box-shadow:0 0 2px #6d9fea;
+}
+
+.post-game-carnage-player-stats-container .stat-name, .post-game-carnage-player-stats-container .stat-display-value{
+    display: inline-block;
+    position: relative;
+    padding:2px;
+    text-align: left;
+}
+
+.post-game-carnage-player-stats-container .stat-display-value{
+    text-align: right;
+    float: right;
+}
+
+.post-game-carnage-player-stats-container li.statistic{
+    width:100%;
+}
+
+#stats-table-container{
+    position: relative;
+    width: 80%;
+    min-width: 680px;
+    margin: 0 auto;
+    background: #101215;
+    max-height: 600px;
+    border-radius: 3px;
+    padding: 5px;
+    overflow: scroll;
+}
+
+#stats-table-container #stats-table{
+    position: relative;
+    width: 100%;
+    display: block;
+}
+
+#stats-table tbody{
+    position: relative;
+    width: 100%;
+    display: table;
+}
+
+
+#stats-table .stat-row{
+    position: relative;
+    width:100%;
+}
+
+#stats-table .stat-row.odd{
+    background: #181d25;
+}
+
+#stats-table .stat-row .column{
+    position: relative;
+    width:10%;
+}
+
+#stats-table .stats-main-header{
+    position: relative;
+    top:0;
+    padding:5px;
+}
+
+#stats-table .stats-main-header .column-spacer{
+    display: inline-block;
+    text-align: center;
+    float: left;
+    width:150px;
+}
+
+#stats-table .stats-main-header .header-column{
+    display: inline-block;
+    text-align: right;
+    float: left;
+    margin-left:5px;
+    margin-right:5px;
+}
+
+#stats-table .column{
+    max-width: 150px;
+    overflow: hidden;
+    padding:5px;
+}
+
+#stats-table .column.row-title{
+    width: 15%;
+}
+
+#stats-table .column.header{
+    text-align: right;
+}
+
+
+#stats-table-container .stat-row.header-row{
+    background: #1e466d;
+    color: #fff;
+}
+
+#stats-table .column.row-value-player{
+    text-align: right;
+}
+
+#stats-table .column.row-value-player.is-greatest{
+    color: #387538;
+}
+
+#stats-table .column.row-value-player.is-least{
+    color: #9e1a1a;
+}
+
+#stats-table .column.row-value-player.is-avg{
+    color: #4599a9;
+}
+
+

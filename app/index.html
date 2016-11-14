@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="fireTeam">
+	<head>
+		<meta charset="utf-8"/>
+		<title>Your Fireteam Sucks</title>
+		<!--<link href="/favicon.ico?ver=1" rel="shortcut icon" type="image/x-icon"/>-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="X-UA-Compatible" content="IE=edge,chrome=1"/>
+		<link href="//fonts.googleapis.com/css?family=Lato:400,700,900" rel="stylesheet" type="text/css">
+		<!--<link href="css/style.css" type="text/css" rel="stylesheet"/>-->
+		<link href="css/sass.css" type="text/css" rel="stylesheet"/>
+
+		<script src="lib/angular.min.js"></script>
+		<script src="lib/angular-routes.min.js"></script>
+		<script src="lib/jquery.min.js"></script>
+		
+		<script type="text/javascript" src="common/fire-team.module.js"></script>
+		<script type="text/javascript" src="common/common.module.js"></script>
+		<script type="text/javascript" src="common/base-http.service.js"></script>
+		<script type="text/javascript" src="common/player-options.factory.js"></script>
+		<script type="text/javascript" src="common/main.controller.js"></script>
+		<script type="text/javascript" src="common/player-base-model.factory.js"></script>
+		<script type="text/javascript" src="common/game-options.service.js"></script>
+		<script type="text/javascript" src="common/game-activity-model.factory.js"></script>
+		<script type="text/javascript" src="characters/character.module.js"></script>
+		<script type="text/javascript" src="characters/character-model.factory.js"></script>
+		<script type="text/javascript" src="characters/character-info.directive.js"></script>
+		<script type="text/javascript" src="characters/character-activity-model.factory.js"></script>
+		<script type="text/javascript" src="fire-teams/fire-team-model.factory.js"></script>
+		<script type="text/javascript" src="fire-teams/activity-model.factory.js"></script>
+		<script type="text/javascript" src="activities/activity-info.directive.js"></script>
+		<script type="text/javascript" src="common/directives/input.directive.js"></script>
+		<script type="text/javascript" src="common/directives/number-picker.directive.js"></script>
+		<script type="text/javascript" src="common/directives/sticky-container.directive.js"></script>
+
+	</head>
+	<body>
+	<div class="main-container">
+		<div class="content" ng-controller="mainCtrl">
+
+					<button ng-click="m.selectedActivity = m.testObject">TEST OBJECT!</button>
+
+			<h3 class="header-text"></h3>
+				<div class="search-player-container">
+					<span>FireTeam Members:</span>
+
+					<!--<input ng-keyup="keyUpEvt($event)" ng-keydown="keyDownEvt($event)" ng-class="{'placeholder' : member.isPlaceHolder}" ng-repeat="member in m.playersArrays track by $index" type="text" placeholder="#gamertag" ng-model="member.displayName" tabindex="{{$index + 1}}"/>-->
+
+					<input-directive 
+						ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
+						ng-repeat="member in m.playersArrays track by $index"
+						input-model="member"
+						tab-index="{{$index + 1}}"
+						ng-keydown="keyDownEvt($event)">
+					</input-directive>
+
+					<div>
+						<button id="PlayerSearch" tabindex="8" class="button" ng-click="getFireTeamModel(m.selectedPlatform)">
+							Search
+						</button>
+						<button id="MoreResults" ng-if="m.initialSearchRun" tabindex="8" ng-click="getMoreResults()">More Results</button>
+						<span class="results">{{m.fireTeamActivityResults.length}}</span>
+					</div>
+				</div>
+
+				<div class="loading-overlay" ng-if="m.isLoadingData">
+					<span ng-if="m.activityListProgress < 1">
+						Finding activity matches...
+					</span>
+					<span ng-if="m.activityListProgress > 0 && m.activityListProgress < 100">
+						Loading activity details: {{m.activityListProgress}} %
+					</span>
+				</div>
+
+				<span ng-if="m.errorMessage">{{m.errorMessage}}</span>
+				<div ng-if="!m.isLoadingData">
+					<div class="haracter-selection-button-container">
+						<button ng-hide="m.showActivityList" ng-click="m.showActivityList = true">Show Activity Results</button>
+						<button ng-show="m.showActivityList && m.fireTeamMembers.length > 1" ng-click="m.showActivityList = false">Hide Activity Results</button>
+					</div>
+					<div class="character-selection-container" ng-show="m.showActivityList">
+						<span class="user-name" data-username={{m.playerInfo.displayName}}>
+							{{m.playerInfo.displayName}}
+						</span>
+						<div class="character-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults track by $index" ng-click="selectActivity(activity)">
+						<img class="activity-icon" src="http://www.bungie.net{{activity.definitions.activityTypes[0].icon}}" />
+							<div class="activity-info-container">
+								<span class="activity-date">{{activity.dateTime | date:'MM/dd/yyyy'}}</span>
+								<div class="activity-title">
+									<span ng-repeat="type in activity.definitions.activityTypes">
+										<span ng-if="type.friendlyUrlId">({{type.friendlyUrlId}})</span> {{type.activityTypeName}} : 
+									</span>
+									<span ng-repeat="act in activity.definitions.activities">
+										{{act.activityName}}
+									</span>
+								</div>
+								<div class="character-container">
+									<div class="character" ng-repeat="character in activity.playerPostGameCarnageReport track by $index">
+										<span class="player-class" data-playerName="{{character.characterInfo.displayName}}">
+											{{character.characterInfo.displayName}} : 
+										</span>
+										<span class="character-class" data-characterClass="{{character.characterInfo.characterClass}}">
+											{{character.characterInfo.characterClass}}
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<activity-info
+						ng-if="m.selectedActivity"
+						activity-info="m.selectedActivity">
+					</activity-info>
+
+				</div>
+		</div>
+	</div>
+	</body>
+</html>
