@@ -4,7 +4,6 @@ angular.module('fireTeam.common')
 
 	var activityModel, activityPromises;
 	var instanceModel, instancePromises;
-	var totalActivities = 0;
 	var progress = 0;
 
 	var activityModelObject = {
@@ -15,8 +14,7 @@ angular.module('fireTeam.common')
 			return getPlayerInstanceList(fireTeamObject);
 		},
 		getProgress: function(){
-			var percentage = Math.round((progress / totalActivities) * 100);
-			return percentage;
+			return progress;
 		},
 		clearActivityModel: clearActivityModel,
 		clearInstanceModel: clearInstanceModel
@@ -33,7 +31,6 @@ angular.module('fireTeam.common')
 	}
 
 	function getFireTeamActivities(instanceArray) {
-		totalActivities = instanceArray.length;
 		var deferred = $q.defer();
 		var activityPromises = [];
 

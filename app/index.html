@@ -38,43 +38,47 @@
 	<div class="main-container">
 		<div class="content" ng-controller="mainCtrl">
 
-					<button ng-click="m.selectedActivity = m.testObject">TEST OBJECT!</button>
+			<button ng-click="m.selectedActivity = m.testObject">TEST OBJECT!</button>
 
 			<h3 class="header-text"></h3>
-				<div class="search-player-container">
-					<span>FireTeam Members:</span>
+				<div>
+					<div class="search-player-container">
+						<span>FireTeam Members:</span>
+						<input-directive 
+							ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
+							ng-repeat="member in m.playersArrays track by $index"
+							input-model="member"
+							tab-index="{{$index + 1}}"
+							ng-keydown="keyDownEvt($event)">
+						</input-directive>
 
-					<!--<input ng-keyup="keyUpEvt($event)" ng-keydown="keyDownEvt($event)" ng-class="{'placeholder' : member.isPlaceHolder}" ng-repeat="member in m.playersArrays track by $index" type="text" placeholder="#gamertag" ng-model="member.displayName" tabindex="{{$index + 1}}"/>-->
-
-					<input-directive 
-						ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
-						ng-repeat="member in m.playersArrays track by $index"
-						input-model="member"
-						tab-index="{{$index + 1}}"
-						ng-keydown="keyDownEvt($event)">
-					</input-directive>
-
-					<div>
-						<button id="PlayerSearch" tabindex="8" class="button" ng-click="getFireTeamModel(m.selectedPlatform)">
-							Search
-						</button>
-						<button id="MoreResults" ng-if="m.initialSearchRun" tabindex="8" ng-click="getMoreResults()">More Results</button>
-						<span class="results">{{m.fireTeamActivityResults.length}}</span>
+						<div>
+							<button id="PlayerSearch" tabindex="8" class="button" ng-click="getFireTeamModel(m.selectedPlatform)">
+								Search
+							</button>
+							<button id="MoreResults" ng-if="m.initialSearchRun" tabindex="8" ng-click="getMoreResults()">More Results</button>
+							<span class="results">{{m.fireTeamActivityResults.length}}</span>
+						</div>
 					</div>
 				</div>
 
 				<div class="loading-overlay" ng-if="m.isLoadingData">
-					<span ng-if="m.activityListProgress < 1">
+					<span ng-hide="m.activityListProgress.totalActivities">
 						Finding activity matches...
 					</span>
-					<span ng-if="m.activityListProgress > 0 && m.activityListProgress < 100">
-						Loading activity details: {{m.activityListProgress}} %
+					<span ng-show="m.activityListProgress.totalActivities">
+						{{m.activityListProgress.totalActivities}} matches found
+					</span>
+					<span ng-show="m.showProgressMessage">
+						<span>Loading activity details:</span>
+						<span>{{m.activityListProgress.activitiesLoaded}} / {{m.activityListProgress.totalActivities}}</span>
+						<span>{{m.activityListProgress.percentComplete}} %</span>
 					</span>
 				</div>
 
 				<span ng-if="m.errorMessage">{{m.errorMessage}}</span>
 				<div ng-if="!m.isLoadingData">
-					<div class="haracter-selection-button-container">
+					<div class="character-selection-button-container">
 						<button ng-hide="m.showActivityList" ng-click="m.showActivityList = true">Show Activity Results</button>
 						<button ng-show="m.showActivityList && m.fireTeamMembers.length > 1" ng-click="m.showActivityList = false">Hide Activity Results</button>
 					</div>

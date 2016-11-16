@@ -1,161 +1,173 @@
 angular
 	.module('fireTeam.common')
 	.controller('activityInfoCtrl', activityInfoCtrl)
-	.directive('activityInfo', ['FireTeamModelFactory', function activityInfo(fireTeamModelFactory) {
-	return {
-		restrict: 'E',
-		scope: {
-			activityInfo: '='
-		},
-		templateUrl: '/activities/activity-info.html',
-		controller: activityInfoCtrl,
-		controllerAs: 'ctrl',
-		transclude: true,
-		replace: true,
-		link: function(scope, element, attrs, ctrl){
-			scope.isLoadingCarnageReport = false;
-			scope.chartModel = {};
-			scope.activityMembers = {};
-			scope.isShowRankings = true;
-			scope.isShowUnusedRankings = false;
+	.directive('activityInfo', activityInfo);
 
-			scope.$watch('activityInfo', function(newVal){
-				if(newVal){
-					getFireTeam();
+	activityInfo.$inject = ['FireTeamModelFactory', '$timeout'];
+
+	function activityInfo(fireTeamModelFactory, $timeout) {
+		return {
+			restrict: 'E',
+			scope: {
+				activityInfo: '='
+			},
+			templateUrl: '/activities/activity-info.html',
+			controller: activityInfoCtrl,
+			controllerAs: 'ctrl',
+			transclude: true,
+			replace: true,
+			link: function(scope, element, attrs, ctrl){
+				scope.isLoadingCarnageReport = false;
+				scope.chartModel = {};
+				scope.activityMembers = {};
+				scope.isShowRankings = true;
+				scope.isShowUnusedRankings = false;
+
+				scope.$watch('activityInfo', function(newVal){
+					if(newVal){
+						getFireTeam();
+					}
+				});
+
+				scope.$watch('chartModel.trueStats', function(newVal){
+					if(newVal){
+						$timeout(function() {
+							var $tableElement = angular.element(element[0].querySelector('#stats-table-container'));
+							scope.fixedHeight = {'height' : $tableElement[0].offsetHeight + 10 + 'px'};
+						}, 10);
+					}
+				});
+
+				function getFireTeam(){
+					scope.activityMembers = {};
+					scope.isLoadingCarnageReport = true;
+					scope.chartModel = createChartModel();
 				}
+
+				function createChartModel(){
+					var tableObj = {};
+					var activityMembers = Object.keys(scope.activityInfo.playerPostGameCarnageReport);
+
+					angular.forEach(activityMembers, function(player){
+						var object = scope.activityInfo.playerPostGameCarnageReport[player].characterInfo;
+						angular.extend(object, scope.activityInfo.playerPostGameCarnageReport[player].playerInfo)
+						scope.activityMembers[player] = object;
+					});
+
+					angular.forEach(scope.activityInfo.playerPostGameCarnageReport, function(player){
+						angular.forEach(player, function(statTopicVal, statTopicKey){
+							if(statTopicKey !== 'playerInfo' && statTopicKey !== 'characterInfo'){
+								if(!tableObj[statTopicKey]){
+									tableObj[statTopicKey] = {};
+								}
+								angular.forEach(statTopicVal, function(val, key){
+									if(!tableObj[statTopicKey][key]){
+										tableObj[statTopicKey][key] = {};
+									}
+									tableObj[statTopicKey][key][player.characterInfo.displayName] = {
+										displayValue: val.displayValue,
+										value: val.value
+									};
+									tableObj[statTopicKey][key].displayName = ctrl.m.camelCaseToString(key);
+								});
+							}
+						});
+					});
+
+					angular.forEach(scope.activityMembers, function(val, key){
+						angular.forEach(tableObj, function(statObj){
+							angular.forEach(statObj, function(stat){
+								if (!stat.hasOwnProperty(key)){
+									stat[key] = {
+										displayValue: null,
+										value: null
+									};
+								}
+							});
+						});
+					});
+
+					return calculateRatingValues(tableObj);
+				};
+			
+				function calculateRatingValues(modelObj){
+					angular.forEach(modelObj, function(statObj){
+						angular.forEach(statObj, function(stat){
+							stat.ratingValues = {};
+							var highestVal = 0;
+							var lowestVal = null;
+							var statArray = [];
+
+							angular.forEach(stat, function(playerValue, playerKey){
+								var intDisplayVal = parseInt(playerValue.value);
+								highestVal = intDisplayVal > highestVal ? intDisplayVal : highestVal;
+								lowestVal = (intDisplayVal < lowestVal || !lowestVal) ? intDisplayVal : lowestVal;
+
+								if(intDisplayVal){
+									statArray.push(intDisplayVal);
+								}
+							});	
+
+							stat.ratingValues.highestVal = isNaN(highestVal) ? 0 : highestVal;
+							stat.ratingValues.lowestVal = isNaN(lowestVal) ? 0 : lowestVal;
+							stat.ratingValues.avgVal = getAvg(statArray);
+
+						});
+					});
+
+					return calculatePlayerRatings(modelObj);
+				}
+
+				function calculatePlayerRatings(ratingObj){
+
+					angular.forEach(ratingObj, function(statCat){
+						angular.forEach(statCat, function(stat){
+							var leastDifferential = null;
+							var avgPlayer;
+							angular.forEach(stat, function(playerVal, playerKey){
+								var intDisplayVal = parseInt(stat[playerKey].value);
+								var avgDifferential = Math.abs(stat.ratingValues.avgVal - intDisplayVal);
+
+								leastDifferential = (avgDifferential < leastDifferential || !leastDifferential) ? avgDifferential : leastDifferential;
+
+								if (intDisplayVal === stat.ratingValues.highestVal && stat.ratingValues.highestVal !== stat.ratingValues.avgVal){
+								 	playerVal.isGreatest = true;
+								}
+
+								if (intDisplayVal === stat.ratingValues.lowestVal && stat.ratingValues.lowestVal !== stat.ratingValues.avgVal){
+								 	playerVal.isLeast = true;
+								}
+					
+								if (avgDifferential === leastDifferential && stat.ratingValues.avgVal !== 0){
+									avgPlayer = playerKey;
+								}
+							});
+
+							if(avgPlayer){
+								stat[avgPlayer].isMostAvg = true;
+							}
+						});
+					});
+
+					scope.isLoadingCarnageReport = false;
+					return ratingObj;
+				}
+			}
+		};
+
+		function getAvg(array){
+			var avg = 0;
+			var sum = 0;
+
+			angular.forEach(array, function(item){
+				sum += item;
 			});
 
-			function getFireTeam(){
-				scope.activityMembers = {};
-				scope.isLoadingCarnageReport = true;
-				scope.chartModel = createChartModel();
-			}
+			avg = sum / array.length;
 
-			function createChartModel(){
-				var tableObj = {};
-				var activityMembers = Object.keys(scope.activityInfo.playerPostGameCarnageReport);
-
-				angular.forEach(activityMembers, function(player){
-					var object = scope.activityInfo.playerPostGameCarnageReport[player].characterInfo;
-					angular.extend(object, scope.activityInfo.playerPostGameCarnageReport[player].playerInfo)
-					scope.activityMembers[player] = object;
-				});
-
-				angular.forEach(scope.activityInfo.playerPostGameCarnageReport, function(player){
-					angular.forEach(player, function(statTopicVal, statTopicKey){
-						if(statTopicKey !== 'playerInfo' && statTopicKey !== 'characterInfo'){
-							if(!tableObj[statTopicKey]){
-								tableObj[statTopicKey] = {};
-							}
-							angular.forEach(statTopicVal, function(val, key){
-								if(!tableObj[statTopicKey][key]){
-									tableObj[statTopicKey][key] = {};
-								}
-								tableObj[statTopicKey][key][player.characterInfo.displayName] = {
-									displayValue: val.displayValue,
-									value: val.value
-								};
-								tableObj[statTopicKey][key].displayName = ctrl.m.camelCaseToString(key);
-							});
-						}
-					});
-				});
-
-				angular.forEach(scope.activityMembers, function(val, key){
-					angular.forEach(tableObj, function(statObj){
-						angular.forEach(statObj, function(stat){
-							if (!stat.hasOwnProperty(key)){
-								stat[key] = {
-									displayValue: null,
-									value: null
-								};
-							}
-						});
-					});
-				});
-
-				return calculateRatingValues(tableObj);
-			};
-		
-			function calculateRatingValues(modelObj){
-
-				angular.forEach(modelObj, function(statObj){
-					angular.forEach(statObj, function(stat){
-						stat.ratingValues = {};
-						var highestVal = 0;
-						var lowestVal = null;
-						var statArray = [];
-
-						angular.forEach(stat, function(playerValue, playerKey){
-							var intDisplayVal = parseInt(playerValue.value);
-							highestVal = intDisplayVal > highestVal ? intDisplayVal : highestVal;
-							lowestVal = (intDisplayVal < lowestVal || !lowestVal) ? intDisplayVal : lowestVal;
-
-							if(intDisplayVal){
-								statArray.push(intDisplayVal);
-							}
-						});	
-
-						stat.ratingValues.highestVal = isNaN(highestVal) ? 0 : highestVal;
-						stat.ratingValues.lowestVal = isNaN(lowestVal) ? 0 : lowestVal;
-						stat.ratingValues.avgVal = getAvg(statArray);
-
-					});
-				});
-
-				return calculatePlayerRatings(modelObj);
-			}
-
-			function calculatePlayerRatings(ratingObj){
-
-				angular.forEach(ratingObj, function(statCat){
-					angular.forEach(statCat, function(stat){
-						var leastDifferential = null;
-						var avgPlayer;
-						angular.forEach(stat, function(playerVal, playerKey){
-							var intDisplayVal = parseInt(stat[playerKey].value);
-							var avgDifferential = Math.abs(stat.ratingValues.avgVal - intDisplayVal);
-
-							leastDifferential = (avgDifferential < leastDifferential || !leastDifferential) ? avgDifferential : leastDifferential;
-
-							if (intDisplayVal === stat.ratingValues.highestVal && stat.ratingValues.highestVal !== stat.ratingValues.avgVal){
-							 	playerVal.isGreatest = true;
-							}
-
-							if (intDisplayVal === stat.ratingValues.lowestVal && stat.ratingValues.lowestVal !== stat.ratingValues.avgVal){
-							 	playerVal.isLeast = true;
-							}
-				
-							if (avgDifferential === leastDifferential && stat.ratingValues.avgVal !== 0){
-								avgPlayer = playerKey;
-							}
-						});
-
-						if(avgPlayer){
-							stat[avgPlayer].isMostAvg = true;
-						}
-					});
-				});
-
-				scope.isLoadingCarnageReport = false;
-				return ratingObj;
-			}
+			return isNaN(avg) ? 0 : Math.round(avg * 100) / 100;
 		}
-	};
-
-	function getAvg(array){
-		var avg = 0;
-		var sum = 0;
-
-		angular.forEach(array, function(item){
-			sum += item;
-		});
-
-		avg = sum / array.length;
-
-		return isNaN(avg) ? 0 : Math.round(avg * 100) / 100;
-	}
-}]);
+};
 
 activityInfoCtrl.$inject = ['$scope'];
 
@@ -165,6 +177,11 @@ function activityInfoCtrl($scope){
 	self.m.isRankLoaded = false;
 	self.m.isSticky = false;
 	self.m.showAllRankOptions = false;
+	self.m.tableSelectionObject = {
+			selectedCell: {},
+			selectedRow: null,
+			selectedColumn: null
+	}
 	self.m.rankingCategories = {};
 	self.m.suggestedRankingCategories = {
 			kills: {
@@ -234,6 +251,9 @@ function activityInfoCtrl($scope){
 	self.m.camelCaseToString = camelCaseToString;
 	self.m.addNewItem = addNewItem;
 	self.m.removeNewItem = removeNewItem;
+	self.m.selectCell = selectCell;
+	self.m.selectColumn = selectColumn;
+	self.m.selectRow = selectRow;
 
 	$scope.$watch('chartModel', function(newVal){
 		if(newVal.trueStats){
@@ -301,6 +321,33 @@ function activityInfoCtrl($scope){
 		});		
 
 		self.m.isRankLoaded = true;
+	}
+
+	function selectCell(columnIndex, rowIndex, cellValue){
+		if(!cellValue){
+			return;
+		}
+		
+		self.m.tableSelectionObject.selectedCell = {
+			row: rowIndex,
+			column: columnIndex
+		};
+
+		console.log(self.m.tableSelectionObject.selectedCell);
+	}
+
+	function selectColumn(columnId){
+		self.m.tableSelectionObject.selectedCell = {
+			row : null,
+			column: columnId
+		}
+	}
+
+	function selectRow(rowId){
+		self.m.tableSelectionObject.selectedCell = {
+			row : rowId,
+			column: null
+		}
 	}
 
 	function camelCaseToString(val){

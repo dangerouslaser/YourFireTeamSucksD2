@@ -7,6 +7,8 @@ $font-size: 14px;
 $stats-table-primary-color: #888888;
 $row-title-color: #ea9b39;
 $shitlord-color: #fff;
+$row-title-color-selected: #00ff95;
+$highlight-tablerow: #375649;
 
 html, body {
 	position: relative;
@@ -104,6 +106,14 @@ input.player-input {
 	position: relative;
 	margin:0 auto;
 	width:25%;
+}
+
+.section{
+    position: relative;
+    display: block;
+    padding:10px;
+    border: 1px solid #24374a;
+    margin-top:10px;
 }
 
 .character-selection-container{
@@ -231,11 +241,11 @@ input.player-input {
 
 #stats-table-container{
     position: relative;
-    min-width: 680px;
+    /*min-width: 680px;*/
     margin: 0 auto;
     background: #101215;
     border-radius: 3px;
-    border: 5px solid #1e466d;
+    border: 1px solid #1e466d;
     color: $stats-table-primary-color;
 }
 
@@ -254,13 +264,16 @@ input.player-input {
     position: relative;
     display: flex;
     width:100%;
+    cursor:pointer;
+
+    &.is-selected{
+        box-shadow: 0px 0px 10px 2px $highlight-tablerow;
+        border-radius: 3px;
+        z-index: 1;
+    }
 }
 
-#stats-table .stat-row.odd{
-    background: #181d25;
-}
-
-#stats-table .stat-row .column{
+#stats-table .stat-row .cell{
     position: relative;
     width:100%;
 }
@@ -274,7 +287,7 @@ input.player-input {
 
 #stats-table .stats-main-header-container.is-fixed{
     position: fixed;
-    z-index: 1;
+    z-index: 100;
     width: 100%;
     top: 0;
     background: #12171c;
@@ -283,7 +296,7 @@ input.player-input {
 
 #stats-table .fixed-header-push{
     position: relative; 
-    height: 137px;
+    height: 130px;
 }
 
 #stats-table .stats-main-header-container.is-fixed .stats-main-header-content{
@@ -309,7 +322,7 @@ input.player-input {
     margin: 0 auto;
 }
 
-#stats-table .stats-main-header-container .stats-main-header .column-spacer{
+#stats-table .stats-main-header-container .stats-main-header .cell-spacer{
     display: inline-block;
     text-align: center;
     float: left;
@@ -335,26 +348,47 @@ input.player-input {
     margin-right:5px;
 }
 
-#stats-table .column{
+#stats-table .cell{
     display: inline-block;
-    overflow: hidden;
     padding:5px;
     text-align: left;
     width: 100%;
+    margin:2px;
 }
 
-#stats-table .column.row-title{
+#stats-table .cell.row-title{
     color: $row-title-color;
 }
 
-#stats-table .column.header{
+#stats-table .stat-row.is-selected .cell.row-title{
+    color: $row-title-color-selected;
+}
+
+#stats-table .cell.header{
     text-align: right;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;
 }
 
-#stats-table .column.activity-title{
+#stats-table .cell.header.is-selected{
+    overflow: none;
+}
+
+#stats-table .cell.header.is-selected .selected-column-highlight{
+    box-shadow: 0px 0px 10px 2px $highlight-tablerow;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 3px;
+    padding-bottom: 3px;
+
+    &.is-fixed{
+        height: 100%;
+    }
+}
+
+#stats-table .cell.activity-title{
     text-align:center;
     color: #fff;
     font-size: 150%;
@@ -362,7 +396,7 @@ input.player-input {
 }
 
 #stats-table-container .stat-row.header-row{
-    color: $row-title-color;
+    color: $row-title-color-selected;
 }
 
 #stats-table-container .stat-row.row-rankings{
@@ -372,23 +406,36 @@ input.player-input {
     color: $shitlord-color;
 }
 
-#stats-table .column.row-value-player{
+#stats-table .cell.row-value-player{
     text-align: right;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+
+    &.highlight {
+        border: 1px solid $row-title-color-selected;
+        border-radius: 3px;
+        box-shadow: 0px 0px 5px 1px $row-title-color-selected;
+    }
 }
 
-#stats-table .column.row-value-player.is-greatest{
+#stats-table .stat-row.odd .cell{
+    background: #181d25;
+}
+
+#stats-table .cell.row-value-player.is-greatest{
     color: #41d641;
+    cursor:pointer;
 }
 
-#stats-table .column.row-value-player.is-least{
+#stats-table .cell.row-value-player.is-least{
     color: #e62424;
+    cursor:pointer;
 }
 
-#stats-table .column.row-value-player.is-avg{
+#stats-table .cell.row-value-player.is-avg{
     color: #19a0e0;
+    cursor:pointer;
 }
 
 #stats-table .activity-icon{
@@ -400,17 +447,18 @@ input.player-input {
 .rank-options-container{
     position: relative;
     display:inline-block;
-    width:100%;
 }
 
 .rank-options-container.bordered{
     border: 1px solid #24374a;
+    padding:10px;
 }
 
 .rank-options{
     position:relative;
-    width:90%;
+    width:100%;
     margin: 0 auto;
+    display: inline-block;
 }
 
 .rank-option{
@@ -419,14 +467,17 @@ input.player-input {
     position: relative;
     float: left;
     text-align: left;
-    margin: 5px;
-    min-width: 150px;
+    margin: 10px;
+    min-width: 100px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     max-width: 150px;
     padding: 10px;
     border-radius: 3px;
+
+    border: 1px solid #00ff95;
+    color: #00ff95;
 }
 
 .rank-option.newItem{
