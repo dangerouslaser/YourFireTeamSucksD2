@@ -1,43 +1,48 @@
 <div id="ActivityContainer">
 	<span ng-if="ctrl.m.isLoadingCarnageReport">Loading Post Game Carnage Report...</span>
 
-	<div class="rank-toggle-container">
-		<button class="tab" ng-show="isShowRankings" ng-click="isShowRankings = false; isShowUnusedRankings = false">Hide Ranks</button>
-		<button class="tab" ng-hide="isShowRankings" ng-click="isShowRankings = true; isShowUnusedRankings = false">Show Ranks</button>
-	</div>
-	<div class="rank-options-container" ng-show="isShowRankings">
-		<div class="tabs-container">
-			<button class="tab" ng-class="{'selected': !isShowUnusedRankings}" ng-click="isShowUnusedRankings = false">Used</button>
-			<button class="tab" ng-class="{'selected': isShowUnusedRankings}" ng-click="isShowUnusedRankings = true">Unused</button>
-		</div>
-		<div class="rank-options-container bordered">
-			<div class="rank-options">
-				<div class="used-ranks" ng-if="!isShowUnusedRankings">
-					<div class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="rank.isUse" ng-class="{'newItem' : rank.isNew}">
-						<span>{{rank.displayName}}: </span>
-						<number-picker 
-							values-array="ctrl.m.weightValueArray" 
-							value-key="weight"
-							input-model="rank">
-						</number-picker>
-					</div>
+
+	<toggle-section is-open="isShowRankings" section-title="Ranks">
+		<div ng-show="isShowRankings">
+			<div class="rank-options-container" ng-show="isShowRankings">
+				<div class="tabs-container">
+					<button class="tab" ng-class="{'selected': !ctrl.m.isShowUnusedRankings}" ng-click="ctrl.m.isShowUnusedRankings = false">Used</button>
+					<button class="tab" ng-class="{'selected': ctrl.m.isShowUnusedRankings}" ng-click="ctrl.m.isShowUnusedRankings = true">Unused</button>
 				</div>
-				<div class="unused-ranks" ng-if="isShowUnusedRankings">
-					<div class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="!rank.isUse">
-						<span>{{rank.displayName}}: </span>
-						<number-picker
-							on-change="ctrl.m.addNewItem"
-							values-array="ctrl.m.weightValueArray" 
-							value-key="weight"
-							input-model="rank">
-						</number-picker>
+				<div class="rank-options-container bordered">
+					<div class="rank-options">
+						<div class="used-ranks" ng-if="!ctrl.m.isShowUnusedRankings">
+							<div style="display:inline-block;">
+								<div class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="rank.isUse" animated-glow is-active="{{rank.isNew}}" delay="800" >
+									<span>{{rank.displayName}}: </span>
+									<number-picker 
+										on-change="ctrl.m.changedRankValue"
+										values-array="ctrl.m.weightValueArray" 
+										value-key="weight"
+										input-model="rank">
+									</number-picker>
+								</div>
+							</div>
+							<div>
+								<button id="rank-submit-button" class="submit" animated-glow is-active="{{ctrl.m.isRankNeedsUpdate}}" delay="800" ng-click="ctrl.m.calculatePlayerStandings()">Rank</button>
+							</div>
+						</div>
+						<div class="unused-ranks" ng-if="ctrl.m.isShowUnusedRankings">
+							<div class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="!rank.isUse">
+								<span>{{rank.displayName}}: </span>
+								<number-picker
+									on-change="ctrl.m.addNewItem"
+									values-array="ctrl.m.weightValueArray" 
+									value-key="weight"
+									input-model="rank">
+								</number-picker>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-
-	<button ng-click="ctrl.m.calculatePlayerStandings()">Rank</button>
+	</toggle-section>
 	<div id="stats-table-container">
 		<div id="stats-table" sticky-container is-sticky="ctrl.m.isSticky" sticky-class="stats-main-header">
 			<div class="stats-main-header-container" ng-class="{'is-fixed' : ctrl.m.isSticky}">
@@ -52,36 +57,45 @@
 							<img class="activity-icon" src="http://www.bungie.net{{activityInfo.definitions.activities[0].icon}}" />
 							<span class="cell activity-title">{{activityInfo.definitions.activities[0].activityName}} - {{activityInfo.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="stat-row header-row">
-								<span class="cell"></span>
+								<span class="cell">Stat</span>
 								<span class="cell header" 
 								      ng-repeat="(key, val) in ctrl.m.activityMembers track by $index" 
 								      ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}" 
-								      ng-click="ctrl.m.selectColumn($index)">{{val.displayName}}
-								<div class="selected-column-highlight" 
-									 ng-style="fixedHeight" 
-									 ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index" 
-									 ng-class="{'is-fixed' : ctrl.m.isSticky}"></div>
+								      ng-click="ctrl.m.selectColumn($index)">
+								      <span>{{val.displayName}}</span>
+								      <br/>
+									  <span ng-if="ctrl.m.isRankLoaded">{{val.rank.totalScore}}</span>
 								</span>
-							</div>
-							<div class="stat-row row-rankings" ng-if="ctrl.m.isRankLoaded">
-								<span class="cell" class="stat-display-name">Shit Lord Rating:</span>
-								<span class="cell row-value-player" ng-repeat="player in ctrl.m.activityMembers track by $index">{{player.rank.totalScore}}</span>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="stat-row header-row" ng-if="ctrl.m.isSticky">
+			<!--<div class="stat-row header-row" ng-if="!ctrl.m.isSticky">
 				<span class="cell"></span>
 				<span class="cell header" ng-repeat="(key, val) in ctrl.m.activityMembers track by $index" ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}">{{val.displayName}}
 					<div class="selected-column-highlight" 
 						 ng-style="fixedHeight"
-						 ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index"></div>
+						 ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index">
+					</div>
 				</span>
-				<!--<div class="fixed-header-push" ng-show="ctrl.m.isSticky"></div>-->
+				<div class="fixed-header-push"></div>
+			</div>-->
+
+			<div id="hidden-header" class="stat-row">
+				<span class="cell row-title stat-display-name"></span>
+				<span ng-repeat="(key, val) in ctrl.m.activityMembers track by $index"
+					  class="cell row-value-player"
+					  ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}" >
+					   <div class="selected-column-highlight"
+						 ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index" 
+						 >
+					</div>
+				</span>
 			</div>
+			<div class="fixed-header-push"></div>
 			<div ng-class="{'odd' : $odd, 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.row === $index}" class="stat-row" ng-repeat="stat in ctrl.m.chartModel.trueStats track by $index">
-				<span class="cell row-title" class="stat-display-name" ng-click="ctrl.m.selectRow($index)">{{stat.displayName}}</span>
+				<span class="cell row-title stat-display-name" ng-click="ctrl.m.selectRow($index)">{{stat.displayName}}</span>
 				<span ng-repeat="(key, val) in activityMembers track by $index"
 					  ng-class="{'is-greatest' : stat[key].isGreatest, 'is-least' : stat[key].isLeast, 'is-avg' : stat[key].isMostAvg, 'highlight' : (ctrl.m.tableSelectionObject.selectedCell.column === $index && ctrl.m.tableSelectionObject.selectedCell.row === $parent.$index)}" class="cell row-value-player" 
 					  title="{{'(avg: ' + stat.ratingValues.avgVal + '; low: ' + stat.ratingValues.lowestVal + '; high: ' + stat.ratingValues.highestVal + ';)' }}" 
@@ -90,11 +104,12 @@
 				</span>
 			</div>
 			<div ng-class="{'odd' : $odd}" class="stat-row" ng-repeat="stat in chartModel.extendedWeaponsStats track by $index">
-				<span class="cell row-title" class="stat-display-name">{{stat.displayName}}</span>
+				<span class="cell row-title stat-display-name" ng-click="ctrl.m.selectRow($index)">{{stat.displayName}}</span>
 				<span ng-repeat="(key, val) in activityMembers track by $index" 
-					  ng-class="{'is-greatest' : stat[key].isGreatest, 'is-least' : stat[key].isLeast, 'is-avg' : stat[key].isMostAvg}" 
+					  ng-class="{'is-greatest' : stat[key].isGreatest, 'is-least' : stat[key].isLeast, 'is-avg' : stat[key].isMostAvg, 'highlight' : (ctrl.m.tableSelectionObject.selectedCell.column === $index && ctrl.m.tableSelectionObject.selectedCell.row === $parent.$index)}" class="cell row-value-player" 
 					  class="cell row-value-player" 
-					  title="{{'(avg: ' + stat.ratingValues.avgVal + '; low: ' + stat.ratingValues.lowestVal + '; high: ' + stat.ratingValues.highestVal + ';)' }}">{{stat[key].displayValue}}</span>
+					  title="{{'(avg: ' + stat.ratingValues.avgVal + '; low: ' + stat.ratingValues.lowestVal + '; high: ' + stat.ratingValues.highestVal + ';)' }}"
+					  ng-click="ctrl.m.selectCell($index, $parent.$index, stat[key].displayValue)">{{stat[key].displayValue}}</span>
 			</div>
 		</div>
 	</div>

@@ -2,6 +2,7 @@ angular.module('fireTeam.common')
 	.factory('ActivityModelFactory', ['$q','PlayerOptionsService', function ($q, playerOptionsService) {
     'use strict';
 
+    var deferred;
 	var activityModel, activityPromises;
 	var instanceModel, instancePromises;
 	var progress = 0;
@@ -15,6 +16,12 @@ angular.module('fireTeam.common')
 		},
 		getProgress: function(){
 			return progress;
+		},
+		cancelAllPromises: function(){
+			if(deferred){
+				return deferred.resolve("user cancelled");
+			}
+			return "nothing to resolve";
 		},
 		clearActivityModel: clearActivityModel,
 		clearInstanceModel: clearInstanceModel

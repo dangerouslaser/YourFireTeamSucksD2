@@ -10,9 +10,10 @@
 		<!--<link href="css/style.css" type="text/css" rel="stylesheet"/>-->
 		<link href="css/sass.css" type="text/css" rel="stylesheet"/>
 
+		<script src="lib/jquery.min.js"></script>
 		<script src="lib/angular.min.js"></script>
 		<script src="lib/angular-routes.min.js"></script>
-		<script src="lib/jquery.min.js"></script>
+		<script src="lib/angular-cookies.min.js"></script>
 		
 		<script type="text/javascript" src="common/fire-team.module.js"></script>
 		<script type="text/javascript" src="common/common.module.js"></script>
@@ -32,57 +33,90 @@
 		<script type="text/javascript" src="common/directives/input.directive.js"></script>
 		<script type="text/javascript" src="common/directives/number-picker.directive.js"></script>
 		<script type="text/javascript" src="common/directives/sticky-container.directive.js"></script>
-
+		<script type="text/javascript" src="common/directives/toggle-section.directive.js"></script>
+		<script type="text/javascript" src="common/directives/animated-glow.directive.js"></script>
 	</head>
 	<body>
 	<div class="main-container">
 		<div class="content" ng-controller="mainCtrl">
 
-			<button ng-click="m.selectedActivity = m.testObject">TEST OBJECT!</button>
-
+			<button ng-click="selectActivity(m.testObject)" class="submit">TEST OBJECT!</button>
 			<h3 class="header-text"></h3>
-				<div>
-					<div class="search-player-container">
-						<span>FireTeam Members:</span>
-						<input-directive 
-							ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
-							ng-repeat="member in m.playersArrays track by $index"
-							input-model="member"
-							tab-index="{{$index + 1}}"
-							ng-keydown="keyDownEvt($event)">
-						</input-directive>
 
-						<div>
-							<button id="PlayerSearch" tabindex="8" class="button" ng-click="getFireTeamModel(m.selectedPlatform)">
-								Search
-							</button>
-							<button id="MoreResults" ng-if="m.initialSearchRun" tabindex="8" ng-click="getMoreResults()">More Results</button>
-							<span class="results">{{m.fireTeamActivityResults.length}}</span>
+			<div class="search-container">
+
+				<div class="search-content">
+					<div class="platform-type-container">
+						<div class="platform-selection" ng-class="{'selected' : m.selectedPlatform.id !== platform.id}" ng-repeat="platform in m.platformTypes track by $index" ng-click="m.selectedPlatform = platform">
+							{{platform.displayValue}}
+						</div>
+					</div>
+
+					<div class="toggle-button-container recent-search" ng-mouseover="m.showRecentSearches = true" ng-mouseout="m.showRecentSearches = false">
+						<span class="section-title">Recent Searches</span>
+						<div class="dropdown recent-search-container" ng-show="m.showRecentSearches">
+							<div class="recent-search" ng-repeat="search in m.recentSearches track by $index" ng-click="loadRecentSearch($index)">
+								<span>{{search.platformType.displayValue.toUpperCase()}}:</span>
+								<span ng-repeat="player in search.players track by $index" ng-if="!player.isPlaceHolder">
+									{{player.displayName}}
+									<span ng-if="$index !== search.players.length-2">,</span>
+								</span>
+							</div>
+						</div>
+						<button class="is-open">></button>
+					</div>
+				</div>
+
+				<div class="search-content">
+					<input-directive 
+						ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
+						ng-repeat="member in m.playersArrays track by $index"
+						input-model="member"
+						tab-index="{{$index + 1}}"
+						ng-keydown="keyDownEvt($event)">
+					</input-directive>
+				</div>
+
+				<div class="search-content">
+					<button id="PlayerSearch" class="submit" tabindex="8" class="button" ng-click="getFireTeamModel()">
+						Search
+					</button>
+					<button id="MoreResults" class="submit" ng-if="m.initialSearchRun" tabindex="8" ng-click="getMoreResults()">More Results</button>
+					<span class="results">{{m.fireTeamActivityResults.length}}</span>
+				</div>
+			</div>
+
+			<div class="loading-overlay" ng-if="m.isLoadingData">
+				<span ng-hide="m.activityListProgress.totalActivities">
+					Finding activity matches...
+				</span>
+				<button class="submit" ng-click="cancelSearch()">cancel</button>
+				<span ng-show="m.activityListProgress.totalActivities">
+					{{m.activityListProgress.totalActivities}} matches found
+				</span>
+				<span ng-show="m.showProgressMessage">
+					<span>Loading activity details:</span>
+					<span>{{m.activityListProgress.activitiesLoaded}} / {{m.activityListProgress.totalActivities}}</span>
+					<span>{{m.activityListProgress.percentComplete}} %</span>
+				</span>
+			</div>
+<!-- 
+			<toggle-section is-open="m.showRecentSearches" section-title="Recent Searches">
+				<div class="recent-search-container">
+					<div ng-if="m.showRecentSearches">
+						<div ng-repeat="search in m.recentSearches track by $index" ng-click="loadRecentSearch($index)">
+							<span ng-repeat="player in search.players track by $index" ng-if="!player.isPlaceHolder">
+								{{player.displayName}}; 
+							</span>
 						</div>
 					</div>
 				</div>
+			</toggle-section> -->
 
-				<div class="loading-overlay" ng-if="m.isLoadingData">
-					<span ng-hide="m.activityListProgress.totalActivities">
-						Finding activity matches...
-					</span>
-					<span ng-show="m.activityListProgress.totalActivities">
-						{{m.activityListProgress.totalActivities}} matches found
-					</span>
-					<span ng-show="m.showProgressMessage">
-						<span>Loading activity details:</span>
-						<span>{{m.activityListProgress.activitiesLoaded}} / {{m.activityListProgress.totalActivities}}</span>
-						<span>{{m.activityListProgress.percentComplete}} %</span>
-					</span>
-				</div>
-
-				<span ng-if="m.errorMessage">{{m.errorMessage}}</span>
-				<div ng-if="!m.isLoadingData">
-					<div class="character-selection-button-container">
-						<button ng-hide="m.showActivityList" ng-click="m.showActivityList = true">Show Activity Results</button>
-						<button ng-show="m.showActivityList && m.fireTeamMembers.length > 1" ng-click="m.showActivityList = false">Hide Activity Results</button>
-					</div>
-					<div class="character-selection-container" ng-show="m.showActivityList">
+			<span ng-if="m.errorMessage">{{m.errorMessage}}</span>
+			<div>
+				<toggle-section is-open="m.isShowActivityList" section-title="Activity List" ng-if="!m.isLoadingData && m.fireTeamMembers.length > 0">
+					<div class="character-selection-container" ng-show="m.isShowActivityList">
 						<span class="user-name" data-username={{m.playerInfo.displayName}}>
 							{{m.playerInfo.displayName}}
 						</span>
@@ -111,13 +145,12 @@
 							</div>
 						</div>
 					</div>
-
-					<activity-info
-						ng-if="m.selectedActivity"
-						activity-info="m.selectedActivity">
-					</activity-info>
-
-				</div>
+				</toggle-section>
+				<activity-info
+					ng-if="m.selectedActivity"
+					activity-info="m.selectedActivity">
+				</activity-info>
+			</div>
 		</div>
 	</div>
 	</body>

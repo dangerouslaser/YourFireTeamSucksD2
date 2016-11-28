@@ -34,7 +34,22 @@ angular.module('fireTeam.common')
 
 		playerOptionsService.getMembershipId({memberType: memberType, userName: userName}).then(function (response) {	
 			var membershipModel = response.data;
-			playerOptionsService.getBaseCharacterInfo({membershipId: response.data.membershipId}).then(function (response) {	
+			if(!membershipModel && membershipModel === ""){
+				var customErrorObject = {
+											ErrorCode: 100, 
+											data: {
+												Message: 'User "' + userName + '" not found.'
+											}
+										};
+				deferred.resolve(customErrorObject);
+				return deferred.promise;
+			}
+			playerOptionsService.getBaseCharacterInfo({membershipId: response.data.membershipId}).then(function (response) {
+				if(response.data.ErrorCode > 1){
+					deferred.resolve(response.data);
+					return deferred.promise;
+				}
+
 				response = response.data.Response.data
 				response.membershipInfo = membershipModel;
 

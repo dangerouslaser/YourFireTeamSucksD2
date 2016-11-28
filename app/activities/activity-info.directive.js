@@ -3,7 +3,7 @@ angular
 	.controller('activityInfoCtrl', activityInfoCtrl)
 	.directive('activityInfo', activityInfo);
 
-	activityInfo.$inject = ['FireTeamModelFactory', '$timeout'];
+	activityInfo.$inject = ['FireTeamModelFactory', '$timeout', '$window'];
 
 	function activityInfo(fireTeamModelFactory, $timeout) {
 		return {
@@ -21,20 +21,16 @@ angular
 				scope.chartModel = {};
 				scope.activityMembers = {};
 				scope.isShowRankings = true;
-				scope.isShowUnusedRankings = false;
+				scope.isShowTable = true;
 
 				scope.$watch('activityInfo', function(newVal){
 					if(newVal){
 						getFireTeam();
-					}
-				});
-
-				scope.$watch('chartModel.trueStats', function(newVal){
-					if(newVal){
-						$timeout(function() {
-							var $tableElement = angular.element(element[0].querySelector('#stats-table-container'));
-							scope.fixedHeight = {'height' : $tableElement[0].offsetHeight + 10 + 'px'};
-						}, 10);
+						// $timeout(function() {
+						// 	var $tableElement = angular.element(element[0].querySelector('#stats-table-container'));
+						// 	var scrollToTablePos = $tableElement[0].getBoundingClientRect().top;
+						// 	$("body").animate({scrollTop: scrollToTablePos}, "fast");
+						// }, 500);
 					}
 				});
 
@@ -176,7 +172,9 @@ function activityInfoCtrl($scope){
 	self.m = $scope;
 	self.m.isRankLoaded = false;
 	self.m.isSticky = false;
-	self.m.showAllRankOptions = false;
+	self.m.isShowUnusedRankings = false;
+	self.m.isRankNeedsUpdate = true;
+
 	self.m.tableSelectionObject = {
 			selectedCell: {},
 			selectedRow: null,
@@ -254,6 +252,7 @@ function activityInfoCtrl($scope){
 	self.m.selectCell = selectCell;
 	self.m.selectColumn = selectColumn;
 	self.m.selectRow = selectRow;
+	self.m.changedRankValue = changedRankValue;
 
 	$scope.$watch('chartModel', function(newVal){
 		if(newVal.trueStats){
@@ -321,13 +320,10 @@ function activityInfoCtrl($scope){
 		});		
 
 		self.m.isRankLoaded = true;
+		self.m.isRankNeedsUpdate = false;
 	}
 
-	function selectCell(columnIndex, rowIndex, cellValue){
-		if(!cellValue){
-			return;
-		}
-		
+	function selectCell(columnIndex, rowIndex, cellValue){		
 		self.m.tableSelectionObject.selectedCell = {
 			row: rowIndex,
 			column: columnIndex
@@ -359,15 +355,21 @@ function activityInfoCtrl($scope){
 	}
 
 	function removeNewItem(rank){
-		delete rank.isNew;
+		rank.isNew = false;
+	}
+
+	function changedRankValue(rank){
+		console.log(rank)
+		rank.isNew = true;
+		self.m.isRankNeedsUpdate = true;
 	}
 
 	function addNewItem(rank){
-		delete rank.isNew;
+		rank.isNew = false;
 		if(rank.weight !== 0){
 			rank.isUse = true;
 			rank.isNew = true;
-			self.m.isShowUnusedRankings = false;
+			self.m.isRankLoaded = false;
 		}
 	}
 
