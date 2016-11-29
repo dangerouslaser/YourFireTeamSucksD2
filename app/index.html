@@ -40,7 +40,7 @@
 	<div class="main-container">
 		<div class="content" ng-controller="mainCtrl">
 
-			<button ng-click="selectActivity(m.testObject)" class="submit">TEST OBJECT!</button>
+			<!--<button ng-click="selectActivity(m.testObject)" class="submit">TEST OBJECT!</button>-->
 			<h3 class="header-text"></h3>
 
 			<div class="search-container">
@@ -52,7 +52,7 @@
 						</div>
 					</div>
 
-					<div class="toggle-button-container recent-search" ng-mouseover="m.showRecentSearches = true" ng-mouseout="m.showRecentSearches = false">
+					<div class="toggle-button-container recent-search" ng-if="m.recentSearches.length > 0" ng-mouseover="m.showRecentSearches = true" ng-mouseout="m.showRecentSearches = false">
 						<span class="section-title">Recent Searches</span>
 						<div class="dropdown recent-search-container" ng-show="m.showRecentSearches">
 							<div class="recent-search" ng-repeat="search in m.recentSearches track by $index" ng-click="loadRecentSearch($index)">
@@ -96,7 +96,7 @@
 					<span ng-show="m.showProgressMessage">
 						<span>Loading activity details:</span>
 						<span>{{m.activityListProgress.activitiesLoaded}} / {{m.activityListProgress.totalActivities}}</span>
-						<span>{{m.activityListProgress.percentComplete}} %</span>
+						<span>({{m.activityListProgress.percentComplete}}%)</span>
 					</span>
 				</div>
 			</div>
