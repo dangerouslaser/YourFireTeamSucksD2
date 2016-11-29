@@ -435,6 +435,8 @@ input.player-input {
 
 #stats-table .cell.row-title{
     color: $row-title-color;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #stats-table .stat-row.is-selected .cell.row-title{

@@ -344,7 +344,9 @@ input.player-input {
   margin: 2px; }
 
 #stats-table .cell.row-title {
-  color: #ea9b39; }
+  color: #ea9b39;
+  overflow: hidden;
+  text-overflow: ellipsis; }
 
 #stats-table .stat-row.is-selected .cell.row-title {
   color: #00ff95; }
