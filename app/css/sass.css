@@ -596,4 +596,34 @@ input.player-input {
   background: #5B84D2;
   color: #fff; }
 
+#stats-table .cell div.tool-tip {
+  padding: 10px;
+  width: 100px;
+  position: absolute;
+  bottom: 100%;
+  left: 100%;
+  z-index: 1000;
+  background: #181d25;
+  border-radius: 3px;
+  box-shadow: 0px 1px 10px 0px #ffffff; }
+  #stats-table .cell div.tool-tip.bottom {
+    top: 100%;
+    bottom: auto; }
+  #stats-table .cell div.tool-tip.left {
+    right: 100%;
+    left: auto; }
+
+#stats-table .cell div.tool-tip span {
+  display: block;
+  text-align: left; }
+
+#stats-table .cell div.tool-tip span.low {
+  color: #e62424; }
+
+#stats-table .cell div.tool-tip span.avg {
+  color: #19a0e0; }
+
+#stats-table .cell div.tool-tip span.high {
+  color: #41d641; }
+
 /*# sourceMappingURL=sass.css.map */

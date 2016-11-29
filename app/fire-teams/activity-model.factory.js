@@ -9,7 +9,8 @@ angular.module('fireTeam.common')
 
 	var activityModelObject = {
 		getFireTeamActivities: function(instanceArray) {
-			return $q.when(activityModel || activityPromises || getFireTeamActivities(instanceArray));
+			//return $q.when(activityModel || activityPromises || getFireTeamActivities(instanceArray));
+			return getFireTeamActivities(instanceArray);
 		},
 		getPlayerInstanceList: function(fireTeamObject) {
 			return getPlayerInstanceList(fireTeamObject);
@@ -18,6 +19,7 @@ angular.module('fireTeam.common')
 			return progress;
 		},
 		cancelAllPromises: function(){
+			progress = 0;
 			if(deferred){
 				return deferred.resolve("user cancelled");
 			}

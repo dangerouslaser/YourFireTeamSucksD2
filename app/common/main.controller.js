@@ -29,6 +29,8 @@ angular.module('fireTeam.common')
 			errorMessage: null,
 			initialSearchRun: false
 		}
+		m.pollingTimeout;
+		m.activityLookupPerSearch = 10;
 		m.hidePlaceHolder = false;
 		m.isShowActivityList = true;
 		m.showProgressMessage = false;
@@ -132,6 +134,7 @@ angular.module('fireTeam.common')
 			m.isShowActivityList = true;
 			m.errorMessage = null;
 
+			m.fireTeamActivityResults = [];
 			fireTeamModelFactory.clear();
 
 			fireTeamModelFactory.getFireTeam(m.selectedPlatform.id, m.playersArrays).then(function(response){
@@ -140,12 +143,13 @@ angular.module('fireTeam.common')
 					throwError(response[0].data);
 					return;
 				}
-
+				console.log('fireteam response')
 				m.fireTeamMembers = response;
 				m.fireTeamMembers.gameMode = m.gameMode;
 				m.fireTeamMembers.pageNum = 0;
 
 				activityModelFactory.getPlayerInstanceList(m.fireTeamMembers).then(function(response){
+					console.log('go fetch matches')
 					if(response.length > 0){
 						getFireTeamInstanceData(compareInstances(response));
 					}
@@ -181,11 +185,9 @@ angular.module('fireTeam.common')
 				return;
 			}
 
-			resetProgressData();
 			m.isLoadingData = true;
 			m.fireTeamMembers.pageNum += 1;
 			activityModelFactory.getPlayerInstanceList(m.fireTeamMembers).then(function(response){
-				console.log(response)
 				if(response.length > 0){
 					getFireTeamInstanceData(compareInstances(response));
 				}
@@ -200,21 +202,58 @@ angular.module('fireTeam.common')
 				m.isLoadingData = false;
 				getMoreResults();
 				return;
+			}	
+
+			var originalArrayLength = instanceIdArray.length;
+
+			getActiviesPagination(instanceIdArray, m.activityLookupPerSearch);
+
+			// activityModelFactory.getFireTeamActivities(instanceIdArray).then(function(response){
+			// 	console.log('all instance arrays - lets try to page this');
+			// 	if(response[0].ErrorCode && response[0].ErrorCode > 1){
+			// 		throwError(response[0]);
+			// 		return;
+			// 	}
+
+			// 	angular.merge(m.fireTeamActivityResults, response);
+
+			// 	m.isLoadingData = false;
+			// 	m.initialSearchRun = true;
+			// });
+
+			startPollingForProgress(100, originalArrayLength);
+		}
+
+		function getActiviesPagination(array, amountToProcess){
+
+			if(array.length < amountToProcess){
+				amountToProcess = array.length;
 			}
 
-			activityModelFactory.getFireTeamActivities(instanceIdArray).then(function(response){
-				console.log(response);
+			var arrayToProcess = array.splice(0, amountToProcess);
+			var remainingLength = array.length;
+
+			activityModelFactory.getFireTeamActivities(arrayToProcess).then(function(response){
 				if(response[0].ErrorCode && response[0].ErrorCode > 1){
 					throwError(response[0]);
 					return;
 				}
 
-				angular.merge(m.fireTeamActivityResults, response);
-
-				m.isLoadingData = false;
+				angular.forEach(response, function(activity){
+					m.fireTeamActivityResults.push(activity);
+				});
+			
 				m.initialSearchRun = true;
+
+				if(remainingLength > 0){
+					getActiviesPagination(array, amountToProcess);
+				}
+				else{
+					m.isLoadingData = false;
+					resetProgressData();
+				}
+
 			});
-			startPollingForProgress(100, instanceIdArray.length);
 		}
 
 		function startPollingForProgress(delay, matches){
@@ -222,7 +261,7 @@ angular.module('fireTeam.common')
 				delay += (delay * .2);
 			}
 			m.activityListProgress.totalActivities = matches;
-			$timeout(function() {
+			m.pollingTimeout = $timeout(function() {
 				var progress = activityModelFactory.getProgress();
 				m.activityListProgress = {
 					totalActivities: matches,
@@ -251,6 +290,7 @@ angular.module('fireTeam.common')
 				}
 			}
 
+			console.log('instances compared')
 			return matchArray;
 		}
 
@@ -306,5 +346,17 @@ angular.module('fireTeam.common')
 		function resetProgressData(){
 			m.activityListProgress = {};
 			m.showProgressMessage = false;
+
+			if(m.pollingTimeout){
+				$timeout.cancel(m.pollingTimeout);
+			}
+
+			m.activityListProgress = {
+					totalActivities: 0,
+					activitiesLoaded: 0,
+					percentComplete: 0
+				}
 		}
 	};
+
+

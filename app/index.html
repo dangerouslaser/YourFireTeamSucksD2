@@ -77,28 +77,28 @@
 					</input-directive>
 				</div>
 
-				<div class="search-content">
+				<div class="search-content" ng-if="!m.isLoadingData">
 					<button id="PlayerSearch" class="submit" tabindex="8" class="button" ng-click="getFireTeamModel()">
 						Search
 					</button>
-					<button id="MoreResults" class="submit" ng-if="m.initialSearchRun" tabindex="8" ng-click="getMoreResults()">More Results</button>
-					<span class="results">{{m.fireTeamActivityResults.length}}</span>
+					<button id="MoreResults" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" tabindex="8" ng-click="getMoreResults()">	More Results
+					</button>
 				</div>
-			</div>
 
-			<div class="loading-overlay" ng-if="m.isLoadingData">
-				<span ng-hide="m.activityListProgress.totalActivities">
-					Finding activity matches...
-				</span>
-				<button class="submit" ng-click="cancelSearch()">cancel</button>
-				<span ng-show="m.activityListProgress.totalActivities">
-					{{m.activityListProgress.totalActivities}} matches found
-				</span>
-				<span ng-show="m.showProgressMessage">
-					<span>Loading activity details:</span>
-					<span>{{m.activityListProgress.activitiesLoaded}} / {{m.activityListProgress.totalActivities}}</span>
-					<span>{{m.activityListProgress.percentComplete}} %</span>
-				</span>
+				<div class="loading-overlay" ng-if="m.isLoadingData">
+					<span ng-hide="m.activityListProgress.totalActivities">
+						Finding activity matches...
+					</span>
+					<button class="submit" ng-click="cancelSearch()">cancel</button>
+					<span ng-show="m.activityListProgress.totalActivities">
+						{{m.activityListProgress.totalActivities}} matches found.
+					</span>
+					<span ng-show="m.showProgressMessage">
+						<span>Loading activity details:</span>
+						<span>{{m.activityListProgress.activitiesLoaded}} / {{m.activityListProgress.totalActivities}}</span>
+						<span>{{m.activityListProgress.percentComplete}} %</span>
+					</span>
+				</div>
 			</div>
 <!-- 
 			<toggle-section is-open="m.showRecentSearches" section-title="Recent Searches">
@@ -115,10 +115,10 @@
 
 			<span ng-if="m.errorMessage">{{m.errorMessage}}</span>
 			<div>
-				<toggle-section is-open="m.isShowActivityList" section-title="Activity List" ng-if="!m.isLoadingData && m.fireTeamMembers.length > 0">
+				<toggle-section is-open="m.isShowActivityList" section-title="Activity List" ng-if="m.fireTeamActivityResults.length > 0">
 					<div class="character-selection-container" ng-show="m.isShowActivityList">
-						<span class="user-name" data-username={{m.playerInfo.displayName}}>
-							{{m.playerInfo.displayName}}
+						<span>
+							Found {{m.fireTeamActivityResults.length}} result(s):
 						</span>
 						<div class="character-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults track by $index" ng-click="selectActivity(activity)">
 						<img class="activity-icon" src="http://www.bungie.net{{activity.definitions.activityTypes[0].icon}}" />
