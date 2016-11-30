@@ -34,6 +34,7 @@ angular.module('fireTeam.common')
 
 		playerOptionsService.getMembershipId({memberType: memberType, userName: userName}).then(function (response) {	
 			var membershipModel = response.data;
+			console.log(response);
 			if(!membershipModel && membershipModel === ""){
 				var customErrorObject = {
 											ErrorCode: 100, 
