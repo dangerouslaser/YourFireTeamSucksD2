@@ -12,11 +12,11 @@ angular
 				tabIndex: '@'
 			},
 			replace: true,
-			template: '<input class="text" type="text" placeholder="#gamertag ex. (zincbeatr)" ng-model="inputModel.displayName"' +
+			template: '<input class="text" type="text" placeholder="Gamertag or PSN" ng-model="inputModel.displayName"' +
 							'tabindex="tabIndex" ng-class="{\'placeholder\' : inputModel.isPlaceHolder}" />',
 			link: function(scope, element, attrs){
 
-				$element = angular.element(element);		
+				$element = angular.element(element);	
 				var inputValLength = 0;
 
 				$element.on('keypress', function(e){

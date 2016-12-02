@@ -321,6 +321,7 @@ function activityInfoCtrl($scope){
 
 		self.m.isRankLoaded = true;
 		self.m.isRankNeedsUpdate = false;
+		$scope.isShowRankings = false;
 	}
 
 	function selectCell(columnIndex, rowIndex, cellValue){		
@@ -328,8 +329,6 @@ function activityInfoCtrl($scope){
 			row: rowIndex,
 			column: columnIndex
 		};
-
-		console.log(self.m.tableSelectionObject.selectedCell);
 	}
 
 	function selectColumn(columnId){
@@ -359,7 +358,6 @@ function activityInfoCtrl($scope){
 	}
 
 	function changedRankValue(rank){
-		console.log(rank)
 		rank.isNew = true;
 		self.m.isRankNeedsUpdate = true;
 	}

@@ -31,20 +31,17 @@ angular.module('fireTeam.common')
 
     function getPlayerData(memberType, userName) {
 		var deferred = $q.defer();
-
 		playerOptionsService.getMembershipId({memberType: memberType, userName: userName}).then(function (response) {	
 			var membershipModel = response.data;
-			console.log(response);
-			if(!membershipModel && membershipModel === ""){
-				var customErrorObject = {
-											ErrorCode: 100, 
-											data: {
-												Message: 'User "' + userName + '" not found.'
-											}
-										};
-				deferred.resolve(customErrorObject);
+
+			if (!membershipModel){
+				var customErrorResponse = {
+					Error: "An unspecified system error occured!"
+				}
+				deferred.resolve(customErrorResponse);
 				return deferred.promise;
 			}
+
 			playerOptionsService.getBaseCharacterInfo({membershipId: response.data.membershipId}).then(function (response) {
 				if(response.data.ErrorCode > 1){
 					deferred.resolve(response.data);
@@ -71,6 +68,9 @@ angular.module('fireTeam.common')
 				});
 				deferred.resolve(response);
 			});
+		}, function (error){
+			deferred.resolve(error);
+			return deferred.promise;
 		});
 		return deferred.promise;
 	};

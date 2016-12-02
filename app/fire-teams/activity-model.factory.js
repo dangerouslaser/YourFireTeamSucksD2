@@ -7,6 +7,11 @@ angular.module('fireTeam.common')
 	var instanceModel, instancePromises;
 	var progress = 0;
 
+	const statsToExcludeArray = [
+		'fireTeamId',
+		'playerCount'
+	]
+
 	var activityModelObject = {
 		getFireTeamActivities: function(instanceArray) {
 			//return $q.when(activityModel || activityPromises || getFireTeamActivities(instanceArray));
@@ -114,15 +119,17 @@ angular.module('fireTeam.common')
 		});
 
 		function getStats(statsObject){
-			var statsDisplayObject = {}
+			var statsDisplayObject = {};
 			if(statsObject){
 				var count = 0;
 				angular.forEach(statsObject, function(val, key){
-					count++;
-					statsDisplayObject[key] = {
-						displayValue: val.basic.displayValue,
-						value: val.basic.value
-					};
+					if(statsToExcludeArray.indexOf(key) === -1){
+						count++;
+						statsDisplayObject[key] = {
+							displayValue: val.basic.displayValue,
+							value: val.basic.value
+						};
+					}
 				});
 				statsDisplayObject.totalStats = {
 						displayValue: count,

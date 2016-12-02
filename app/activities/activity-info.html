@@ -1,4 +1,5 @@
 <div id="ActivityContainer">
+	<div class="tooltip" id="tooltip" style="display:none;"></div>
 	<span ng-if="ctrl.m.isLoadingCarnageReport">Loading Post Game Carnage Report...</span>
 
 
@@ -13,6 +14,8 @@
 					<div class="rank-options">
 						<div class="used-ranks" ng-if="!ctrl.m.isShowUnusedRankings">
 							<div style="display:inline-block;">
+								<span class="info-show-button" ng-hide="true"></span>
+								<span class="info-text">-Set your desired rank values, these are just suggested options. <br/> -Weigh your picks on a scale from -10 to 10 (least to most important). <br/>-To remove a rank set it to 0 then click the rank button to recalculate. <br/>-Find more options on the unused tab. <br/>-Newly added or changed ranks will be displayed as blinking, click the rank button again to add these ranks to your results. <br/>-The users rank will be displayed beneath their player name on the stats table.</span>
 								<div class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="rank.isUse" animated-glow is-active="{{rank.isNew}}" delay="800" >
 									<span>{{rank.displayName}}: </span>
 									<number-picker 
@@ -28,6 +31,7 @@
 							</div>
 						</div>
 						<div class="unused-ranks" ng-if="ctrl.m.isShowUnusedRankings">
+							<span class="info-text">Change any value from 0 and it will be added to the used tab.</span>
 							<div class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="!rank.isUse">
 								<span>{{rank.displayName}}: </span>
 								<number-picker
@@ -61,7 +65,8 @@
 								<span class="cell header" 
 								      ng-repeat="(key, val) in ctrl.m.activityMembers track by $index" 
 								      ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}" 
-								      ng-click="ctrl.m.selectColumn($index)">
+								      ng-click="ctrl.m.selectColumn($index)"
+								      yfs-tooltip display-text="{{val.displayName}}" append-classes="player-name">
 								      <span>{{val.displayName}}</span>
 								      <br/>
 									  <span ng-if="ctrl.m.isRankLoaded">{{val.rank.totalScore}}</span>
@@ -98,9 +103,12 @@
 					</div>
 				</span>
 			</div>
-			<div class="fixed-header-push"></div>
+			<div class="fixed-header-push">
+			</div>
 			<div ng-class="{'odd' : $odd, 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.row === $index}" class="stat-row" ng-repeat="stat in ctrl.m.chartModel.trueStats track by $index">
-				<span class="cell row-title stat-display-name" ng-click="ctrl.m.selectRow($index)">{{stat.displayName}}</span>
+				<span class="cell row-title stat-display-name" 
+				ng-click="ctrl.m.selectRow($index)"
+				yfs-tooltip display-text="{{stat.displayName}}" append-classes="stat-name">{{stat.displayName}}</span>
 				<span ng-repeat="(key, val) in activityMembers track by $index"
 					  ng-class="{'is-greatest' : stat[key].isGreatest, 'is-least' : stat[key].isLeast, 'is-avg' : stat[key].isMostAvg, 'highlight' : (ctrl.m.tableSelectionObject.selectedCell.column === $index && ctrl.m.tableSelectionObject.selectedCell.row === $parent.$index)}" class="cell row-value-player" 
 					  title="{{'(avg: ' + stat.ratingValues.avgVal + '; low: ' + stat.ratingValues.lowestVal + '; high: ' + stat.ratingValues.highestVal + ';)' }}" 

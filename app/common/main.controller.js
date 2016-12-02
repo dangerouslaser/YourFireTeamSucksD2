@@ -119,7 +119,7 @@ angular.module('fireTeam.common')
 			}
 
 			if(m.playersArrays[0].isPlaceHolder){
-				throwError({Message: 'Please enter a player name.'});
+				throwError({Error: 'Please enter a player name.'});
 				return;
 			}
 
@@ -138,44 +138,56 @@ angular.module('fireTeam.common')
 			fireTeamModelFactory.clear();
 
 			fireTeamModelFactory.getFireTeam(m.selectedPlatform.id, m.playersArrays).then(function(response){
-				if(response[0].ErrorCode && response[0].ErrorCode > 1){
+
+				if((response[0].status && response[0].status !== 200) || (response[0].data && response[0].data.ErrorCode)){
 					m.initialSearchRun = true;
 					throwError(response[0].data);
 					return;
 				}
-				console.log('fireteam response')
+
 				m.fireTeamMembers = response;
 				m.fireTeamMembers.gameMode = m.gameMode;
 				m.fireTeamMembers.pageNum = 0;
 
 				activityModelFactory.getPlayerInstanceList(m.fireTeamMembers).then(function(response){
-					console.log('go fetch matches')
 					if(response.length > 0){
 						getFireTeamInstanceData(compareInstances(response));
 					}
 					else{
 						m.initialSearchRun = true;
-						throwError({Message: 'No matching results found.'});
+						throwError({ErrorCode: 100, Error: 'No matching results found.'});
 					}
 				});
+			}, function(error){
+				console.log(error)
 			});
 		};
 
 		function cancelSearch(){
-			console.log(activityModelFactory.cancelAllPromises());
-
-				
-				m.isLoadingData = false;
-				resetProgressData();
-			
+			m.isLoadingData = false;
+			resetProgressData();	
 		}
 
 		function throwError(data){
-			if(data.ErrorCode){
-				data.Message = 'A system error occurred.';
+
+			if(!data.ErrorCode){
+				data.ErrorCode = 100;
 			}
 
-			m.errorMessage = data.Message;
+			//Custom Error Handling
+			switch (data.ErrorCode){
+				case 100:
+					data.Error = 'A system error occurred. Please try again';
+					break;		
+				case 401:	
+					data.Error = 'Failed to reach Destiny Servers. Please try again in a few minutes.';
+					break;		
+				case 500:	
+					data.Error = 'A critical error occured. Please try again.';
+					break;	
+			}
+
+			m.errorMessage = data.Error;
 			m.isLoadingData = false;	
 			resetProgressData();
 		}
@@ -192,7 +204,7 @@ angular.module('fireTeam.common')
 					getFireTeamInstanceData(compareInstances(response));
 				}
 				else{
-					throwError({Message: 'No matching results found.'});
+					throwError({Error: 'No matching results found.'});
 				}
 			});
 		}
@@ -289,8 +301,7 @@ angular.module('fireTeam.common')
 					matchArray.push(instanceId);
 				}
 			}
-
-			console.log('instances compared')
+			
 			return matchArray;
 		}
 

@@ -222,6 +222,15 @@ input.player-input {
   border-color: #6d9fea;
   box-shadow: 0 0 2px #6d9fea; }
 
+span.info-text {
+  display: block;
+  padding: 10px;
+  position: relative;
+  color: #ababab; }
+
+span.info-show-button {
+  cursor: pointer; }
+
 .post-game-carnage-player-stats-container .stat-name, .post-game-carnage-player-stats-container .stat-display-value {
   display: inline-block;
   position: relative;
@@ -434,7 +443,7 @@ input.player-input {
   width: 100%;
   margin: 0 auto;
   display: inline-block;
-  text-align: center; }
+  text-align: left; }
 
 .rank-option {
   display: inline-block;
@@ -627,5 +636,19 @@ input.player-input {
 
 #stats-table .cell div.tool-tip span.high {
   color: #41d641; }
+
+div.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  border-radius: 3px;
+  z-index: 100;
+  padding: 5px;
+  background: #2d2d2d;
+  box-shadow: 0px 1px 2px 0px #000; }
+  div.tooltip.player-name {
+    color: #00ff95; }
+  div.tooltip.stat-name {
+    color: #ea9b39; }
 
 /*# sourceMappingURL=sass.css.map */
