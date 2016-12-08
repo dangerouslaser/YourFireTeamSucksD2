@@ -2,9 +2,8 @@ angular.module('fireTeam.common')
 	.factory('ActivityModelFactory', ['$q','PlayerOptionsService', function ($q, playerOptionsService) {
     'use strict';
 
-    var deferred;
-	var activityModel, activityPromises;
-	var instanceModel, instancePromises;
+    var currentDeferred;
+	var activityModel;
 	var progress = 0;
 
 	const statsToExcludeArray = [
@@ -14,7 +13,7 @@ angular.module('fireTeam.common')
 
 	var activityModelObject = {
 		getFireTeamActivities: function(instanceArray) {
-			//return $q.when(activityModel || activityPromises || getFireTeamActivities(instanceArray));
+			//return $q.when(activityModel || getFireTeamActivities(instanceArray));
 			return getFireTeamActivities(instanceArray);
 		},
 		getPlayerInstanceList: function(fireTeamObject) {
@@ -25,27 +24,21 @@ angular.module('fireTeam.common')
 		},
 		cancelAllPromises: function(){
 			progress = 0;
-			if(deferred){
-				return deferred.resolve("user cancelled");
+			if(currentDeferred){
+				currentDeferred.resolve({Message: 'user cancelled'});
+				return currentDeferred.promise;
 			}
-			return "nothing to resolve";
+			return {Message: 'nothing to resolve'};
 		},
-		clearActivityModel: clearActivityModel,
-		clearInstanceModel: clearInstanceModel
-	};	
+		clearActivityModel: clearActivityModel
+	};
 
 	function clearActivityModel() {
 		activityModel = null;
-		activityPromises = null;
-	}
-
-	function clearInstanceModel() {
-		instanceModel = null;
-		instancePromises = null;
 	}
 
 	function getFireTeamActivities(instanceArray) {
-		var deferred = $q.defer();
+		var deferred = currentDeferred = $q.defer();
 		var activityPromises = [];
 
 		angular.forEach(instanceArray, function(Id){
@@ -56,7 +49,7 @@ angular.module('fireTeam.common')
 	};
 
     function getPostGameCarnageReport(Id) {
-		var deferred = $q.defer();
+		var deferred = currentDeferred = $q.defer();
 
 		playerOptionsService.getPostGameCarnageReport({instanceId: Id}).then(function (response) {	
 			if(response.data.ErrorCode && response.data.ErrorCode > 1){
@@ -173,7 +166,7 @@ angular.module('fireTeam.common')
 	};
 
 	function getPlayerInstanceList(fireTeamObject) {
-		var deferred = $q.defer();
+		var deferred = currentDeferred = $q.defer();
 		var playerInstancePromises = [];	
 
 		angular.forEach(fireTeamObject, function(player){
@@ -210,7 +203,7 @@ angular.module('fireTeam.common')
 
 
     function getPlayerInstance(request) {
-		var deferred = $q.defer();
+		var deferred = currentDeferred = $q.defer();
 		var playerInstanceArray = [];
 		var playerObject = {};
 

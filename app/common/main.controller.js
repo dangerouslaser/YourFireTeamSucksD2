@@ -37,6 +37,7 @@ angular.module('fireTeam.common')
 		m.showRecentSearches = false;
 		m.activityListProgress = {};
 		m.recentSearches = [];
+		m.isNewSearch = false;
 
 		m.testCaseSectionClosed = false;
 
@@ -54,10 +55,14 @@ angular.module('fireTeam.common')
 
 		m.selectedPlatform = m.platformTypes.ps4;
 
-		$scope.$watch('m.playersArrays', function(newVal){
-
+		$scope.$watch('m.playersArrays', function(newVal, oldVal){
 			if(newVal.length <= 1 && newVal[0].isPlaceHolder){
 				return;
+			}
+
+			if(newVal !== oldVal){
+				m.isNewSearch = true;
+				m.initialSearchRun = false;
 			}
 
 			$timeout(function(){
@@ -123,6 +128,11 @@ angular.module('fireTeam.common')
 				return;
 			}
 
+
+			if(!m.isNewSearch){
+				return;
+			}
+
 			var recentSearch = {
 				players: m.playersArrays,
 				platformType: m.selectedPlatform
@@ -164,8 +174,10 @@ angular.module('fireTeam.common')
 		};
 
 		function cancelSearch(){
-			m.isLoadingData = false;
-			resetProgressData();	
+			activityModelFactory.cancelAllPromises().then(function(response){
+				m.isLoadingData = false;
+				resetData();	
+			});
 		}
 
 		function throwError(data){
@@ -214,7 +226,7 @@ angular.module('fireTeam.common')
 				m.isLoadingData = false;
 				getMoreResults();
 				return;
-			}	
+			}
 
 			var originalArrayLength = instanceIdArray.length;
 
@@ -257,7 +269,7 @@ angular.module('fireTeam.common')
 			
 				m.initialSearchRun = true;
 
-				if(remainingLength > 0){
+				if(remainingLength > 0 && m.isLoadingData){
 					getActiviesPagination(array, amountToProcess);
 				}
 				else{
@@ -301,7 +313,7 @@ angular.module('fireTeam.common')
 					matchArray.push(instanceId);
 				}
 			}
-			
+
 			return matchArray;
 		}
 
@@ -354,7 +366,7 @@ angular.module('fireTeam.common')
 			$cookies[name] = JSON.stringify(val);
 		}
 
-		function resetProgressData(){
+		function resetData(){
 			m.activityListProgress = {};
 			m.showProgressMessage = false;
 
