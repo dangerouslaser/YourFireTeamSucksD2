@@ -443,7 +443,6 @@ span.info-show-button {
 
 .rank-options-container {
   position: relative;
-  display: inline-block;
   margin-top: 10px; }
 
 .rank-options-container.bordered {
