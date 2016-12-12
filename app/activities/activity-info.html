@@ -26,7 +26,7 @@
 									</number-picker>
 								</div>
 							</div>
-							<div>
+							<div style="text-align: center;">
 								<button id="rank-submit-button" class="submit" animated-glow is-active="{{ctrl.m.isRankNeedsUpdate}}" delay="800" ng-click="ctrl.m.calculatePlayerStandings()">Rank</button>
 							</div>
 						</div>
@@ -61,7 +61,11 @@
 							<img class="activity-icon" src="http://www.bungie.net{{activityInfo.definitions.activities[0].icon}}" />
 							<span class="cell activity-title">{{activityInfo.definitions.activities[0].activityName}} - {{activityInfo.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="stat-row header-row">
-								<span class="cell">Stat</span>
+								<span class="cell">
+									<span style="display: block;">Stat</span>
+									<span class="rank" ng-if="ctrl.m.isRankLoaded">Rank:</span>
+								</span>
+
 								<span class="cell header" 
 								      ng-repeat="(key, val) in ctrl.m.activityMembers track by $index" 
 								      ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}" 
@@ -69,7 +73,7 @@
 								      yfs-tooltip display-text="{{val.displayName}}" append-classes="player-name">
 								      <span>{{val.displayName}}</span>
 								      <br/>
-									  <span ng-if="ctrl.m.isRankLoaded">{{val.rank.totalScore}}</span>
+									  <span class="rank" ng-if="ctrl.m.isRankLoaded">{{val.rank.totalScore}}</span>
 
 									  <div class="tool-tip" ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index">
 										  <span class="low">{{val.displayName}}</span>

@@ -34,16 +34,44 @@ var destinyBaseRequest = request.defaults({headers: {'X-API-Key': credentials.de
 
 router.get('/getMembershipIdByUserName', function(req, res, next){
     credentials.defaultMemberType = req.query.memberType;
-    destinyBaseRequest(HOST + 'SearchDestinyPlayer/' + credentials.defaultMemberType + '/' + req.query.userName + '/',
+    var user = req.query.userName;
+
+    if(user.charAt(0) === '#'){
+      user = user.substring(1, user.length-1);
+    }
+
+    destinyBaseRequest(HOST + 'SearchDestinyPlayer/' + credentials.defaultMemberType + '/' + user + '/',
         function (err, response, body) {
-          var response = JSON.parse(body).Response[0];
-          res.json(response);
+          var jsonResponse, result;
+          res.setHeader('Content-Type', 'application/json');
+          res.status(200);
+
+          try {
+            jsonResponse = JSON.parse(body);
+          } catch (e) {
+            res.status(500);
+            result = {ErrorCode: 500, Error: e};
+          }
+
+          if(jsonResponse.Response){
+            result = jsonResponse.Response[0];
+          }
+          else if(jsonResponse.ErrorCode){
+            res.status(401);
+            result = {ErrorCode: 401, Error: jsonResponse.Message};
+          }
+
+          res.json(result);
     });
 });
    
 router.get('/getCharacterInfoByMembershipId', function(req, res, next){
     destinyBaseRequest(HOST + credentials.defaultMemberType + '/Account/' + req.query.membershipId + '/Summary/',
         function (err, response, body) {
+          var jsonResponse, result;
+          res.setHeader('Content-Type', 'application/json');
+          res.status(200);
+
           var response = JSON.parse(body);
           res.json(response);
     });
@@ -52,8 +80,18 @@ router.get('/getCharacterInfoByMembershipId', function(req, res, next){
 router.get('/getCharacterStatsById', function(req, res, next){
     destinyBaseRequest(HOST + '/Stats/AggregateActivityStats/' + credentials.defaultMemberType+ '/' + req.query.membershipId + '/' + req.query.characterId + '/',
         function (err, response, body) {
-          var response = JSON.parse(body);
-          res.json(response);
+          var jsonResponse, result;
+          res.setHeader('Content-Type', 'application/json');
+          res.status(200);
+
+          try {
+            result = jsonResponse = JSON.parse(body);
+          } catch (e) {
+            res.status(500);
+            result = {ErrorCode: 500, Error: e};
+          }
+
+          res.json(result);
     });
 });
 
@@ -64,16 +102,36 @@ router.get('/getCharacterActivityHistoryData', function(req, res, next){
       req.query.characterId + '/' + 
       '?mode=' + req.query.mode + '&page=' + req.query.page + '&definitions=true',
         function (err, response, body) {
-          var response = JSON.parse(body);
-          res.json(response);
+          var jsonResponse, result;
+          res.setHeader('Content-Type', 'application/json');
+          res.status(200);
+
+          try {
+            result = jsonResponse = JSON.parse(body);
+          } catch (e) {
+            res.status(500);
+            result = {ErrorCode: 500, Error: e};
+          }
+
+          res.json(result);
     });
 });
 
 router.get('/getPostGameCarnageReport', function(req, res, next){
     destinyBaseRequest(HOST + '/Stats/PostGameCarnageReport/' + req.query.instanceId + '/?definitions=true',
         function (err, response, body) {
-          var response = JSON.parse(body);
-          res.json(response);
+          var jsonResponse, result;
+          res.setHeader('Content-Type', 'application/json');
+          res.status(200);
+
+          try {
+            result = jsonResponse = JSON.parse(body);
+          } catch (e) {
+            res.status(500);
+            result = {ErrorCode: 500, Error: e};
+          }
+
+          res.json(result);
     });
 });
 
@@ -86,8 +144,18 @@ router.get('/getWeaponDefinitionById', function(req, res, next){
         req.query.referenceId + '/' + 
         '/?definitions=true',
         function (err, response, body) {
-          var response = JSON.parse(body).definitions.items[req.query.referenceId];
-          res.json(response);
+          var jsonResponse, result;
+          res.setHeader('Content-Type', 'application/json');
+          res.status(200);
+
+          try {
+            result = jsonResponse = JSON.parse(body).definitions.items[req.query.referenceId];
+          } catch (e) {
+            res.status(500);
+            result = {ErrorCode: 500, Error: e};
+          }
+
+          res.json(result);
     });
 });
 
@@ -97,7 +165,6 @@ app.get('/', function(req, res) {
     res.sendfile('index.html');
 });
 
- 
 // Register all our routes with /api
 app.use('/api', router);
 

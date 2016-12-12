@@ -55,6 +55,18 @@ button.submit {
   border-radius: 3px;
   padding: 5px; }
 
+.summary-text {
+  padding: 10px;
+  margin: 0 auto;
+  width: 80%;
+  position: relative;
+  display: block;
+  text-align: center;
+  color: #878a8d;
+  font-size: 16px;
+  margin-bottom: 20px;
+  line-height: 30px; }
+
 .toggle-button-container {
   display: inline-block;
   margin-right: 10px;
@@ -201,7 +213,6 @@ input.player-input {
   display: block; }
 
 .main-container {
-  padding-top: 50px;
   position: relative;
   width: 90%;
   display: block;
@@ -391,6 +402,9 @@ span.info-show-button {
   box-shadow: 0px 0px 20px 1px #a062de inset;
   color: #a062de; }
 
+#stats-table-container .stat-row.header-row span.rank {
+  color: #00ff95; }
+
 #stats-table-container .stat-row.row-rankings {
   box-shadow: 0px 0px 20px 1px #a062de inset;
   border-top: 1px solid #1e466d;
@@ -575,7 +589,8 @@ span.info-show-button {
   text-align: center;
   padding-top: 10px;
   padding-bottom: 10px;
-  cursor: default; }
+  cursor: default;
+  box-shadow: 0px 0px 1px 1px #b3b3b3 inset; }
 
 .platform-type-container .platform-selection.selected {
   background: #6796dc;

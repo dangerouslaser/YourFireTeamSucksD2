@@ -16,18 +16,18 @@
 		
 		<script type="text/javascript" src="common/fire-team.module.js"></script>
 		<script type="text/javascript" src="common/common.module.js"></script>
-		<script type="text/javascript" src="common/base-http.service.js"></script>
-		<script type="text/javascript" src="common/player-options.factory.js"></script>
+		<script type="text/javascript" src="services/base-http.service.js"></script>
+		<script type="text/javascript" src="services/player-options.factory.js"></script>
 		<script type="text/javascript" src="common/main.controller.js"></script>
-		<script type="text/javascript" src="common/player-base-model.factory.js"></script>
-		<script type="text/javascript" src="common/game-options.service.js"></script>
-		<script type="text/javascript" src="common/game-activity-model.factory.js"></script>
+		<script type="text/javascript" src="services/player-base-model.factory.js"></script>
+		<script type="text/javascript" src="services/game-options.service.js"></script>
+		<script type="text/javascript" src="services/game-activity-model.factory.js"></script>
 		<script type="text/javascript" src="characters/character.module.js"></script>
-		<script type="text/javascript" src="characters/character-model.factory.js"></script>
+		<script type="text/javascript" src="services/character-model.factory.js"></script>
 		<script type="text/javascript" src="characters/character-info.directive.js"></script>
-		<script type="text/javascript" src="characters/character-activity-model.factory.js"></script>
-		<script type="text/javascript" src="fire-teams/fire-team-model.factory.js"></script>
-		<script type="text/javascript" src="fire-teams/activity-model.factory.js"></script>
+		<script type="text/javascript" src="services/character-activity-model.factory.js"></script>
+		<script type="text/javascript" src="services/fire-team-model.factory.js"></script>
+		<script type="text/javascript" src="services/activity-model.factory.js"></script>
 		<script type="text/javascript" src="activities/activity-info.directive.js"></script>
 		<script type="text/javascript" src="common/directives/input.directive.js"></script>
 		<script type="text/javascript" src="common/directives/number-picker.directive.js"></script>
@@ -39,9 +39,13 @@
 	<body>
 	<div class="main-container">
 		<div class="content" ng-controller="mainCtrl">
-
-			<!--<button ng-click="selectActivity(m.testObject)" class="submit">TEST OBJECT!</button>-->
 			<h3 class="header-text"></h3>
+
+			<span class="summary-text">
+				Enter members of your fireteam to find recent activities. <br/>
+				Select an event and set your prefered ranking options. <br/>
+				View activity stats and compare your team members to see how your fireteam matches up!
+			</span>
 
 			<div class="search-container">
 
@@ -78,7 +82,7 @@
 				</div>
 
 				<div class="search-content" ng-if="!m.isLoadingData">
-					<button id="PlayerSearch" class="submit" tabindex="8" class="button" ng-click="getFireTeamModel()">
+					<button id="PlayerSearch" class="submit" tabindex="8" class="button" ng-click="getFireTeamModel()" ng-if="m.isNewSearch">
 						Search
 					</button>
 					<button id="MoreResults" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" tabindex="8" ng-click="getMoreResults()">	More Results
