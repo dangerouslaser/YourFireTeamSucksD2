@@ -30,7 +30,7 @@ angular
 
 				$element.on('keyup', function(e){
 					var inputValLength = scope.inputModel.displayName.length;
-					if(inputValLength <= 1){
+					if(inputValLength > -1){
 						scope.inputModel.isPlaceHolder = inputValLength < 1 ? true : false;
 						scope.$apply();
 					}

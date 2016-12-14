@@ -13,34 +13,49 @@
 				<div class="rank-options-container bordered">
 					<div class="rank-options">
 						<div class="used-ranks" ng-if="!ctrl.m.isShowUnusedRankings">
-							<div style="display:inline-block;">
+							<div>
 								<span class="info-show-button" ng-hide="true"></span>
 								<span class="info-text">-Set your desired rank values, these are just suggested options. <br/> -Weigh your picks on a scale from -10 to 10 (least to most important). <br/>-To remove a rank set it to 0 then click the rank button to recalculate. <br/>-Find more options on the unused tab. <br/>-Newly added or changed ranks will be displayed as blinking, click the rank button again to add these ranks to your results. <br/>-The users rank will be displayed beneath their player name on the stats table.</span>
-								<div class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="rank.isUse" animated-glow is-active="{{rank.isNew}}" delay="800" >
-									<span>{{rank.displayName}}: </span>
-									<number-picker 
-										on-change="ctrl.m.changedRankValue"
-										values-array="ctrl.m.weightValueArray" 
-										value-key="weight"
-										input-model="rank">
-									</number-picker>
-								</div>
+								
+								<ul>
+									<li class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="rank.isUse" animated-glow is-active="{{rank.isNew}}" delay="1500" >
+										<div class="rank-picker">
+											<span>{{rank.displayName}}: </span>
+										</div>
+										<div class="rank-picker">
+											<number-picker 
+												on-change="ctrl.m.changedRankValue"
+												values-array="ctrl.m.weightValueArray" 
+												value-key="weight"
+												input-model="rank">
+											</number-picker>
+										</div>
+									</li>
+								</ul>
+
+
 							</div>
-							<div style="text-align: center;">
-								<button id="rank-submit-button" class="submit" animated-glow is-active="{{ctrl.m.isRankNeedsUpdate}}" delay="800" ng-click="ctrl.m.calculatePlayerStandings()">Rank</button>
+							<div>
+								<button id="rank-submit-button" class="submit" animated-glow is-active="{{ctrl.m.isRankNeedsUpdate}}" delay="1500" ng-click="ctrl.m.calculatePlayerStandings()">Rank</button>
 							</div>
 						</div>
 						<div class="unused-ranks" ng-if="ctrl.m.isShowUnusedRankings">
 							<span class="info-text">Change any value from 0 and it will be added to the used tab.</span>
-							<div class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="!rank.isUse">
-								<span>{{rank.displayName}}: </span>
-								<number-picker
-									on-change="ctrl.m.addNewItem"
-									values-array="ctrl.m.weightValueArray" 
-									value-key="weight"
-									input-model="rank">
-								</number-picker>
-							</div>
+							<ul>
+								<li class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="!rank.isUse">
+									<div class="rank-picker">
+										<span>{{rank.displayName}}: </span>
+									</div>
+									<div class="rank-picker">
+										<number-picker
+											on-change="ctrl.m.addNewItem"
+											values-array="ctrl.m.weightValueArray" 
+											value-key="weight"
+											input-model="rank">
+										</number-picker>
+									</div>
+								</li>
+							</ul>
 						</div>
 					</div>
 				</div>
@@ -57,7 +72,7 @@
 								{{rank.displayName}} : {{rank.weight}}
 							</span>
 						</div>
-						<div class="activity-header-content">
+						<div class="activity-header-content {{activityInfo.definitions.activities[0].activityTypeName.toLowerCase()}}">
 							<img class="activity-icon" src="http://www.bungie.net{{activityInfo.definitions.activities[0].icon}}" />
 							<span class="cell activity-title">{{activityInfo.definitions.activities[0].activityName}} - {{activityInfo.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="stat-row header-row">

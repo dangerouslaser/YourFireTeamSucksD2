@@ -61,8 +61,9 @@ angular.module('fireTeam.common')
 			}
 
 			$timeout(function(){
+				console.log('input detection fn')
 				inputDetectionFn(newVal);
-			},0);
+			},10);
 			
 
 		}, true);
@@ -163,7 +164,7 @@ angular.module('fireTeam.common')
 					}
 				});
 			}, function(error){
-				console.log(error)
+				throwError(error);
 			});
 		};
 
@@ -196,6 +197,8 @@ angular.module('fireTeam.common')
 
 			m.errorMessage = data.Error;
 			m.isLoadingData = false;	
+			m.isNewSearch = true;
+			m.initialSearchRun = false;
 			clearData();
 		}
 
