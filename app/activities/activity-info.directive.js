@@ -3,9 +3,9 @@ angular
 	.controller('activityInfoCtrl', activityInfoCtrl)
 	.directive('activityInfo', activityInfo);
 
-	activityInfo.$inject = ['FireTeamModelFactory', '$timeout', '$window'];
+	activityInfo.$inject = ['$rootScope', 'FireTeamModelFactory', '$timeout', '$window'];
 
-	function activityInfo(fireTeamModelFactory, $timeout) {
+	function activityInfo($rootScope, fireTeamModelFactory, $timeout) {
 		return {
 			restrict: 'E',
 			scope: {
@@ -22,6 +22,7 @@ angular
 				scope.activityMembers = {};
 				scope.isShowRankings = true;
 				scope.isShowTable = true;
+				scope.const = $rootScope.const;
 
 				scope.$watch('activityInfo', function(newVal){
 					if(newVal){

@@ -46,8 +46,10 @@
 				Select an event and set your prefered ranking options. <br/>
 				View activity stats and compare your team members to see how your fireteam matches up!
 			</span>
+
 			<div class="search-container">
 				<div class="search-block">
+					<div class="bg"></div>
 					<div class="search-content">
 						<div class="platform-type-container" ng-if="!m.isLoadingData">
 							<div class="platform-selection" ng-class="{'selected' : m.selectedPlatform.id !== platform.id}" ng-repeat="platform in m.platformTypes track by $index" ng-click="m.selectedPlatform = platform">
@@ -116,7 +118,9 @@
 						Found {{m.fireTeamActivityResults.length}} result(s):
 					</span>
 					<div class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults track by $index" ng-click="selectActivity(activity)">
-					<img class="activity-icon" src="{{const.bungieRoot}}{{activity.definitions.activityTypes[0].icon}}" />
+						<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activity.definitions.activities[0].pgcrImage}})'}">
+						</div>
+						<img class="activity-icon" src="{{const.bungieRoot}}{{activity.definitions.activityTypes[0].icon}}" />
 						<div class="activity-info-container">
 							<span class="activity-date">{{activity.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="activity-title">

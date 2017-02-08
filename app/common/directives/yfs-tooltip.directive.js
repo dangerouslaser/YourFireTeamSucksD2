@@ -12,8 +12,6 @@ angular
 			replace: false,
 			link: function(scope, element, attrs){
 
-				return;
-
 				var $element = angular.element(element);	
 				var $toolTipElement = angular.element($('body').find('#tooltip'));
 				var appendClasses = attrs.appendClasses;
@@ -45,7 +43,6 @@ angular
 				$element.on('mousemove', function(e){
 					yOffset = $element.prop('offsetTop');
 
-					console.log(yOffset)
 
 					var xPos = e.clientX - xOffset;
 					var yPos = yOffset;

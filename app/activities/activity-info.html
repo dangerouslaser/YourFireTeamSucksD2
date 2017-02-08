@@ -72,9 +72,9 @@
 							</span>
 						</div>
 						<div class="activity-header-content {{activityInfo.definitions.activities[0].activityTypeName.toLowerCase()}}">
+							<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activityInfo.definitions.activities[0].pgcrImage}})'}"></div>
 							<img class="activity-icon" src="{{const.bungieRoot}}{{activityInfo.definitions.activities[0].icon}}" />
 							<span class="cell activity-title">{{activityInfo.definitions.activities[0].activityName}} - {{activityInfo.dateTime | date:'MM/dd/yyyy'}}</span>
-							{{const.bungieRoot}}
 							<div class="stat-row header-row">
 								<span class="cell">
 									<span style="display: block;">Stat</span>
@@ -86,7 +86,7 @@
 								      ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}" 
 								      ng-click="ctrl.m.selectColumn($index)"
 								      yfs-tooltip display-text="{{val.displayName}}" append-classes="player-name">
-								      <img style="height:25px;" src="{{const.bungieRoot}}{{val.iconPath}}" />
+								      <img src="{{const.bungieRoot}}{{val.iconPath}}" />
 								      <span>{{val.displayName}}</span>
 								      <br/>
 									  <span class="rank" ng-if="ctrl.m.isRankLoaded">{{val.rank.totalScore}}</span>

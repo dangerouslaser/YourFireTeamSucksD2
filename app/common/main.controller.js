@@ -40,6 +40,7 @@ angular.module('fireTeam.common')
 		m.isNewSearch = false;
 		m.selectedPlatform = m.platformTypes.ps4;
 		m.pageInitialized = false;
+		m.instanceInterval;
 
 		$scope.selectActivity = selectActivity;
 		$scope.getFireTeamModel = getFireTeamModel;
@@ -68,9 +69,9 @@ angular.module('fireTeam.common')
 				},10);
 
 				if (toParams.instanceId){
-					var interval = setInterval(function(){
+					m.instanceInterval = setInterval(function(){
 						if(!m.isLoadingData){
-							clearInterval(interval);
+							clearInterval(m.instanceInterval);
 							angular.forEach(m.fireTeamActivityResults, function(activity){
 								if (activity.activityDetails.instanceId == toParams.instanceId){
 									selectActivity(activity);
@@ -394,6 +395,7 @@ angular.module('fireTeam.common')
 			$location.search('instanceId', activity.activityDetails.instanceId);
 			m.selectedActivity = activity;
 			m.isShowActivityList = false;
+			clearInterval(m.instanceInterval);
 		}
 
 		function getGameActivitiesData(){
