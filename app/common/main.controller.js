@@ -1,9 +1,9 @@
 angular.module('fireTeam.common')
 	.controller('mainCtrl', MainCtrl);
 
-	MainCtrl.$inject = ['$scope','PlayerBaseModelFactory', 'GameActivityModelFactory', 'FireTeamModelFactory', 'PlayerOptionsService', 'ActivityModelFactory', '$timeout', '$cookies'];
+	MainCtrl.$inject = ['$rootScope','$scope', '$state', '$location', 'PlayerBaseModelFactory', 'GameActivityModelFactory', 'FireTeamModelFactory', 'PlayerOptionsService', 'ActivityModelFactory', '$timeout', '$cookies'];
 
-	function MainCtrl($scope, playerBaseModelFactory, gameActivityModelFactory, fireTeamModelFactory, playerOptionsService, activityModelFactory, $timeout, $cookies) {
+	function MainCtrl($rootScope, $scope, $state, $location, playerBaseModelFactory, gameActivityModelFactory, fireTeamModelFactory, playerOptionsService, activityModelFactory, $timeout, $cookies) {
 
 		var m = $scope.m = {
 			fireTeamActivityResults: [],
@@ -39,6 +39,7 @@ angular.module('fireTeam.common')
 		m.recentSearches = [];
 		m.isNewSearch = false;
 		m.selectedPlatform = m.platformTypes.ps4;
+		m.pageInitialized = false;
 
 		$scope.selectActivity = selectActivity;
 		$scope.getFireTeamModel = getFireTeamModel;
@@ -48,7 +49,46 @@ angular.module('fireTeam.common')
 		$scope.keyDownEvt = keyDownEvt;
 		$scope.loadRecentSearch = loadRecentSearch;
 		$scope.cancelSearch = cancelSearch;
+		$scope.search = search;
 
+		$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
+
+			var membersArray = toParams.members.split(';');
+
+			if(toParams.platform && membersArray.length > 0){
+				m.playersArrays = [];
+				angular.forEach(membersArray, function(player){
+					m.playersArrays.push({displayName: player, isPlaceHolder : false});
+				});
+				
+				m.selectedPlatform = m.platformTypes[toParams.platform];
+
+				$timeout(function(){
+					getFireTeamModel();
+				},10);
+
+				if (toParams.instanceId){
+					var interval = setInterval(function(){
+						if(!m.isLoadingData){
+							clearInterval(interval);
+							angular.forEach(m.fireTeamActivityResults, function(activity){
+								if (activity.activityDetails.instanceId == toParams.instanceId){
+									selectActivity(activity);
+									$scope.$apply();
+								}
+							})
+						}
+					},100);
+				}
+			}
+		});
+
+		$scope.$watch('m.selectedPlatform', function(newVal, oldVal){
+			if(newVal !== oldVal){
+				m.initialSearchRun = false;
+				m.isNewSearch = true;
+			}
+		})
 
 		$scope.$watch('m.playersArrays', function(newVal, oldVal){
 			if(newVal.length <= 1 && newVal[0].isPlaceHolder){
@@ -61,17 +101,16 @@ angular.module('fireTeam.common')
 			}
 
 			$timeout(function(){
-				console.log('input detection fn')
 				inputDetectionFn(newVal);
 			},10);
 			
-
 		}, true);
 
 		init();
 
 		function init(){
 			checkRecentSearches();
+			m.pageInitialized = true;
 		}
 
 		function inputDetectionFn(model){
@@ -104,7 +143,11 @@ angular.module('fireTeam.common')
 		}
 
 		function loadRecentSearch(index){
-			m.playersArrays = m.recentSearches[index].players;
+			m.playersArrays = [];
+			angular.forEach(m.recentSearches[index].players, function(player){
+				m.playersArrays.push({displayName: player.displayName, isPlaceHolder : false});
+			});
+			
 			m.selectedPlatform = m.recentSearches[index].platformType;
 		}
 
@@ -112,6 +155,19 @@ angular.module('fireTeam.common')
 			if(m.playersArrays.length < m.maxMembers){
 				m.playersArrays.push({displayName:'', isPlaceHolder: true});
 			}
+		}
+
+		function search(){
+			var membersString = '';
+			angular.forEach(m.playersArrays, function(p){
+				if(!p.isPlaceHolder){
+					membersString = membersString + p.displayName + ';'
+			 	}
+			});
+
+			membersString = membersString.replace(/;+$/, "");
+
+			$state.go('home', {platform: m.selectedPlatform.displayValue, members: membersString});
 		}
 
 		function getFireTeamModel(){
@@ -127,13 +183,6 @@ angular.module('fireTeam.common')
 			if(!m.isNewSearch){
 				return;
 			}
-
-			var recentSearch = {
-				players: m.playersArrays,
-				platformType: m.selectedPlatform
-			}
-
-			updateRecentSearches(recentSearch);
 
 			m.isLoadingData = true;
 			m.isShowActivityList = true;
@@ -154,6 +203,17 @@ angular.module('fireTeam.common')
 				m.fireTeamMembers.gameMode = m.gameMode;
 				m.fireTeamMembers.pageNum = 0;
 
+				var recentSearch = {
+					players: [],
+					platformType: m.selectedPlatform
+				}
+
+				angular.forEach(response, function(player){
+					recentSearch.players.push(player.membershipInfo);
+				});
+
+				updateRecentSearches(recentSearch);
+
 				activityModelFactory.getPlayerInstanceList(m.fireTeamMembers).then(function(response){
 					if(response.length > 0){
 						getFireTeamInstanceData(compareInstances(response));
@@ -170,7 +230,6 @@ angular.module('fireTeam.common')
 
 		function cancelSearch(){
 			activityModelFactory.cancelAllPromises().then(function(response){
-				console.log(response)
 				m.isLoadingData = false;
 				clearData();	
 			});
@@ -332,6 +391,7 @@ angular.module('fireTeam.common')
 		}
 
 		function selectActivity(activity){
+			$location.search('instanceId', activity.activityDetails.instanceId);
 			m.selectedActivity = activity;
 			m.isShowActivityList = false;
 		}

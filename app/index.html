@@ -11,7 +11,7 @@
 
 		<script src="lib/jquery.min.js"></script>
 		<script src="lib/angular.min.js"></script>
-		<script src="lib/angular-routes.min.js"></script>
+		<script src="lib/angular-ui-router.min.js"></script>
 		<script src="lib/angular-cookies.min.js"></script>
 		
 		<script type="text/javascript" src="common/fire-team.module.js"></script>
@@ -49,7 +49,7 @@
 			<div class="search-container">
 				<div class="search-block">
 					<div class="search-content">
-						<div class="platform-type-container">
+						<div class="platform-type-container" ng-if="!m.isLoadingData">
 							<div class="platform-selection" ng-class="{'selected' : m.selectedPlatform.id !== platform.id}" ng-repeat="platform in m.platformTypes track by $index" ng-click="m.selectedPlatform = platform">
 								{{platform.displayValue}}
 							</div>
@@ -66,7 +66,7 @@
 						<span class="error" ng-if="m.errorMessage">{{m.errorMessage}}</span>
 
 						<div ng-if="!m.isLoadingData">
-							<button id="PlayerSearch" class="submit" tabindex="8" class="button" ng-click="getFireTeamModel()" ng-if="m.isNewSearch">
+							<button id="PlayerSearch" class="submit" tabindex="8" class="button" ng-click="search()" ng-if="m.isNewSearch">
 								Search
 							</button>
 							<button id="MoreResults" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" tabindex="8" ng-click="getMoreResults()">	More Results
@@ -99,9 +99,10 @@
 						<div class="recent-search-table">
 							<div class="recent-search" ng-repeat="search in m.recentSearches track by $index" ng-click="loadRecentSearch($index)">
 								<div class="recent-search-platform" ng-class="{'xbox': search.platformType.id === 1}">
+									<img src="{{const.bungieRoot}}{{search.players[0].iconPath}}"/>
 									<span>{{search.platformType.displayValue.toUpperCase()}}:</span>
 								</div>
-								<div class="recent-search-player" ng-repeat="player in search.players track by $index" ng-if="!player.isPlaceHolder">
+								<div class="recent-search-player" ng-repeat="player in search.players track by $index">
 									<span>{{player.displayName}}</span>
 								</div>
 							</div>
@@ -115,19 +116,25 @@
 						Found {{m.fireTeamActivityResults.length}} result(s):
 					</span>
 					<div class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults track by $index" ng-click="selectActivity(activity)">
-					<img class="activity-icon" src="http://www.bungie.net{{activity.definitions.activityTypes[0].icon}}" />
+					<img class="activity-icon" src="{{const.bungieRoot}}{{activity.definitions.activityTypes[0].icon}}" />
 						<div class="activity-info-container">
 							<span class="activity-date">{{activity.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="activity-title">
-								<span ng-repeat="type in activity.definitions.activityTypes">
-									<span ng-if="type.friendlyUrlId">({{type.friendlyUrlId}})</span> {{type.activityTypeName}} : 
+								<span>
+									<span ng-if="activity.definitions.activityTypes[0].friendlyUrlId">
+										({{activity.definitions.activityTypes[0].friendlyUrlId}})
+									</span>
+									<span>
+									{{activity.definitions.activityTypes[0].activityTypeName}} : 
+									</span>
 								</span>
 								<span ng-repeat="act in activity.definitions.activities">
 									{{act.activityName}}
 								</span>
 							</div>
 							<div class="character-container">
-								<div class="character" ng-repeat="character in activity.playerPostGameCarnageReport track by $index">
+								<div class="character {{character.characterInfo.characterClass.toLowerCase()}}" ng-repeat="character in activity.playerPostGameCarnageReport track by $index">
+									<img src="{{const.bungieRoot}}{{character.characterInfo.iconPath}}" />
 									<span class="player-class" data-playerName="{{character.characterInfo.displayName}}">
 										{{character.characterInfo.displayName}} : 
 									</span>

@@ -277,8 +277,27 @@ input.player-input {
 
 .activity-selection-container .activity-selection .character-container .character{
     display: inline-block;
-    float: left;
-    margin-right: 20px;
+    padding: 5px;
+    width:25%;
+    background: rgba(255, 255, 255, 0.2);
+    margin-right: 5px;
+    margin-top: 5px;
+
+    &.titan{
+        color: hotpink;
+    }
+    &.hunter{
+        color: yellow;
+    }
+    &.warlock{
+        color: #35c7ff;
+    }
+}
+
+.activity-selection-container .activity-selection .character-container .character img{
+    width: 25px;
+    height:25px;
+    vertical-align: middle;
 }
 
 .light-level{

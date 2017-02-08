@@ -1,5 +1,5 @@
 {
-  "name": "lightregionsAPI",
+  "name": "YourFireTeamSucks",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -11,13 +11,10 @@
     "express": "^4.1.2",
     "express-session": "^1.13.0",
     "handlebars": "^4.0.5",
-    "mongoose": "^4.4.5",
-    "oauth2orize": "^1.2.2",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",
-    "request": "^2.75.0",
-    "angular-cookies": "1.3.x"
+    "request": "^2.75.0"
   },
   "engines": {
     "node": "^5.7.0"
