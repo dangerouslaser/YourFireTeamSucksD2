@@ -411,7 +411,7 @@ angular.module('fireTeam.common')
 			switch(e.keyCode){
 				case 13:
 					e.preventDefault();
-					getFireTeamModel();
+					search();
 				break;
 			}
 		}
