@@ -153,6 +153,10 @@ angular
 							if(avgPlayer){
 								stat[avgPlayer].isMostAvg = true;
 							}
+
+							stat.ratingValues.highestVal = stat.ratingValues.highestVal.toFixed(2);
+							stat.ratingValues.lowestVal = stat.ratingValues.lowestVal.toFixed(2);
+							stat.ratingValues.avgVal = stat.ratingValues.avgVal.toFixed(2);
 						});
 					});
 
