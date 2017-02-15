@@ -80,11 +80,7 @@ angular.module('fireTeam.common')
 					m.instanceInterval = setInterval(function(){
 						if(!m.isLoadingData){
 							clearInterval(m.instanceInterval);
-							var instanceArray = [];
-							instanceArray.push(toParams.instanceId);
-							getFireTeamInstanceData(instanceArray, 1);
-							selectActivity(m.fireTeamActivityResults[m.fireTeamActivityResults.length -1]);
-							$scope.$apply();
+							loadActivityByIdParameter(toParams.instanceId);	
 						}
 					},100);
 				}
@@ -346,6 +342,21 @@ angular.module('fireTeam.common')
 				}
 
 			});
+		}
+
+		function loadActivityByIdParameter(id){
+			var array = [id];
+
+			activityModelFactory.getFireTeamActivities(array).then(function(response){
+				if(response[0].ErrorCode && response[0].ErrorCode > 1){
+					throwError(response[0]);
+					return;
+				}
+				var activity = response[0];
+
+				m.fireTeamActivityResults.push(activity);
+				selectActivity(activity);
+			})
 		}
 
 		function startPollingForProgress(delay, matches){
