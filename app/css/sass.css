@@ -464,9 +464,11 @@ span.info-show-button {
 
 #stats-table .cell.activity-title {
   text-align: center;
-  font-size: 150%;
+  font-size: 200%;
   padding: 10px;
-  height: 100px; }
+  height: 55px;
+  text-shadow: 1px 1px 1px #000;
+  margin-top: 30px; }
 
 #stats-table-container .stat-row.header-row {
   color: #00ff95;
