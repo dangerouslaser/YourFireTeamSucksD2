@@ -80,12 +80,11 @@ angular.module('fireTeam.common')
 					m.instanceInterval = setInterval(function(){
 						if(!m.isLoadingData){
 							clearInterval(m.instanceInterval);
-							angular.forEach(m.fireTeamActivityResults, function(activity){
-								if (activity.activityDetails.instanceId == toParams.instanceId){
-									selectActivity(activity);
-									$scope.$apply();
-								}
-							})
+							var instanceArray = [];
+							instanceArray.push(toParams.instanceId);
+							getFireTeamInstanceData(instanceArray, 1);
+							selectActivity(m.fireTeamActivityResults[m.fireTeamActivityResults.length -1]);
+							$scope.$apply();
 						}
 					},100);
 				}
@@ -303,6 +302,7 @@ angular.module('fireTeam.common')
 				getMoreResults();
 				return;
 			}
+
 			m.activityListProgress = {
 					totalActivities: 0,
 					activitiesLoaded: 0,
