@@ -106,12 +106,12 @@ angular
 							var statArray = [];
 
 							angular.forEach(stat, function(playerValue, playerKey){
-								var intDisplayVal = parseInt(playerValue.value);
-								highestVal = intDisplayVal > highestVal ? intDisplayVal : highestVal;
-								lowestVal = (intDisplayVal < lowestVal || !lowestVal) ? intDisplayVal : lowestVal;
+								var floatDisplayVal = parseFloat(playerValue.value);
+								highestVal = floatDisplayVal > highestVal ? floatDisplayVal : highestVal;
+								lowestVal = (floatDisplayVal < lowestVal || !lowestVal) ? floatDisplayVal : lowestVal;
 
-								if(intDisplayVal){
-									statArray.push(intDisplayVal);
+								if(floatDisplayVal){
+									statArray.push(floatDisplayVal);
 								}
 							});	
 
@@ -132,16 +132,16 @@ angular
 							var leastDifferential = null;
 							var avgPlayer;
 							angular.forEach(stat, function(playerVal, playerKey){
-								var intDisplayVal = parseInt(stat[playerKey].value);
-								var avgDifferential = Math.abs(stat.ratingValues.avgVal - intDisplayVal);
+								var floatDisplayVal = parseFloat(stat[playerKey].value);
+								var avgDifferential = Math.abs(stat.ratingValues.avgVal - floatDisplayVal);
 
 								leastDifferential = (avgDifferential < leastDifferential || !leastDifferential) ? avgDifferential : leastDifferential;
 
-								if (intDisplayVal === stat.ratingValues.highestVal && stat.ratingValues.highestVal !== stat.ratingValues.avgVal){
+								if (floatDisplayVal === stat.ratingValues.highestVal && stat.ratingValues.highestVal !== stat.ratingValues.avgVal){
 								 	playerVal.isGreatest = true;
 								}
 
-								if (intDisplayVal === stat.ratingValues.lowestVal && stat.ratingValues.lowestVal !== stat.ratingValues.avgVal){
+								if (floatDisplayVal === stat.ratingValues.lowestVal && stat.ratingValues.lowestVal !== stat.ratingValues.avgVal){
 								 	playerVal.isLeast = true;
 								}
 					
