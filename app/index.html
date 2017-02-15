@@ -36,16 +36,16 @@
 		<script type="text/javascript" src="common/directives/animated-glow.directive.js"></script>
 		<script type="text/javascript" src="common/directives/yfs-tooltip.directive.js"></script>
 	</head>
-	<body>
+	<body ng-controller="mainCtrl">
 	<div class="main-container">
-		<div class="content" ng-controller="mainCtrl">
+		<div class="content">
 			<h3 class="header-text"></h3>
 
-			<span class="summary-text">
+			<!--<span class="summary-text">
 				Enter members of your fireteam to find recent activities. <br/>
 				Select an event and set your prefered ranking options. <br/>
 				View activity stats and compare your team members to see how your fireteam matches up!
-			</span>
+			</span>-->
 
 			<div class="search-container">
 				<div class="search-block">
@@ -61,6 +61,8 @@
 							ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
 							ng-repeat="member in m.playersArrays track by $index"
 							input-model="member"
+							recent-search="m.recentSearches"
+							on-click="loadRecentSearch"
 							tab-index="{{$index + 1}}"
 							ng-keydown="keyDownEvt($event)">
 						</input-directive>
@@ -70,8 +72,6 @@
 						<div ng-if="!m.isLoadingData">
 							<button id="PlayerSearch" class="submit" tabindex="8" class="button" ng-click="search()" ng-if="m.isNewSearch">
 								Search
-							</button>
-							<button id="MoreResults" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" tabindex="8" ng-click="getMoreResults()">	More Results
 							</button>
 						</div>
 
@@ -93,37 +93,23 @@
 
 					</div>
 				</div>
-				<div class="search-block">
-					<div class="recent-search-container" ng-if="m.recentSearches.length > 0">
-						<div class="section-title">
-							<span>Recent Searches</span>
-						</div>
-						<div class="recent-search-table">
-							<div class="recent-search" ng-repeat="search in m.recentSearches track by $index" ng-click="loadRecentSearch($index)">
-								<div class="recent-search-platform" ng-class="{'xbox': search.platformType.id === 1}">
-									<img src="{{const.bungieRoot}}{{search.players[0].iconPath}}"/>
-									<span>{{search.platformType.displayValue.toUpperCase()}}:</span>
-								</div>
-								<div class="recent-search-player" ng-repeat="player in search.players track by $index">
-									<span>{{player.displayName}}</span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
 			</div>
 			<toggle-section is-open="m.isShowActivityList" section-title="Activity List" ng-if="m.fireTeamActivityResults.length > 0">
 				<div class="activity-selection-container" ng-show="m.isShowActivityList">
 					<span>
 						Found {{m.fireTeamActivityResults.length}} result(s):
+						<button id="MoreResults" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" ng-click="getMoreResults()">
+							More Results
+						</button>
 					</span>
 					<div class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults track by $index" ng-click="selectActivity(activity)">
 						<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activity.definitions.activities[0].pgcrImage}})'}">
 						</div>
 						<img class="activity-icon" src="{{const.bungieRoot}}{{activity.definitions.activityTypes[0].icon}}" />
 						<div class="activity-info-container">
-							<span class="activity-date">{{activity.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="activity-title">
+								<span class="activity-date">{{activity.dateTime | date:'MM/dd/yyyy'}}</span>
+								<br/>
 								<span>
 									<span ng-if="activity.definitions.activityTypes[0].friendlyUrlId">
 										({{activity.definitions.activityTypes[0].friendlyUrlId}})

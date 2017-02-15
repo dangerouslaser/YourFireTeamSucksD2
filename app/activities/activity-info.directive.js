@@ -3,9 +3,9 @@ angular
 	.controller('activityInfoCtrl', activityInfoCtrl)
 	.directive('activityInfo', activityInfo);
 
-	activityInfo.$inject = ['$rootScope', 'FireTeamModelFactory', '$timeout', '$window'];
+	activityInfo.$inject = ['$rootScope', '$timeout', '$window'];
 
-	function activityInfo($rootScope, fireTeamModelFactory, $timeout) {
+	function activityInfo($rootScope, $timeout, $window) {
 		return {
 			restrict: 'E',
 			scope: {
@@ -23,15 +23,25 @@ angular
 				scope.isShowRankings = true;
 				scope.isShowTable = true;
 				scope.const = $rootScope.const;
+				scope.tableClickEvnt = null;
+
+				angular.element($window).on('click', function(e){
+					if(scope.tableClickEvnt){
+						e.stopPropagation();
+						scope.tableClickEvnt = null;
+						return;
+					}
+					scope.clearTableSelection();
+					scope.$apply();
+				});
+
+				angular.element(element).on('click', function(e){
+					scope.tableClickEvnt = e;
+				});
 
 				scope.$watch('activityInfo', function(newVal){
 					if(newVal){
 						getFireTeam();
-						// $timeout(function() {
-						// 	var $tableElement = angular.element(element[0].querySelector('#stats-table-container'));
-						// 	var scrollToTablePos = $tableElement[0].getBoundingClientRect().top;
-						// 	$("body").animate({scrollTop: scrollToTablePos}, "fast");
-						// }, 500);
 					}
 				});
 
@@ -244,16 +254,19 @@ function activityInfoCtrl($scope){
 				isNew: true
 			}
 	};
+	self.m.isTableCellSelected = false;
+	self.m.isTableRowSelected = false;
+	self.m.isTableColumnSelected = false;
 
-	self.m.weightValueArray = setupValueArray();
+	self.m.setupValueArray = setupValueArray();
 	self.m.calculatePlayerStandings = calculatePlayerStandings;
 	self.m.camelCaseToString = camelCaseToString;
 	self.m.addNewItem = addNewItem;
 	self.m.removeNewItem = removeNewItem;
 	self.m.selectCell = selectCell;
-	self.m.selectColumn = selectColumn;
-	self.m.selectRow = selectRow;
 	self.m.changedRankValue = changedRankValue;
+
+	$scope.clearTableSelection = clearTableSelection;
 
 	$scope.$watch('chartModel', function(newVal){
 		if(newVal.trueStats){
@@ -275,6 +288,7 @@ function activityInfoCtrl($scope){
 	}
 
 	function getPossibleRankingOptions(){
+
 		self.m.rankingCategories = {};
 		angular.forEach(self.m.chartModel.trueStats, function(val, key){
 			var weight = self.m.suggestedRankingCategories[key] ? self.m.suggestedRankingCategories[key].weight : 0;
@@ -289,12 +303,17 @@ function activityInfoCtrl($scope){
 
 	function calculatePlayerStandings(){
 
+		const perfectRank = 5000;
+		var highestScore = 0;
+		var lowestScore = 0;
+
 		angular.forEach(self.m.activityMembers, function(playerVal, playerKey){
 			playerVal.rank = {
-				totalScore: 0
+				totalScore: 0,
+				trueRank: null,
 			};
 
-			 angular.forEach(self.m.rankingCategories, function(rankVal, rankKey){
+			angular.forEach(self.m.rankingCategories, function(rankVal, rankKey){
 			 	var weight = rankVal.weight;
 			 	var avgValue = self.m.chartModel.trueStats[rankKey].ratingValues.avgVal;
 			 	var playerStatValue = self.m.chartModel.trueStats[rankKey][playerKey].value;
@@ -302,14 +321,18 @@ function activityInfoCtrl($scope){
 			 	var statRankScore = differential * weight;
 
 			 	removeNewItem(rankVal);
+
 			 	if(weight === 0){
 			 		rankVal.isUse = false;
 			 	}
 
-			 	self.m.chartModel.trueStats[rankKey].weight = weight;		 
+			 	self.m.chartModel.trueStats[rankKey].weight = weight;	
 			 	playerVal.rank[rankKey] = statRankScore;		
 		 		playerVal.rank.totalScore += statRankScore;
-			 });
+			});
+
+		 	highestScore = (playerVal.rank.totalScore > highestScore) ? playerVal.rank.totalScore : highestScore;
+			lowestScore = (playerVal.rank.totalScore < lowestScore) ? playerVal.rank.totalScore : lowestScore;
 
 		 	var maxActivityDuration = self.m.chartModel.trueStats.secondsPlayed.ratingValues.highestVal;
 		 	var thisPlayerActivityDuration = self.m.chartModel.trueStats.secondsPlayed[playerKey].value;
@@ -317,33 +340,46 @@ function activityInfoCtrl($scope){
 		 	var finalRankScore = (timePlayedPercentage * playerVal.rank.totalScore) / 100;
 
 		 	playerVal.rank.timePlayedPercentage = timePlayedPercentage;
-		 	playerVal.rank.totalScore = Math.round(finalRankScore * 100)/100;
+		 	//playerVal.rank.totalScore = Math.round(finalRankScore * 100) / 100;
 		});		
+
+		//Scale the new rank
+		var absLowest = Math.abs(lowestScore);
+		var scaledHighestScore = highestScore + absLowest;
+
+		angular.forEach(self.m.activityMembers, function(playerVal, playerKey){
+			var scaledPercent = (playerVal.rank.totalScore + absLowest) / scaledHighestScore;
+		 	playerVal.rank.trueRank = Math.round(scaledPercent * perfectRank);
+		});
 
 		self.m.isRankLoaded = true;
 		self.m.isRankNeedsUpdate = false;
 		$scope.isShowRankings = false;
 	}
 
-	function selectCell(columnIndex, rowIndex, cellValue){		
+	function selectCell(columnIndex, rowIndex, cellValue){
+		if((columnIndex && rowIndex && !cellValue) || checkTableSelectionObject(columnIndex, rowIndex)){
+			clearTableSelection();
+			return;
+		}
+
 		self.m.tableSelectionObject.selectedCell = {
 			row: rowIndex,
 			column: columnIndex
 		};
+
+		self.m.isTableCellSelected = columnIndex !== null && rowIndex !== null;
+		self.m.isTableColumnSelected = columnIndex !== null && rowIndex == null;
+		self.m.isTableRowSelected = columnIndex === null && rowIndex !== null;
 	}
 
-	function selectColumn(columnId){
-		self.m.tableSelectionObject.selectedCell = {
-			row : null,
-			column: columnId
+	function checkTableSelectionObject(columnIndex, rowIndex){
+		var tempObj = {
+			row: rowIndex,
+			column: columnIndex
 		}
-	}
 
-	function selectRow(rowId){
-		self.m.tableSelectionObject.selectedCell = {
-			row : rowId,
-			column: null
-		}
+		return angular.equals(tempObj, self.m.tableSelectionObject.selectedCell);
 	}
 
 	function camelCaseToString(val){
@@ -372,5 +408,14 @@ function activityInfoCtrl($scope){
 		}
 	}
 
+	function clearTableSelection(){
+		self.m.tableSelectionObject.selectedCell = {
+			row: null,
+			column: null
+		};
+		self.m.isTableRowSelected = false;
+		self.m.isTableColumnSelected = false;
+		self.m.isTableCellSelected = false;
+	}
 }
 

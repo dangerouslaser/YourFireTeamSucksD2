@@ -1,22 +1,44 @@
 angular
 	.module('fireTeam.common')
-	.directive('inputDirective', inputDirective);
+	.directive('inputDirective', inputDirective)
+	.controller('inputDirectiveCtrl', inputDirectiveCtrl);
 
-	inputDirective.$inject = ['$timeout'];
+	inputDirective.$inject = ['$timeout','$parse'];
 
-	function inputDirective($timeout) {
+	function inputDirective($timeout,$parse) {
 		return {
 			restrict: 'E',
 			scope: {
 				inputModel: '=',
-				tabIndex: '@'
+				tabIndex: '@',
+				recentSearch: '=',
+				onClick: '&'
 			},
+			controller:inputDirectiveCtrl,
 			replace: true,
-			template: '<input class="text" type="text" placeholder="Gamertag or PSN" ng-model="inputModel.displayName"' +
-							'tabindex="tabIndex" ng-class="{\'placeholder\' : inputModel.isPlaceHolder}" />',
+			template: '<div class="test">' + 
+					    '<input class="text" ng-focus="focus=true" ng-blur="focus=false" type="text" placeholder="Gamertag or PSN" ng-model="inputModel.displayName"' +
+						'tabindex="tabIndex" ng-class="{\'placeholder\' : inputModel.isPlaceHolder}"/>' + 
+						'<div class="recent-search-container" ng-if="recentSearch.length > 0 && focus===true">' + 
+							'<div class="recent-search-table">' + 
+								'<ul>' + 
+									'<li>Recent Searches:</li>' + 
+								'</ul>' + 
+								'<ul class="recent-search" ng-repeat="search in recentSearch track by $index" ng-mouseover="selectRecentSearch($index)" ng-mouseout="selectRecentSearch(-1)">' + 
+									'<li class="recent-search-platform">' + 
+										'<img ng-src="/img/{{search.platformType.id === 1 && \'xbox_icon.png\' || \'psn_icon.png\'}}">' + 
+									'</li>' + 
+									'<li class="recent-search-player" ng-repeat="player in search.players track by $index">' + 
+										'<span>{{player.displayName}}</span>' + 
+									'</li>' + 
+								'</ul>' + 
+							'</div>' + 
+						'</div>' + 
+					'</div>',
 			link: function(scope, element, attrs){
-
-				$element = angular.element(element);	
+				scope.clickFn = $parse(attrs.onClick)(scope.$parent);
+				$element = angular.element(element);
+				var inputElement = $element.find('input');	
 				var inputValLength = 0;
 
 				$element.on('keypress', function(e){
@@ -35,6 +57,30 @@ angular
 						scope.$apply();
 					}
 				});
+
+				inputElement.on('blur', function(e){
+					if(scope.selectedIndex !== -1){
+						scope.loadRecent(scope.selectedIndex);
+					}	
+				});
 			}		
 		}
 	};
+
+	inputDirectiveCtrl.inject = ['$scope'];
+
+	function inputDirectiveCtrl($scope){
+		$scope.loadRecent = loadRecent;
+		$scope.selectedIndex = -1;
+		$scope.selectRecentSearch = selectRecentSearch;
+
+		function selectRecentSearch(i){
+			$scope.selectedIndex = i;
+		}
+
+		function loadRecent(){
+			if($scope.clickFn){
+				$scope.clickFn($scope.selectedIndex);
+			}
+		}
+	}

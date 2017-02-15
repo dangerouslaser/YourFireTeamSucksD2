@@ -1,14 +1,15 @@
 
-$primary-color: #fff;
+$primary-color: #eee;
 $primary-bg-color: #12171c;
+$primary-border-color: #757575;
 $content-bg-color: #adadad;
 $font-family: 'Open Sans', sans-serif;
 $font-size: 14px;
-$stats-table-primary-color: #888888;
-$row-title-color: #ea9b39;
+$stats-table-primary-color: $primary-color;
+$row-title-color: $primary-color; /* #ea9b39; */
 $shitlord-color: #a062de;
 $row-title-color-selected: #00ff95;
-$highlight-tablerow: #375649;
+$highlight-tablerow: #1fb173;
 $rank-option-text: #efff00;
 $rank-option-borders: #fff;
 
@@ -45,21 +46,23 @@ input.text {
     background: #000;
     border-radius: 3px;
     border: 1px solid #6796dc;
-    color: #fff;
     margin-top: 5px;
+    color: $primary-color
 }
 
 input:focus{
     outline:none;
     border-color:$row-title-color;
     box-shadow:0 0 10px $row-title-color;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
 }
 
 button{
     position: relative;
     cursor: pointer;
     display: inline-block;
-    color: #fff;
+    color: $primary-color;
     outline:none;
 }
 
@@ -201,7 +204,7 @@ input.player-input {
     position: absolute;
     background-image: url('http://www.bungie.net/img/theme/destiny/bgs/pgcrs/story_moon_1.jpg');
     opacity: .5;
-    border: 1px solid #757575;
+    border: 1px solid $primary-border-color;
 }
 
 .search-content{
@@ -209,11 +212,9 @@ input.player-input {
     width: 40%;
     margin: 0 auto;
     text-align: center;
-    text-shadow: 1px 1px #000;
 }
 
 .search-content .loading-overlay{
-    color: #fff;
     padding-top: 10px;
 }
 
@@ -221,7 +222,7 @@ input.player-input {
     position: relative;
     display: block;
     padding: 8px;
-    border: 1px solid $row-title-color;
+    border: 1px solid $primary-border-color;
     margin-top:10px;
 }
 
@@ -243,23 +244,31 @@ input.player-input {
 }
 
 .activity-selection-container .activity-selection{
-    color: #fff;
     position: relative;
     padding: 10px;
     background: #2a3240;
     cursor: pointer;
     border: 1px solid #12171c;
     opacity: .7;
+    box-shadow: 1px 1px 20px 0px #fff inset;
+    text-shadow: 0px 1px 1px #000;
+    margin-top: 10px;
     
     &.strike{
-        background: #182792;
+        
     }
     &.raid {
-        background: #580363;
+        
     }
     &.story{
-        background: #03650f;
+       
     }
+}
+
+.activity-selection-container .activity-selection:hover{
+    box-shadow: 0px 0px 20px 1px #777777;
+    z-index: 1;
+    opacity: .9;
 }
 
 .activity-header-content .bg, .activity-selection-container .activity-selection .bg{
@@ -268,18 +277,17 @@ input.player-input {
     position: absolute; 
     top:0; 
     left: 0; 
-    opacity: .5;
+    opacity: .8;
+    z-index: -1;
 }
 
 .activity-selection-container .activity-selection .bg{
     z-index: -1; 
 } 
 
-.activity-selection-container .activity-selection:hover{
-    box-shadow: 0px 0px 20px 1px #00ff95;
-    z-index: 1;
-    opacity: 1;
-}
+.activity-selection-container .activity-selection .bg{
+    opacity: .8;
+} 
 
 .activity-selection-container .activity-selection .activity-date{
 
@@ -292,7 +300,7 @@ input.player-input {
 }
 
 .activity-selection-container .activity-selection .activity-info-container .activity-title{
-    
+    font-size: 20px;
 }
 
 .activity-selection-container .activity-selection .character-container{
@@ -308,6 +316,7 @@ input.player-input {
     background: rgba(255, 255, 255, 0.2);
     margin-right: 5px;
     margin-top: 5px;
+    box-shadow: 1px 1px 1px #000;
 
     &.titan{
         color: hotpink;
@@ -374,7 +383,6 @@ span.info-text{
     display: block;
     padding: 10px;
     position: relative;
-    color: #ababab;
 }
 
 span.info-show-button{
@@ -427,7 +435,6 @@ span.info-show-button{
     position: relative;
     display: flex;
     width:100%;
-    cursor:pointer;
 
     &.is-selected{
         box-shadow: 0px 0px 20px 2px $highlight-tablerow;
@@ -454,7 +461,7 @@ span.info-show-button{
     position: relative;
     width: 95%;
     margin: 0 auto;
-    box-shadow: 0px 5px 10px 0px #1e466d;
+    /*box-shadow: 0px 5px 10px 0px #1e466d;*/
 }
 
 #stats-table .stats-main-header-container.is-fixed{
@@ -468,7 +475,7 @@ span.info-show-button{
 
 #stats-table .fixed-header-push{
     position: relative; 
-    height: 155px;
+    height: 180px;
 }
 
 #stats-table .stats-main-header-container.is-fixed .stats-main-header-content{
@@ -479,7 +486,6 @@ span.info-show-button{
 
 .stats-main-header-container.is-fixed .activity-header-content {
     margin: 0 auto;
-    background: #101215;
 }
 
 .stats-main-header-container .activity-header-content{
@@ -524,12 +530,17 @@ span.info-show-button{
     text-align: left;
     width: 100%;
     margin:2px;
+
+    &.dim {
+        opacity: .4;
+    }
 }
 
 #stats-table .cell.row-title{
     color: $row-title-color;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
 }
 
 #stats-table .stat-row.is-selected .cell.row-title{
@@ -540,20 +551,22 @@ span.info-show-button{
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-}
-
-#stats-table .cell.header:hover{
-    overflow: visible;
+    text-align:center;
+    cursor: pointer;
 }
 
 #stats-table .cell.header img{
     width: 15px;
     display: block;
+    margin: 0 auto;
 }
 
 #stats-table .cell.header.is-selected{
     box-shadow: 0px 0px 10px 2px $highlight-tablerow;
     color: #00ff95;
+    overflow: visible;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 }
 
 #stats-table .cell.is-selected .selected-column-highlight{
@@ -569,16 +582,15 @@ span.info-show-button{
 
 #stats-table .cell.activity-title{
     text-align:center;
-    color: #fff;
     font-size: 150%;
     padding: 10px;
-    height:55px;
+    height:100px;
 }
 
 #stats-table-container .stat-row.header-row{
     color: $row-title-color-selected;
-    box-shadow: 0px 0px 20px 1px #a062de inset;
-    color: #a062de;
+    /*box-shadow: 0px 0px 20px 1px #a062de inset;*/
+    color: $primary-color;
     background: rgba(0, 0, 0, 0.67);
 }
 
@@ -598,11 +610,15 @@ span.info-show-button{
     text-align: right;
     text-overflow: ellipsis;
     /*overflow: hidden;*/
+    text-align: center;
 
-    &.highlight {
-        /*border: 1px solid $row-title-color-selected;*/
-        border-radius: 3px;
-        box-shadow: 0px 0px 20px 1px $row-title-color-selected;
+    &.dim.highlight {
+        opacity: 1;
+        box-shadow: 0px 0px 20px 1px $primary-color;
+        margin: 0;
+    }
+    &.is-clickable{
+        cursor: pointer;
     }
 }
 
@@ -770,7 +786,6 @@ span.info-show-button{
 
 .up-down-buttons span.is-selected, .up-down-buttons span:hover{
     background: #71ade8;
-    color: #fff;
 }
 
 .up-down-buttons .plus{
@@ -809,13 +824,14 @@ span.info-show-button{
     cursor: default;
     box-shadow: 0px 0px 1px 1px #b3b3b3 inset;
     color:#6d9fea;
+    text-shadow: none;
 }
 
 .platform-type-container .platform-selection.selected{
     background: #6796dc;
-    color: #fff;
     box-shadow: 0px 0px 10px 1px #5f5f5f;
     cursor: pointer;
+    color: $primary-color;
 }
 
 .platform-type-container .platform-selection.selected:hover{
@@ -823,65 +839,58 @@ span.info-show-button{
 }
 
 .recent-search-container{
-    position: relative;
+    position: absolute;
     width: 100%;
-    background: #000;
+    margin-top: -1px;
+    background: #fff;
     margin-bottom: 10px;
+    color: $primary-bg-color;
+    text-align: left;
+    border: 1px solid #fff;
+    border-top:none;
+    z-index:10;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    box-shadow:0 0 10px $row-title-color;
+    border-top:none;
 }
 
 .recent-search-container .recent-search-table{
-    max-height: 200px;
-    overflow:scroll;
+    overflow: scroll;
+    padding: 5px;
 }
 
-.recent-search-container .section-title{
-    background: #6796dc;
-    text-align: center;
-    padding: 2px 0px 2px 0px;
-    width: 100%;
-    border-bottom: 1px solid #333;
-}
-
-.recent-search-container .recent-search{
+.recent-search-container ul.recent-search{
     cursor: pointer;
-    border-bottom: 1px solid #333;
 }
 
-.recent-search-container .recent-search div{
+ul.recent-search .recent-search-platform img{
+    width: 30px;
+    margin-bottom: -6px;
+}
+
+.recent-search-container .recent-search li{
     padding: 10px;
     display:inline-block;
-    border-right: 1px solid #333;
 }
 
-.recent-search-container .recent-search .recent-search-platform{
-    background: #002282;
-    width: 40px;
-    text-align: right;
-
-    &.xbox {
-        background: green;
-    }
-}
-
-.recent-search-container .recent-search .recent-search-player{
- 
-}
-
-.recent-search-container .recent-search:hover {
+.recent-search-container ul.recent-search:hover {
     background: #333;
-    opacity:.5;
+    color: $primary-color;
 }
 
 #stats-table .cell div.tool-tip{
     padding: 10px;
-    width:100px;
+    width: 100px;
     position: absolute;
-    bottom: 100%;
-    left: 100%;
+    bottom: 120%;
+    left: 110%;
     z-index: 1000;
     background: #181d25;
     border-radius: 3px;
-    box-shadow: 0px 1px 10px 0px #ffffff;
+    box-shadow: 0px 1px 20px 1px #eee;
+    border: 1px solid #6b6b6b;
+    opacity: .8;
 
     &.bottom {
         top: 100%;

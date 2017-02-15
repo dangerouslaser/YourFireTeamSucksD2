@@ -24,7 +24,7 @@
 										<div class="rank-picker">
 											<number-picker 
 												on-change="ctrl.m.changedRankValue"
-												values-array="ctrl.m.weightValueArray" 
+												values-array="ctrl.m.setupValueArray" 
 												value-key="weight"
 												input-model="rank">
 											</number-picker>
@@ -48,7 +48,7 @@
 									<div class="rank-picker">
 										<number-picker
 											on-change="ctrl.m.addNewItem"
-											values-array="ctrl.m.weightValueArray" 
+											values-array="ctrl.m.setupValueArray" 
 											value-key="weight"
 											input-model="rank">
 										</number-picker>
@@ -77,41 +77,27 @@
 							<span class="cell activity-title">{{activityInfo.definitions.activities[0].activityName}} - {{activityInfo.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="stat-row header-row">
 								<span class="cell">
+									<br/>
 									<span style="display: block;">Stat</span>
 									<span class="rank" ng-if="ctrl.m.isRankLoaded">Rank:</span>
 								</span>
-
 								<span class="cell header" 
 								      ng-repeat="(key, val) in ctrl.m.activityMembers track by $index" 
-								      ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}" 
-								      ng-click="ctrl.m.selectColumn($index)"
+								      ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index, 'dim': ((ctrl.m.isTableCellSelected || ctrl.m.isTableColumnSelected) && ctrl.m.tableSelectionObject.selectedCell.column !== $index)}" 
+								      ng-click="ctrl.m.selectCell($index, null, null)"
 								      yfs-tooltip display-text="{{val.displayName}}" append-classes="player-name">
 								      <img src="{{const.bungieRoot}}{{val.iconPath}}" />
-								      <span>{{val.displayName}}</span>
+								      <span>
+								      	{{val.displayName}}
+								      </span>
 								      <br/>
-									  <span class="rank" ng-if="ctrl.m.isRankLoaded">{{val.rank.totalScore}}</span>
-
-									  <div class="tool-tip" ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index">
-										  <span class="low">{{val.displayName}}</span>
-										  <span class="avg">{{val.rank.totalScore}}</span>
-									  </div>
+									  <span class="rank" ng-if="ctrl.m.isRankLoaded">{{val.rank.trueRank}}</span>
 								</span>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<!--<div class="stat-row header-row" ng-if="!ctrl.m.isSticky">
-				<span class="cell"></span>
-				<span class="cell header" ng-repeat="(key, val) in ctrl.m.activityMembers track by $index" ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}">{{val.displayName}}
-					<div class="selected-column-highlight" 
-						 ng-style="fixedHeight"
-						 ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index">
-					</div>
-				</span>
-				<div class="fixed-header-push"></div>
-			</div>-->
-
 			<div id="hidden-header" class="stat-row">
 				<span class="cell row-title stat-display-name"></span>
 				<span ng-repeat="(key, val) in ctrl.m.activityMembers track by $index"
@@ -127,10 +113,13 @@
 			</div>
 			<div ng-class="{'odd' : $odd, 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.row === $index}" class="stat-row" ng-repeat="stat in ctrl.m.chartModel.trueStats track by $index">
 				<span class="cell row-title stat-display-name" 
-				ng-click="ctrl.m.selectRow($index)"
-				yfs-tooltip display-text="{{stat.displayName}}" append-classes="stat-name">{{stat.displayName}}</span>
+				ng-click="ctrl.m.selectCell(null, $index, null)"
+				ng-class="{ 'dim': (ctrl.m.isTableCellSelected || ctrl.m.isTableRowSelected) && ctrl.m.tableSelectionObject.selectedCell.row !== $index}"
+				yfs-tooltip display-text="{{stat.displayName}}" 
+				append-classes="stat-name">{{stat.displayName}}</span>
 				<span ng-repeat="(key, val) in activityMembers track by $index"
-					  ng-class="{'is-greatest' : stat[key].isGreatest, 'is-least' : stat[key].isLeast, 'is-avg' : stat[key].isMostAvg, 'highlight' : (ctrl.m.tableSelectionObject.selectedCell.column === $index && ctrl.m.tableSelectionObject.selectedCell.row === $parent.$index)}" class="cell row-value-player" 
+					  ng-class="{'is-clickable' : stat[key].displayValue,'is-greatest' : stat[key].isGreatest, 'is-least' : stat[key].isLeast, 'is-avg' : stat[key].isMostAvg, 'highlight' : (ctrl.m.tableSelectionObject.selectedCell.column === $index && ctrl.m.tableSelectionObject.selectedCell.row === $parent.$index), 'dim': (ctrl.m.isTableCellSelected || (ctrl.m.isTableRowSelected && ctrl.m.tableSelectionObject.selectedCell.row !== $parent.$index) || (ctrl.m.isTableColumnSelected && ctrl.m.tableSelectionObject.selectedCell.column !== $index))}"
+					  class="cell row-value-player" 
 					  title="{{'(avg: ' + stat.ratingValues.avgVal + '; low: ' + stat.ratingValues.lowestVal + '; high: ' + stat.ratingValues.highestVal + ';)' }}" 
 					  ng-click="ctrl.m.selectCell($index, $parent.$index, stat[key].displayValue)">
 					  {{stat[key].displayValue}}
@@ -142,9 +131,12 @@
 				</span>
 			</div>
 			<div ng-class="{'odd' : $odd}" class="stat-row" ng-repeat="stat in chartModel.extendedWeaponsStats track by $index">
-				<span class="cell row-title stat-display-name" ng-click="ctrl.m.selectRow($index)">{{stat.displayName}}</span>
+				<span class="cell row-title stat-display-name" 
+				ng-click="ctrl.m.selectCell(null, $index, null)"
+				ng-class="{ 'dim': (ctrl.m.isTableCellSelected || ctrl.m.isTableRowSelected || ctrl.m.isTableColumnSelected) && ctrl.m.tableSelectionObject.selectedCell.row !== $index}"
+				>{{stat.displayName}}</span>
 				<span ng-repeat="(key, val) in activityMembers track by $index" 
-					  ng-class="{'is-greatest' : stat[key].isGreatest, 'is-least' : stat[key].isLeast, 'is-avg' : stat[key].isMostAvg, 'highlight' : (ctrl.m.tableSelectionObject.selectedCell.column === $index && ctrl.m.tableSelectionObject.selectedCell.row === $parent.$index)}" class="cell row-value-player" 
+					  ng-class="{'is-clickable' : stat[key].displayValue,'is-greatest' : stat[key].isGreatest, 'is-least' : stat[key].isLeast, 'is-avg' : stat[key].isMostAvg, 'highlight' : (ctrl.m.tableSelectionObject.selectedCell.column === $index && ctrl.m.tableSelectionObject.selectedCell.row === $parent.$index), 'dim': (ctrl.m.isTableCellSelected || (ctrl.m.isTableRowSelected && ctrl.m.tableSelectionObject.selectedCell.row !== $parent.$index) || (ctrl.m.isTableColumnSelected && ctrl.m.tableSelectionObject.selectedCell.column !== $index))}"
 					  class="cell row-value-player" 
 					  title="{{'(avg: ' + stat.ratingValues.avgVal + '; low: ' + stat.ratingValues.lowestVal + '; high: ' + stat.ratingValues.highestVal + ';)' }}"
 					  ng-click="ctrl.m.selectCell($index, $parent.$index, stat[key].displayValue)">{{stat[key].displayValue}}</span>

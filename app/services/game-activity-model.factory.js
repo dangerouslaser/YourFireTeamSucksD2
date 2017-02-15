@@ -15,7 +15,6 @@ angular.module('fireTeam.common')
 		playerPromise = deferred.promise;
 
 			gameOptionsService.getActivityData().then(function (response) {
-			console.log(response)
 			gameActivityModel = response;
 			deferred.resolve(response);
 		});	

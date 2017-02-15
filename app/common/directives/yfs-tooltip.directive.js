@@ -12,6 +12,9 @@ angular
 			replace: false,
 			link: function(scope, element, attrs){
 
+				//currently not in use, although there are references
+				return;
+
 				var $element = angular.element(element);	
 				var $toolTipElement = angular.element($('body').find('#tooltip'));
 				var appendClasses = attrs.appendClasses;

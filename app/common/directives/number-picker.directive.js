@@ -107,4 +107,4 @@ angular
 				$scope.changeFn($scope.inputModel);
 			}
 		}
-	}
+	};

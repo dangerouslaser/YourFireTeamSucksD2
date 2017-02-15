@@ -1,9 +1,9 @@
 angular.module('fireTeam.common')
 	.controller('mainCtrl', MainCtrl);
 
-	MainCtrl.$inject = ['$rootScope','$scope', '$state', '$location', 'PlayerBaseModelFactory', 'GameActivityModelFactory', 'FireTeamModelFactory', 'PlayerOptionsService', 'ActivityModelFactory', '$timeout', '$cookies'];
+	MainCtrl.$inject = ['$rootScope','$scope', '$state', '$location', 'GameActivityModelFactory', 'FireTeamModelFactory', 'ActivityModelFactory', '$timeout', '$cookies'];
 
-	function MainCtrl($rootScope, $scope, $state, $location, playerBaseModelFactory, gameActivityModelFactory, fireTeamModelFactory, playerOptionsService, activityModelFactory, $timeout, $cookies) {
+	function MainCtrl($rootScope, $scope, $state, $location, gameActivityModelFactory, fireTeamModelFactory, activityModelFactory, $timeout, $cookies) {
 
 		var m = $scope.m = {
 			fireTeamActivityResults: [],
@@ -41,6 +41,7 @@ angular.module('fireTeam.common')
 		m.selectedPlatform = m.platformTypes.ps4;
 		m.pageInitialized = false;
 		m.instanceInterval;
+		m.searchCriteria = null;
 
 		$scope.selectActivity = selectActivity;
 		$scope.getFireTeamModel = getFireTeamModel;
@@ -53,20 +54,27 @@ angular.module('fireTeam.common')
 		$scope.search = search;
 
 		$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
-
 			var membersArray = toParams.members.split(';');
 
 			if(toParams.platform && membersArray.length > 0){
+				m.selectedPlatform = m.platformTypes[toParams.platform];
+
+				var searchCriteria = {
+					members: membersArray,
+					platform: m.selectedPlatform
+				};
+				
 				m.playersArrays = [];
+
 				angular.forEach(membersArray, function(player){
 					m.playersArrays.push({displayName: player, isPlaceHolder : false});
 				});
-				
-				m.selectedPlatform = m.platformTypes[toParams.platform];
 
-				$timeout(function(){
-					getFireTeamModel();
-				},10);
+				if(!angular.equals(searchCriteria, angular.fromJson($cookies['searchCriteria'])) || m.fireTeamActivityResults.length < 1){
+					$timeout(function(){
+						getFireTeamModel();
+					},10);
+				};
 
 				if (toParams.instanceId){
 					m.instanceInterval = setInterval(function(){
@@ -114,6 +122,21 @@ angular.module('fireTeam.common')
 			m.pageInitialized = true;
 		}
 
+		function setSearchCriteria(){
+			var membersNameArray = [];
+			angular.forEach(m.playersArrays, function(players){
+				if(!players.isPlaceHolder){
+					membersNameArray.push(players.displayName);
+				}
+			});
+
+			m.searchCriteria = {
+				members: membersNameArray,
+				platform: m.selectedPlatform
+			};
+			setCookie('searchCriteria', m.searchCriteria);
+		}
+
 		function inputDetectionFn(model){
 			var firstPlaceHolderIndex = null;
 			var placeHolderCount = 0;
@@ -144,12 +167,10 @@ angular.module('fireTeam.common')
 		}
 
 		function loadRecentSearch(index){
-			m.playersArrays = [];
-			angular.forEach(m.recentSearches[index].players, function(player){
-				m.playersArrays.push({displayName: player.displayName, isPlaceHolder : false});
-			});
+			m.playersArrays = m.recentSearches[index].players
 			
 			m.selectedPlatform = m.recentSearches[index].platformType;
+			$scope.$apply();
 		}
 
 		function addPlayer(){
@@ -166,8 +187,14 @@ angular.module('fireTeam.common')
 			 	}
 			});
 
-			membersString = membersString.replace(/;+$/, "");
+			var recentSearch = {
+				players: m.playersArrays,
+				platformType: m.selectedPlatform
+			}
 
+			updateRecentSearches(recentSearch);
+
+			membersString = membersString.replace(/;+$/, "");
 			$state.go('home', {platform: m.selectedPlatform.displayValue, members: membersString});
 		}
 
@@ -204,16 +231,7 @@ angular.module('fireTeam.common')
 				m.fireTeamMembers.gameMode = m.gameMode;
 				m.fireTeamMembers.pageNum = 0;
 
-				var recentSearch = {
-					players: [],
-					platformType: m.selectedPlatform
-				}
-
-				angular.forEach(response, function(player){
-					recentSearch.players.push(player.membershipInfo);
-				});
-
-				updateRecentSearches(recentSearch);
+				setSearchCriteria();
 
 				activityModelFactory.getPlayerInstanceList(m.fireTeamMembers).then(function(response){
 					if(response.length > 0){
@@ -294,19 +312,6 @@ angular.module('fireTeam.common')
 			var originalArrayLength = instanceIdArray.length;
 
 			getActiviesPagination(instanceIdArray, m.activityLookupPerSearch);
-
-			// activityModelFactory.getFireTeamActivities(instanceIdArray).then(function(response){
-			// 	console.log('all instance arrays - lets try to page this');
-			// 	if(response[0].ErrorCode && response[0].ErrorCode > 1){
-			// 		throwError(response[0]);
-			// 		return;
-			// 	}
-
-			// 	angular.merge(m.fireTeamActivityResults, response);
-
-			// 	m.isLoadingData = false;
-			// 	m.initialSearchRun = true;
-			// });
 
 			startPollingForProgress(100, originalArrayLength);
 		}
@@ -392,6 +397,7 @@ angular.module('fireTeam.common')
 		}
 
 		function selectActivity(activity){
+			clearInterval(m.instanceInterval);
 			$location.search('instanceId', activity.activityDetails.instanceId);
 			m.selectedActivity = activity;
 			m.isShowActivityList = false;
@@ -419,6 +425,17 @@ angular.module('fireTeam.common')
 		}
 
 		function updateRecentSearches(obj){
+			var recentMatch = false;
+			angular.forEach(m.recentSearches, function(item){
+				if(angular.equals(item, obj)){
+					recentMatch = true;
+				}
+			});
+			
+			if(recentMatch){
+				return;
+			}
+
 			if(m.recentSearches.length >= 10){
 				m.recentSearches.splice(0,1);
 			}
