@@ -135,19 +135,21 @@ angular
 								var floatDisplayVal = parseFloat(stat[playerKey].value);
 								var avgDifferential = Math.abs(stat.ratingValues.avgVal - floatDisplayVal);
 
-								leastDifferential = (avgDifferential < leastDifferential || !leastDifferential) ? avgDifferential : leastDifferential;
+								if(!isNaN(stat[playerKey].displayValue)){
+									leastDifferential = (avgDifferential < leastDifferential || !leastDifferential) ? avgDifferential : leastDifferential;
 
-								if (floatDisplayVal === stat.ratingValues.highestVal && stat.ratingValues.highestVal !== stat.ratingValues.avgVal){
-								 	playerVal.isGreatest = true;
-								}
+									if (floatDisplayVal === stat.ratingValues.highestVal && stat.ratingValues.highestVal !== stat.ratingValues.avgVal){
+									 	playerVal.isGreatest = true;
+									}
 
-								if (floatDisplayVal === stat.ratingValues.lowestVal && stat.ratingValues.lowestVal !== stat.ratingValues.avgVal){
-								 	playerVal.isLeast = true;
-								}
-					
-								if (avgDifferential === leastDifferential && stat.ratingValues.avgVal !== 0){
-									avgPlayer = playerKey;
-								}
+									if (floatDisplayVal === stat.ratingValues.lowestVal && stat.ratingValues.lowestVal !== stat.ratingValues.avgVal){
+									 	playerVal.isLeast = true;
+									}
+						
+									if (avgDifferential === leastDifferential && stat.ratingValues.avgVal !== 0){
+										avgPlayer = playerKey;
+									}
+								}	
 							});
 
 							if(avgPlayer){

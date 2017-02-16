@@ -74,7 +74,7 @@
 						<div class="activity-header-content {{activityInfo.definitions.activities[0].activityTypeName.toLowerCase()}}">
 							<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activityInfo.definitions.activities[0].pgcrImage}})'}"></div>
 							<img class="activity-icon" src="{{const.bungieRoot}}{{activityInfo.definitions.activities[0].icon}}" />
-							<span class="cell activity-title">{{activityInfo.definitions.activities[0].activityName}} - {{activityInfo.dateTime | date:'MM/dd/yyyy'}}</span>
+							<span class="cell activity-title" ng-click="clearTableSelection()">{{activityInfo.definitions.activities[0].activityName}} - {{activityInfo.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="stat-row header-row">
 								<span class="cell">
 									<br/>
@@ -130,16 +130,18 @@
 					  </div>
 				</span>
 			</div>
-			<div ng-class="{'odd' : $odd}" class="stat-row" ng-repeat="stat in chartModel.extendedWeaponsStats track by $index">
+			<div ng-class="{'odd' : $odd, 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.row === $index}" class="stat-row" ng-repeat="stat in chartModel.extendedWeaponsStats track by $index">
 				<span class="cell row-title stat-display-name" 
 				ng-click="ctrl.m.selectCell(null, $index, null)"
-				ng-class="{ 'dim': (ctrl.m.isTableCellSelected || ctrl.m.isTableRowSelected || ctrl.m.isTableColumnSelected) && ctrl.m.tableSelectionObject.selectedCell.row !== $index}"
+				ng-class="{ 'dim': (ctrl.m.isTableCellSelected || ctrl.m.isTableRowSelected) && ctrl.m.tableSelectionObject.selectedCell.row !== $index}"
 				>{{stat.displayName}}</span>
 				<span ng-repeat="(key, val) in activityMembers track by $index" 
 					  ng-class="{'is-clickable' : stat[key].displayValue,'is-greatest' : stat[key].isGreatest, 'is-least' : stat[key].isLeast, 'is-avg' : stat[key].isMostAvg, 'highlight' : (ctrl.m.tableSelectionObject.selectedCell.column === $index && ctrl.m.tableSelectionObject.selectedCell.row === $parent.$index), 'dim': (ctrl.m.isTableCellSelected || (ctrl.m.isTableRowSelected && ctrl.m.tableSelectionObject.selectedCell.row !== $parent.$index) || (ctrl.m.isTableColumnSelected && ctrl.m.tableSelectionObject.selectedCell.column !== $index))}"
 					  class="cell row-value-player" 
 					  title="{{'(avg: ' + stat.ratingValues.avgVal + '; low: ' + stat.ratingValues.lowestVal + '; high: ' + stat.ratingValues.highestVal + ';)' }}"
-					  ng-click="ctrl.m.selectCell($index, $parent.$index, stat[key].displayValue)">{{stat[key].displayValue}}</span>
+					  ng-click="ctrl.m.selectCell($index, $parent.$index, stat[key].displayValue)">
+					  {{stat[key].displayValue}}
+					  </span>
 			</div>
 		</div>
 	</div>
