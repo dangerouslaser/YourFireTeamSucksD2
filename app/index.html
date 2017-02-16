@@ -57,6 +57,19 @@
 							</div>
 						</div>
 
+						<div class="dropdown-container">
+							<div class="selected-option" ng-click="toggleGameMode()">{{m.selectedGameMode}}</div>
+							<div class="dropdown-select" ng-show="m.showDropDown">
+								<ul class="select-category" ng-repeat="(key, val) in m.gameModes track by $index">
+									<li class="category">
+										<span>{{key.toUpperCase()}}:</span>
+									<li>
+									<li class="option" ng-repeat="mode in m.gameModes[key] track by $index" ng-click="selectMode(mode.value)">{{mode.displayName}}</li>
+								</ul>
+							</div>
+							<div class="dropdown-button" ng-click="toggleGameMode()">+</div>
+						</div>
+
 						<input-directive 
 							ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
 							ng-repeat="member in m.playersArrays track by $index"
@@ -98,7 +111,7 @@
 				<div class="activity-selection-container" ng-show="m.isShowActivityList">
 					<span>
 						Found {{m.fireTeamActivityResults.length}} result(s):
-						<button id="MoreResults" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" ng-click="getMoreResults()">
+						<button id="MoreResults" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" ng-click="getMoreResults(); m.matchAttempts = 0;">
 							More Results
 						</button>
 					</span>

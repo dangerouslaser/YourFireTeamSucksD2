@@ -13,7 +13,7 @@ angular.module('fireTeam', [
 
 	    $stateProvider
             .state('home', {
-                url: '/:platform?members?instanceId',
+                url: '/:platform?members?mode?instanceId',
                 templateUrl: 'index.html'
             });
 	}]);

@@ -84,7 +84,6 @@ angular.module('fireTeam.common')
 			data[activityKey] = tempModel;
 		});
 		progress +=1;
-		//console.log('done')
 		return data;
 	}
 

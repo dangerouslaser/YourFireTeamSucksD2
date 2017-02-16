@@ -13,8 +13,8 @@ angular.module('fireTeam.common')
 			}],
 			fireTeamMembers: {},
 			maxMembers: 6,
-			gameModeArray:['None'],
-			gameMode: 'None',
+			gameModes:{},
+			selectedGameMode:'None',
 			platformTypes: {
 				xbox: {
 					id: 1,
@@ -29,6 +29,7 @@ angular.module('fireTeam.common')
 			errorMessage: null,
 			initialSearchRun: false
 		}
+		m.showDropDown = false;
 		m.pollingTimeout;
 		m.activityLookupPerSearch = 10;
 		m.hidePlaceHolder = false;
@@ -42,6 +43,8 @@ angular.module('fireTeam.common')
 		m.pageInitialized = false;
 		m.instanceInterval;
 		m.searchCriteria = null;
+		m.maxMatchAttempts = 10;
+		m.matchAttempts = 0;
 
 		$scope.selectActivity = selectActivity;
 		$scope.getFireTeamModel = getFireTeamModel;
@@ -52,16 +55,22 @@ angular.module('fireTeam.common')
 		$scope.loadRecentSearch = loadRecentSearch;
 		$scope.cancelSearch = cancelSearch;
 		$scope.search = search;
+		$scope.selectMode = selectMode;
+		$scope.toggleGameMode = toggleGameMode;
 
 		$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
 			var membersArray = toParams.members.split(';');
 
 			if(toParams.platform && membersArray.length > 0){
 				m.selectedPlatform = m.platformTypes[toParams.platform];
+				if(toParams.mode){
+					m.selectedGameMode = toParams.mode; 
+				}
 
 				var searchCriteria = {
 					members: membersArray,
-					platform: m.selectedPlatform
+					platform: m.selectedPlatform,
+					mode: m.selectedGameMode
 				};
 				
 				m.playersArrays = [];
@@ -71,19 +80,22 @@ angular.module('fireTeam.common')
 				});
 
 				if(!angular.equals(searchCriteria, angular.fromJson($cookies['searchCriteria'])) || m.fireTeamActivityResults.length < 1){
+					if(toParams.instanceId){
+						loadActivityByIdParameter(toParams.instanceId);
+					}
 					$timeout(function(){
 						getFireTeamModel();
 					},10);
 				};
 
-				if (toParams.instanceId){
-					m.instanceInterval = setInterval(function(){
-						if(!m.isLoadingData){
-							clearInterval(m.instanceInterval);
-							loadActivityByIdParameter(toParams.instanceId);	
-						}
-					},100);
-				}
+				// if (toParams.instanceId){
+				// 	m.instanceInterval = setInterval(function(){
+				// 		if(!m.isLoadingData){
+				// 			clearInterval(m.instanceInterval);
+				// 			loadActivityByIdParameter(toParams.instanceId);	
+				// 		}
+				// 	},100);
+				// }
 			}
 		});
 
@@ -113,6 +125,7 @@ angular.module('fireTeam.common')
 		init();
 
 		function init(){
+			buildGameModeObj();
 			checkRecentSearches();
 			m.pageInitialized = true;
 		}
@@ -127,9 +140,116 @@ angular.module('fireTeam.common')
 
 			m.searchCriteria = {
 				members: membersNameArray,
-				platform: m.selectedPlatform
+				platform: m.selectedPlatform,
+				mode: m.selectedGameMode
 			};
 			setCookie('searchCriteria', m.searchCriteria);
+		}
+
+		function buildGameModeObj(){
+			m.gameModes = {
+					generic:[
+						{
+							value: 'None',
+							displayName: 'Any'
+						}
+					],
+					pve:[
+						{
+							value: 'AllPvE',
+							displayName: 'PvE (Any)'
+						},{
+							value: 'Story',
+							displayName: 'Story'
+						},{
+							value: 'Strike',
+							displayName: 'Strike'
+						},{
+							value: 'Raid',
+							displayName: 'Raid'
+						},{
+							value: 'Nightfall',
+							displayName: 'Nightfall'
+						},{
+							value: 'Heroic',
+							displayName: 'Heroic'
+						},{
+							value: 'AllStrikes',
+							displayName: 'Strikes (All)'
+						},{
+							value: 'Arena',
+							displayName: 'Arena'
+						},{
+							value: 'AllArena',
+							displayName: 'All Arena'
+						},{
+							value: 'ArenaChallenge',
+							displayName: 'Arena Challenge'
+						},{
+							value: 'None',
+							displayName: 'Any'
+						}
+					],
+					pvp: [
+						{
+							value: 'AllPvP',
+							displayName: 'PvP (Any)'
+						}
+						,{
+							value: 'ThreeVsThree',
+							displayName: '3 v 3'
+						},{
+							value: 'Control',
+							displayName: 'Control'
+						},{
+							value: 'Lockdown',
+							displayName: 'Lockdown'
+						},{
+							value: 'Team',
+							displayName: 'Team'
+						},{
+							value: 'FreeForAll',
+							displayName: 'Free For All'
+						},{
+							value: 'IronBanner',
+							displayName: 'Iron Banner'
+						},{
+							value: 'TrialsOfOsiris',
+							displayName: 'Trials Of Osiris'
+						},{
+							value: 'Elimination',
+							displayName: 'Elimination'
+						},{
+							value: 'Rift',
+							displayName: 'Rift'
+						},{
+							value: 'ZoneControl',
+							displayName: 'Control'
+						},{
+							value: 'Racing',
+							displayName: 'Sparrow Racing'
+						},{
+							value: 'Supremacy',
+							displayName: 'Supremacy'
+						},{
+							value: 'Mayhem',
+							displayName: 'Mayhem'
+						},{
+							value: 'PrivateMatchesAll',
+							displayName: 'Private Matches (All)'
+						}
+					]
+				}
+		}
+
+		function selectMode(mode){
+			m.selectedGameMode = mode;
+			m.isNewSearch = true;
+			toggleGameMode();
+		}
+
+		function toggleGameMode(){
+			m.showDropDown = !m.showDropDown;
 		}
 
 		function inputDetectionFn(model){
@@ -165,6 +285,7 @@ angular.module('fireTeam.common')
 			m.playersArrays = m.recentSearches[index].players
 			
 			m.selectedPlatform = m.recentSearches[index].platformType;
+			m.selectedGameMode = m.recentSearches[index].mode;
 			$scope.$apply();
 		}
 
@@ -184,13 +305,14 @@ angular.module('fireTeam.common')
 
 			var recentSearch = {
 				players: m.playersArrays,
-				platformType: m.selectedPlatform
+				platformType: m.selectedPlatform,
+				mode: m.selectedGameMode
 			}
 
 			updateRecentSearches(recentSearch);
 
 			membersString = membersString.replace(/;+$/, "");
-			$state.go('home', {platform: m.selectedPlatform.displayValue, members: membersString});
+			$state.go('home', {platform: m.selectedPlatform.displayValue, members: membersString, mode: m.selectedGameMode});
 		}
 
 		function getFireTeamModel(){
@@ -223,7 +345,7 @@ angular.module('fireTeam.common')
 				}
 
 				m.fireTeamMembers = response;
-				m.fireTeamMembers.gameMode = m.gameMode;
+				m.fireTeamMembers.gameMode = m.selectedGameMode;
 				m.fireTeamMembers.pageNum = 0;
 
 				setSearchCriteria();
@@ -294,8 +416,12 @@ angular.module('fireTeam.common')
 
 		function getFireTeamInstanceData(instanceIdArray){
 			if (instanceIdArray.length < 1){
+				m.matchAttempts += 1;
 				m.isLoadingData = false;
-				getMoreResults();
+
+				if(m.matchAttempts <= m.maxMatchAttempts){
+					getMoreResults();
+				}
 				return;
 			}
 
@@ -464,6 +590,7 @@ angular.module('fireTeam.common')
 				$timeout.cancel(m.pollingTimeout);
 			}
 
+			m.matchAttempts = m.maxMatchAttempts;
 			m.showProgressMessage = false;
 			m.activityListProgress = {
 					totalActivities: 0,
