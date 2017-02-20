@@ -42,7 +42,7 @@ angular
 				var inputValLength = 0;
 
 				$element.on('keypress', function(e){
-			        var regex = new RegExp(/^[a-zA-Z0-9._]+$/);
+			        var regex = new RegExp(/^[a-zA-Z0-9._-]+$/);
 			        var key = String.fromCharCode(!e.charCode ? e.which : e.charCode);
 			        if (!regex.test(key)) {
 			           e.preventDefault();

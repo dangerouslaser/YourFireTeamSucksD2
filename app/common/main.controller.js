@@ -87,15 +87,6 @@ angular.module('fireTeam.common')
 						getFireTeamModel();
 					},10);
 				};
-
-				// if (toParams.instanceId){
-				// 	m.instanceInterval = setInterval(function(){
-				// 		if(!m.isLoadingData){
-				// 			clearInterval(m.instanceInterval);
-				// 			loadActivityByIdParameter(toParams.instanceId);	
-				// 		}
-				// 	},100);
-				// }
 			}
 		});
 
@@ -282,10 +273,10 @@ angular.module('fireTeam.common')
 		}
 
 		function loadRecentSearch(index){
-			m.playersArrays = m.recentSearches[index].players
+			m.playersArrays = m.recentSearches[index].players;
 			
-			m.selectedPlatform = m.recentSearches[index].platformType;
-			m.selectedGameMode = m.recentSearches[index].mode;
+			m.selectedPlatform = m.recentSearches[index].platformType || m.selectedPlatform;
+			m.selectedGameMode = m.recentSearches[index].mode || m.selectedGameMode;
 			$scope.$apply();
 		}
 
@@ -296,6 +287,12 @@ angular.module('fireTeam.common')
 		}
 
 		function search(){
+
+			if(m.playersArrays[0].isPlaceHolder){
+				throwError({ErrorCode: 101, Error: 'Please enter a player name.'});
+				return;
+			}
+
 			var membersString = '';
 			angular.forEach(m.playersArrays, function(p){
 				if(!p.isPlaceHolder){
@@ -320,14 +317,10 @@ angular.module('fireTeam.common')
 				return;
 			}
 
-			if(m.playersArrays[0].isPlaceHolder){
-				throwError({Error: 'Please enter a player name.'});
-				return;
-			}
-
 			if(!m.isNewSearch){
 				return;
 			}
+
 
 			m.isLoadingData = true;
 			m.isShowActivityList = true;
@@ -338,9 +331,17 @@ angular.module('fireTeam.common')
 
 			fireTeamModelFactory.getFireTeam(m.selectedPlatform.id, m.playersArrays).then(function(response){
 				m.isNewSearch = false;
-				if((response[0].status && response[0].status !== 200) || (response[0].data && response[0].data.ErrorCode)){
-					m.initialSearchRun = true;
-					throwError(response[0].data);
+
+				var playerResponseError = false;
+				angular.forEach(response, function(playerResponse){
+					if((playerResponse.status && playerResponse.status !== 200) || (playerResponse.data && playerResponse.data.ErrorCode)){
+						m.initialSearchRun = true;
+						playerResponseError = true;
+						throwError(playerResponse.data);
+					}
+				});
+
+				if(playerResponseError){
 					return;
 				}
 
@@ -373,7 +374,7 @@ angular.module('fireTeam.common')
 
 		function throwError(data){
 
-			if(!data.ErrorCode){
+			if(!data.Error && !data.Error){
 				data.ErrorCode = 100;
 			}
 

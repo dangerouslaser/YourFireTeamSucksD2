@@ -33,7 +33,7 @@ angular.module('fireTeam.common')
 			}
 			return {Message: 'nothing to resolve'};
 		},
-		clearActivityModel: clearActivityModel
+		clear: clearActivityModel
 	};
 
 	function clearActivityModel() {
