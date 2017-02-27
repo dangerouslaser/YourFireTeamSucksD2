@@ -290,7 +290,6 @@ angular.module('fireTeam.common')
 		}
 
 		function search(){
-
 			if(m.playersArrays[0].isPlaceHolder){
 				throwError({ErrorCode: 101, Error: 'Please enter a player name.'});
 				return;
@@ -335,7 +334,6 @@ angular.module('fireTeam.common')
 
 			fireTeamModelFactory.getFireTeam(m.selectedPlatform.id, m.playersArrays).then(function(response){
 				m.isNewSearch = false;
-
 				var playerResponseError = false;
 				angular.forEach(response, function(playerResponse){
 					if((playerResponse.status && playerResponse.status !== 200) || (playerResponse.data && playerResponse.data.ErrorCode)){
@@ -377,7 +375,6 @@ angular.module('fireTeam.common')
 		}
 
 		function throwError(data){
-
 			if(!data.Error && !data.Error){
 				data.ErrorCode = 100;
 			}

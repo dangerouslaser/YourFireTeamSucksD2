@@ -73,7 +73,6 @@ angular.module('fireTeam.common')
 	};	
 
 	function buildActivityDetailsModel(data){
-
 		angular.forEach(data, function(activityVal, activityKey){
 			var tempModel = [];
 
