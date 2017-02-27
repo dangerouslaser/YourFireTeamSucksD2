@@ -301,7 +301,8 @@ input.player-input {
 
 .activity-selection-container .activity-selection .spacing {
   position: relative;
-  padding: 10px; }
+  padding: 10px;
+  border: 1px solid #eee; }
 
 .activity-selection-container .activity-selection:hover {
   z-index: 1;

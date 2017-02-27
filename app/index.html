@@ -109,12 +109,12 @@
 						</button>
 					</span>
 					<span>
-						<button id="ShowMore" class="link" ng-if="m.initialSearchRun" ng-click="showMoreResults(10);">
+						<button id="ShowMore" class="link" ng-if="m.fireTeamActivityResults.length > m.activitiesDisplayed" ng-click="showMoreResults(10);">
 							show more
 						</button>
 					</span>
 					<span>
-						<button id="ShowAll" class="link" ng-if="m.initialSearchRun" ng-click="showMoreResults(m.fireTeamActivityResults.length);">
+						<button id="ShowAll" class="link" ng-if="m.fireTeamActivityResults.length > m.activitiesDisplayed" ng-click="showMoreResults(m.fireTeamActivityResults.length);">
 							show all
 						</button>
 					</span>
