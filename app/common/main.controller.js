@@ -45,6 +45,7 @@ angular.module('fireTeam.common')
 		m.searchCriteria = null;
 		m.maxMatchAttempts = 10;
 		m.matchAttempts = 0;
+		m.hoveredActivity = null;
 
 		$scope.selectActivity = selectActivity;
 		$scope.getFireTeamModel = getFireTeamModel;
@@ -56,7 +57,6 @@ angular.module('fireTeam.common')
 		$scope.cancelSearch = cancelSearch;
 		$scope.search = search;
 		$scope.selectMode = selectMode;
-		$scope.toggleGameMode = toggleGameMode;
 
 		$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
 			var membersArray = toParams.members.split(';');
@@ -64,7 +64,13 @@ angular.module('fireTeam.common')
 			if(toParams.platform && membersArray.length > 0){
 				m.selectedPlatform = m.platformTypes[toParams.platform];
 				if(toParams.mode){
-					m.selectedGameMode = toParams.mode; 
+					angular.forEach(m.gameModes, function(mode){
+						angular.forEach(mode, function(modeItem){
+							if(modeItem.value === toParams.mode){
+								m.selectedGameMode = modeItem;
+							}
+						})
+					}) 
 				}
 
 				var searchCriteria = {
@@ -236,11 +242,6 @@ angular.module('fireTeam.common')
 		function selectMode(mode){
 			m.selectedGameMode = mode;
 			m.isNewSearch = true;
-			toggleGameMode();
-		}
-
-		function toggleGameMode(){
-			m.showDropDown = !m.showDropDown;
 		}
 
 		function inputDetectionFn(model){
@@ -292,6 +293,7 @@ angular.module('fireTeam.common')
 				throwError({ErrorCode: 101, Error: 'Please enter a player name.'});
 				return;
 			}
+			m.selectedActivity = null;
 
 			var membersString = '';
 			angular.forEach(m.playersArrays, function(p){
@@ -309,7 +311,7 @@ angular.module('fireTeam.common')
 			updateRecentSearches(recentSearch);
 
 			membersString = membersString.replace(/;+$/, "");
-			$state.go('home', {platform: m.selectedPlatform.displayValue, members: membersString, mode: m.selectedGameMode});
+			$state.go('home', {platform: m.selectedPlatform.displayValue, members: membersString, mode: m.selectedGameMode.value, instanceId: null});
 		}
 
 		function getFireTeamModel(){
@@ -346,7 +348,7 @@ angular.module('fireTeam.common')
 				}
 
 				m.fireTeamMembers = response;
-				m.fireTeamMembers.gameMode = m.selectedGameMode;
+				m.fireTeamMembers.gameMode = m.selectedGameMode.value;
 				m.fireTeamMembers.pageNum = 0;
 
 				setSearchCriteria();
@@ -455,6 +457,9 @@ angular.module('fireTeam.common')
 				}
 
 				angular.forEach(response, function(activity){
+					angular.forEach(activity.playerPostGameCarnageReport, function(val, key){
+						activity.playerPostGameCarnageReport[key].isSearchedPlayer = isSearchedPlayer(key.toLowerCase());
+					});
 					m.fireTeamActivityResults.push(activity);
 				});
 			
@@ -471,6 +476,15 @@ angular.module('fireTeam.common')
 			});
 		}
 
+		function isSearchedPlayer(lowerCaseNameToCheck){
+			var searchedPlayersLowerCaseStringArray = [];
+			angular.forEach(m.playersArrays, function(searchedPlayer){
+				searchedPlayersLowerCaseStringArray.push(searchedPlayer.displayName.toLowerCase());
+			});
+
+			return searchedPlayersLowerCaseStringArray.indexOf(lowerCaseNameToCheck) !== -1;
+		}
+
 		function loadActivityByIdParameter(id){
 			var array = [id];
 
@@ -480,7 +494,9 @@ angular.module('fireTeam.common')
 					return;
 				}
 				var activity = response[0];
-
+				angular.forEach(activity.playerPostGameCarnageReport, function(val, key){
+					activity.playerPostGameCarnageReport[key].isSearchedPlayer = isSearchedPlayer(key.toLowerCase());
+				});
 				m.fireTeamActivityResults.push(activity);
 				selectActivity(activity);
 			})

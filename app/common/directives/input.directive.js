@@ -37,20 +37,28 @@ angular
 					'</div>',
 			link: function(scope, element, attrs){
 				scope.clickFn = $parse(attrs.onClick)(scope.$parent);
+				scope.keyDownFn = $parse(attrs.onKeyDown)(scope.$parent);
 				$element = angular.element(element);
 				var inputElement = $element.find('input');	
 				var inputValLength = 0;
 
-				$element.on('keypress', function(e){
+				inputElement.on('keypress', function(e){
 			        var regex = new RegExp(/^[a-zA-Z0-9._-]+$/);
 			        var key = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+
 			        if (!regex.test(key)) {
 			           e.preventDefault();
 			           return false;
 			        }
 				});
 
-				$element.on('keyup', function(e){
+				inputElement.on('keydown', function(e){
+			        if(e.keyCode === 13 || e.keyCode === 27){
+		        		this.blur();
+			        }
+				})
+
+				inputElement.on('keyup', function(e){
 					var inputValLength = scope.inputModel.displayName.length;
 					if(inputValLength > -1){
 						scope.inputModel.isPlaceHolder = inputValLength < 1 ? true : false;

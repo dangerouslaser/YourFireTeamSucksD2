@@ -29,12 +29,14 @@
 		<script type="text/javascript" src="services/fire-team-model.factory.js"></script>
 		<script type="text/javascript" src="services/activity-model.factory.js"></script>
 		<script type="text/javascript" src="activities/activity-info.directive.js"></script>
+		<script type="text/javascript" src="common/directives/dropdown.directive.js"></script>
 		<script type="text/javascript" src="common/directives/input.directive.js"></script>
 		<script type="text/javascript" src="common/directives/number-picker.directive.js"></script>
 		<script type="text/javascript" src="common/directives/sticky-container.directive.js"></script>
 		<script type="text/javascript" src="common/directives/toggle-section.directive.js"></script>
 		<script type="text/javascript" src="common/directives/animated-glow.directive.js"></script>
 		<script type="text/javascript" src="common/directives/yfs-tooltip.directive.js"></script>
+		<script type="text/javascript" src="common/directives/disabled-div.directive.js"></script>
 	</head>
 	<body ng-controller="mainCtrl">
 	<div class="main-container">
@@ -45,35 +47,31 @@
 				<div class="search-block">
 					<div class="bg"></div>
 					<div class="search-content">
-						<div class="platform-type-container" ng-if="!m.isLoadingData">
-							<div class="platform-selection" ng-class="{'selected' : m.selectedPlatform.id !== platform.id}" ng-repeat="platform in m.platformTypes track by $index" ng-click="m.selectedPlatform = platform">
-								{{platform.displayValue}}
+						<div style="position: relative;">
+							<disabled-div ng-if="m.isLoadingData"></disabled-div>
+							<div class="platform-type-container">
+								<div class="platform-selection" ng-class="{'selected' : m.selectedPlatform.id !== platform.id}" ng-repeat="platform in m.platformTypes track by $index" ng-click="m.selectedPlatform = platform">
+									{{platform.displayValue}}
+								</div>
 							</div>
+
+							<drop-down-directive
+								input-model="m.gameModes"
+								on-click="selectMode"
+								tab-index="0"
+								default-value="m.gameModes.generic[0]">
+							</drop-down-directive>
+
+							<input-directive 
+								ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
+								ng-repeat="member in m.playersArrays track by $index"
+								input-model="member"
+								recent-search="m.recentSearches"
+								on-click="loadRecentSearch"
+								tab-index="{{$index + 1}}"
+								ng-keydown="keyDownEvt($event)">
+							</input-directive>
 						</div>
-
-						<div class="dropdown-container">
-							<div class="selected-option" ng-click="toggleGameMode()">{{m.selectedGameMode}}</div>
-							<div class="dropdown-select" ng-show="m.showDropDown">
-								<ul class="select-category" ng-repeat="(key, val) in m.gameModes track by $index">
-									<li class="category">
-										<span>{{key.toUpperCase()}}:</span>
-									<li>
-									<li class="option" ng-repeat="mode in m.gameModes[key] track by $index" ng-click="selectMode(mode.value)">{{mode.displayName}}</li>
-								</ul>
-							</div>
-							<div class="dropdown-button" ng-click="toggleGameMode()">+</div>
-						</div>
-
-						<input-directive 
-							ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
-							ng-repeat="member in m.playersArrays track by $index"
-							input-model="member"
-							recent-search="m.recentSearches"
-							on-click="loadRecentSearch"
-							tab-index="{{$index + 1}}"
-							ng-keydown="keyDownEvt($event)">
-						</input-directive>
-
 						<span class="error" ng-if="m.errorMessage">{{m.errorMessage}}</span>
 
 						<div ng-if="!m.isLoadingData">
@@ -102,45 +100,55 @@
 				</div>
 			</div>
 			<toggle-section is-open="m.isShowActivityList" section-title="Activity List" ng-if="m.fireTeamActivityResults.length > 0">
-				<div class="activity-selection-container" ng-show="m.isShowActivityList">
+
+				<div class="section-header">
 					<span>
 						Found {{m.fireTeamActivityResults.length}} result(s):
 						<button id="MoreResults" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" ng-click="getMoreResults(); m.matchAttempts = 0;">
 							More Results
 						</button>
 					</span>
-					<div class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults track by $index" ng-click="selectActivity(activity)">
+				</div>
+
+				<div class="activity-selection-container" ng-show="m.isShowActivityList">
+					<div class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults track by $index" ng-click="selectActivity(activity)" ng-mouseover="m.hoveredActivity = activity" ng-mouseout="m.hoveredActivity = null"  ng-class="{'not-selected' : m.hoveredActivity !== activity && m.hoveredActivity !== null}">
+					<div class="spacing">
 						<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activity.definitions.activities[0].pgcrImage}})'}">
 						</div>
-						<img class="activity-icon" src="{{const.bungieRoot}}{{activity.definitions.activityTypes[0].icon}}" />
-						<div class="activity-info-container">
-							<div class="activity-title">
-								<span class="activity-date">{{activity.dateTime | date:'MM/dd/yyyy'}}</span>
-								<br/>
+						<div class="activity-title">
+							<img class="activity-icon" src="{{const.bungieRoot}}{{activity.definitions.activityTypes[0].icon}}" />
+							<span class="activity-date">{{activity.dateTime | date:'MM/dd/yyyy'}}</span>
+							<br/>
+							<span>
+								<span ng-if="activity.definitions.activityTypes[0].friendlyUrlId">
+									({{activity.definitions.activityTypes[0].friendlyUrlId}})
+								</span>
 								<span>
-									<span ng-if="activity.definitions.activityTypes[0].friendlyUrlId">
-										({{activity.definitions.activityTypes[0].friendlyUrlId}})
-									</span>
-									<span>
-									{{activity.definitions.activityTypes[0].activityTypeName}} : 
-									</span>
+								{{activity.definitions.activityTypes[0].activityTypeName}} : 
 								</span>
-								<span ng-repeat="act in activity.definitions.activities">
-									{{act.activityName}}
-								</span>
-							</div>
+							</span>
+							<span ng-repeat="act in activity.definitions.activities">
+								{{act.activityName}}
+							</span>
+						</div>
+						<div class="activity-info-container" ng-show="m.selectedActivity === activity || m.hoveredActivity === activity">
 							<div class="character-container">
-								<div class="character {{character.characterInfo.characterClass.toLowerCase()}}" ng-repeat="character in activity.playerPostGameCarnageReport track by $index">
+								<div class="character" ng-repeat="character in activity.playerPostGameCarnageReport track by $index">
 									<img src="{{const.bungieRoot}}{{character.characterInfo.iconPath}}" />
+									<span class="character-class  {{character.characterInfo.characterClass.toLowerCase()}}" data-characterClass="{{character.characterInfo.characterClass}}">
+										[{{character.characterInfo.characterClass}}] : 
+									</span>
 									<span class="player-class" data-playerName="{{character.characterInfo.displayName}}">
-										{{character.characterInfo.displayName}} : 
+										{{character.characterInfo.displayName}}  
 									</span>
-									<span class="character-class" data-characterClass="{{character.characterInfo.characterClass}}">
-										{{character.characterInfo.characterClass}}
+									<span class="light-level">
+										{{character.characterInfo.lightLevel}} 
 									</span>
+									
 								</div>
 							</div>
 						</div>
+					</div>
 					</div>
 				</div>
 			</toggle-section>

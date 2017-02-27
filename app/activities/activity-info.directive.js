@@ -49,6 +49,7 @@ angular
 					scope.activityMembers = {};
 					scope.isLoadingCarnageReport = true;
 					scope.chartModel = createChartModel();
+					scope.scrollToTable();
 				}
 
 				function createChartModel(){
@@ -57,6 +58,7 @@ angular
 
 					angular.forEach(activityMembers, function(player){
 						var object = scope.activityInfo.playerPostGameCarnageReport[player].characterInfo;
+						object.isSearchedPlayer = scope.activityInfo.playerPostGameCarnageReport[player].isSearchedPlayer;
 						angular.extend(object, scope.activityInfo.playerPostGameCarnageReport[player].playerInfo)
 						scope.activityMembers[player] = object;
 					});
@@ -182,9 +184,9 @@ angular
 		}
 };
 
-activityInfoCtrl.$inject = ['$scope'];
+activityInfoCtrl.$inject = ['$scope', '$location','$anchorScroll'];
 
-function activityInfoCtrl($scope){
+function activityInfoCtrl($scope, $location, $anchorScroll){
 	var self = this;
 	self.m = $scope;
 	self.m.isRankLoaded = false;
@@ -263,7 +265,6 @@ function activityInfoCtrl($scope){
 	self.m.isTableCellSelected = false;
 	self.m.isTableRowSelected = false;
 	self.m.isTableColumnSelected = false;
-
 	self.m.setupValueArray = setupValueArray();
 	self.m.calculatePlayerStandings = calculatePlayerStandings;
 	self.m.camelCaseToString = camelCaseToString;
@@ -272,7 +273,9 @@ function activityInfoCtrl($scope){
 	self.m.selectCell = selectCell;
 	self.m.changedRankValue = changedRankValue;
 
+	$scope.isShowNonSearchedPlayers = true;
 	$scope.clearTableSelection = clearTableSelection;
+	$scope.scrollToTable = scrollToTable;
 
 	$scope.$watch('chartModel', function(newVal){
 		if(newVal.trueStats){
@@ -361,6 +364,7 @@ function activityInfoCtrl($scope){
 		self.m.isRankLoaded = true;
 		self.m.isRankNeedsUpdate = false;
 		$scope.isShowRankings = false;
+		scrollToTable();
 	}
 
 	function selectCell(columnIndex, rowIndex, cellValue){
@@ -423,5 +427,10 @@ function activityInfoCtrl($scope){
 		self.m.isTableColumnSelected = false;
 		self.m.isTableCellSelected = false;
 	}
+
+	function scrollToTable(){
+		$location.hash('stats-table-container');
+		$anchorScroll();
+	};
 }
 
