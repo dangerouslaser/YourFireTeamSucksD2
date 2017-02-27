@@ -32,6 +32,7 @@ angular.module('fireTeam.common')
 		m.showDropDown = false;
 		m.pollingTimeout;
 		m.activityLookupPerSearch = 10;
+		m.activitiesDisplayed = m.activityLookupPerSearch;
 		m.hidePlaceHolder = false;
 		m.isShowActivityList = true;
 		m.showProgressMessage = false;
@@ -57,6 +58,7 @@ angular.module('fireTeam.common')
 		$scope.cancelSearch = cancelSearch;
 		$scope.search = search;
 		$scope.selectMode = selectMode;
+		$scope.showMoreResults = showMoreResults;
 
 		$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
 			var membersArray = toParams.members.split(';');
@@ -558,6 +560,13 @@ angular.module('fireTeam.common')
 			clearInterval(m.instanceInterval);
 		}
 
+		function showMoreResults(amt){
+			m.activitiesDisplayed += amt;
+			if(m.activitiesDisplayed > m.fireTeamActivityResults.length){
+				m.activitiesDisplayed = m.fireTeamActivityResults.length;
+			}
+		}
+
 		function getGameActivitiesData(){
 			gameActivityModelFactory.getActivityData().then(function(response){
 				m.gameOptionsModel = response;
@@ -607,6 +616,7 @@ angular.module('fireTeam.common')
 				$timeout.cancel(m.pollingTimeout);
 			}
 
+			m.activitiesDisplayed = m.activityLookupPerSearch;
 			m.matchAttempts = m.maxMatchAttempts;
 			m.showProgressMessage = false;
 			m.activityListProgress = {

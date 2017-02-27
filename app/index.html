@@ -103,15 +103,25 @@
 
 				<div class="section-header">
 					<span>
-						Found {{m.fireTeamActivityResults.length}} result(s):
-						<button id="MoreResults" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" ng-click="getMoreResults(); m.matchAttempts = 0;">
-							More Results
+						Displaying {{m.activitiesDisplayed}} of {{m.fireTeamActivityResults.length}} result(s): 
+						<button id="MoreResults" style="float: right;" class="submit" ng-if="m.initialSearchRun && !m.isLoadingData" ng-click="getMoreResults(); m.matchAttempts = 0;">
+							Search More
+						</button>
+					</span>
+					<span>
+						<button id="ShowMore" class="link" ng-if="m.initialSearchRun" ng-click="showMoreResults(10);">
+							show more
+						</button>
+					</span>
+					<span>
+						<button id="ShowAll" class="link" ng-if="m.initialSearchRun" ng-click="showMoreResults(m.fireTeamActivityResults.length);">
+							show all
 						</button>
 					</span>
 				</div>
 
 				<div class="activity-selection-container" ng-show="m.isShowActivityList">
-					<div class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults track by $index" ng-click="selectActivity(activity)" ng-mouseover="m.hoveredActivity = activity" ng-mouseout="m.hoveredActivity = null"  ng-class="{'not-selected' : m.hoveredActivity !== activity && m.hoveredActivity !== null}">
+					<div class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults | limitTo:m.activitiesDisplayed track by $index" ng-click="selectActivity(activity)" ng-mouseover="m.hoveredActivity = activity" ng-mouseout="m.hoveredActivity = null"  ng-class="{'not-selected' : m.hoveredActivity !== activity && m.hoveredActivity !== null}">
 					<div class="spacing">
 						<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activity.definitions.activities[0].pgcrImage}})'}">
 						</div>
