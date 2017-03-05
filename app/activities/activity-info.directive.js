@@ -272,6 +272,7 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 	self.m.removeNewItem = removeNewItem;
 	self.m.selectCell = selectCell;
 	self.m.changedRankValue = changedRankValue;
+	self.m.removeRankValue = removeRankValue;
 
 	$scope.isShowNonSearchedPlayers = true;
 	$scope.clearTableSelection = clearTableSelection;
@@ -332,7 +333,7 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 			 	removeNewItem(rankVal);
 
 			 	if(weight === 0){
-			 		rankVal.isUse = false;
+			 		return;
 			 	}
 
 			 	self.m.chartModel.trueStats[rankKey].weight = weight;	
@@ -411,11 +412,9 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 
 	function addNewItem(rank){
 		rank.isNew = false;
-		if(rank.weight !== 0){
-			rank.isUse = true;
-			rank.isNew = true;
-			self.m.isRankLoaded = false;
-		}
+		rank.isUse = true;
+		rank.isNew = true;
+		self.m.isRankLoaded = false;
 	}
 
 	function clearTableSelection(){
@@ -432,5 +431,12 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 		$location.hash('stats-table-container');
 		$anchorScroll();
 	};
+
+	function removeRankValue(rank){
+		rank.weight = 0;
+		rank.isUse = false;
+		rank.isNew = false;
+		self.m.isRankNeedsUpdate = true;
+	}
 }
 

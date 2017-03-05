@@ -6,8 +6,10 @@ var request = require('request');
 var bodyParser = require('body-parser');
 var ejs = require('ejs');
 var session = require('express-session');
+var timeout = require('connect-timeout');
 // Create our Express application
 var app = express();
+
 
 // Set view engine to ejs
 app.set('view engine', 'ejs');
@@ -45,6 +47,8 @@ router.get('/getMembershipIdByUserName', function(req, res, next){
           var jsonResponse, result;
           res.setHeader('Content-Type', 'application/json');
           res.status(200);
+
+          console.log(res);
 
           try {
             jsonResponse = JSON.parse(body);
@@ -158,6 +162,13 @@ router.get('/getWeaponDefinitionById', function(req, res, next){
           res.json(result);
     });
 });
+
+app.use(timeout(120000));
+app.use(haltOnTimedout);
+
+function haltOnTimedout(req, res, next){
+  if (!req.timedout) next();
+}
 
 app.use(express.static(__dirname + '/app'));
 

@@ -31,6 +31,8 @@ input.text {
   border: 1px solid #6796dc;
   margin-top: 5px;
   color: #eee; }
+  input.text.placeholder {
+    opacity: .6; }
 
 input.checkbox {
   width: auto;
@@ -70,6 +72,8 @@ button.submit {
     background: transparent;
     color: red;
     box-shadow: 0px 0px 10px 2px red; }
+  button.submit.more-results {
+    margin: 10px 0px 10px 0px; }
 
 button.link {
   text-decoration: underline;
@@ -259,6 +263,28 @@ input.player-input {
   margin: 0 auto;
   text-align: center; }
 
+.search-container .input-container {
+  position: relative; }
+
+.input-container .clear-text-button, .exit-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 16px 8px 0px 0px;
+  cursor: pointer;
+  background: rgba(51, 51, 51, 0.91);
+  padding: 2px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  border-radius: 20px;
+  color: #eee;
+  text-align: center;
+  opacity: .4; }
+  .input-container .clear-text-button:hover, .exit-button:hover {
+    opacity: 1;
+    border: 1px solid #eee; }
+
 .search-content .loading-overlay {
   padding-top: 10px; }
 
@@ -389,7 +415,7 @@ input.player-input {
 
 .content {
   margin: 0 auto;
-  width: 95%; }
+  width: 100%; }
 
 .post-game-carnage-player-stats-container {
   position: relative;
@@ -467,7 +493,7 @@ span.info-show-button {
 
 #stats-table .stats-main-header-container.is-fixed .stats-main-header {
   position: relative;
-  width: 95%;
+  width: 100%;
   margin: 0 auto;
   /*box-shadow: 0px 5px 10px 0px #1e466d;*/ }
 
@@ -496,7 +522,7 @@ span.info-show-button {
 
 .stats-main-header-container.is-fixed .stats-main-header- {
   position: relative;
-  width: 95%;
+  width: 100%;
   margin: 0 auto; }
 
 #stats-table .stats-main-header-container .stats-main-header .cell-spacer {

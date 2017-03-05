@@ -12,12 +12,13 @@ angular
 				inputModel: '=',
 				tabIndex: '@',
 				onClick: '&',
-				defaultValue: '='
+				defaultValue: '=',
+				selectedItem: '='
 			},
 			controller:dropDownDirectiveCtrl,
 			replace: true,
 			template: '<div class="dropdown-container" tabIndex="{{tabIndex}}" ng-click="toggleDropDown()">' +
-							'<div class="selected-option" >{{selectedObject.displayName}}</div>' +
+							'<div class="selected-option" >{{selectedItem}}</div>' +
 							'<div class="dropdown-select" ng-show="showDropDown">' +
 								'<ul class="select-category" ng-repeat="(key, val) in inputModel track by $index">' +
 									'<li class="category">' +
@@ -66,6 +67,7 @@ angular
 		$scope.selectItem = selectItem;
 		$scope.toggleDropDown = toggleDropDown;
 		$scope.selectedObject = $scope.defaultValue;
+		$scope.selectedItem = $scope.selectedObject.displayName;
 
 		function toggleDropDown(){
 			$scope.showDropDown = !$scope.showDropDown;
@@ -73,6 +75,7 @@ angular
 
 		function selectItem(item){
 			$scope.selectedObject = item;
+			$scope.selectedItem = item.value;
 			if($scope.clickFn){
 				$scope.clickFn(item);
 			}

@@ -16,10 +16,10 @@ angular
 			},
 			controller:inputDirectiveCtrl,
 			replace: true,
-			template: '<div class="test">' + 
-					    '<input class="text" ng-focus="focus=true" ng-blur="focus=false" type="text" placeholder="Gamertag or PSN" ng-model="inputModel.displayName"' +
-						'tabindex="tabIndex" ng-class="{\'placeholder\' : inputModel.isPlaceHolder}"/>' + 
-						'<div class="recent-search-container" ng-if="recentSearch.length > 0 && focus===true">' + 
+			template: '<div class="input-container">' + 
+					    '<input class="text" ng-focus="initialFocus=true" ng-blur="initialFocus=false" type="text" placeholder="Gamertag or PSN" ng-model="inputModel.displayName"' +
+						'tabindex="tabIndex" ng-class="{\'placeholder\' : inputModel.isPlaceHolder && !initialFocus}" />' + 
+						'<div class="recent-search-container" ng-if="recentSearch.length > 0 && initialFocus === true">' + 
 							'<div class="recent-search-table">' + 
 								'<ul>' + 
 									'<li>Recent Searches:</li>' + 
@@ -31,14 +31,20 @@ angular
 									'<li class="recent-search-player" ng-repeat="player in search.players track by $index">' + 
 										'<span>{{player.displayName}}</span>' + 
 									'</li>' + 
+									'<li class="recent-search-mode">' + 
+										'<span>{{search.mode.displayName}}</span>' + 
+									'</li>' + 
 								'</ul>' + 
 							'</div>' + 
 						'</div>' + 
+						'<div class="clear-text-button" ng-show="!inputModel.isPlaceHolder" ng-click="clearText()">X</div>' +
 					'</div>',
 			link: function(scope, element, attrs){
+				scope.initialFocus = false;
 				scope.clickFn = $parse(attrs.onClick)(scope.$parent);
 				scope.keyDownFn = $parse(attrs.onKeyDown)(scope.$parent);
 				$element = angular.element(element);
+				var blurKeyCode = null;
 				var inputElement = $element.find('input');	
 				var inputValLength = 0;
 
@@ -50,13 +56,16 @@ angular
 			           e.preventDefault();
 			           return false;
 			        }
+			        scope.initialFocus = false;
 				});
 
 				inputElement.on('keydown', function(e){
+					blurKeyCode = e.keyCode;
 			        if(e.keyCode === 13 || e.keyCode === 27){
 		        		this.blur();
 			        }
-				})
+			  		scope.initialFocus = false;
+				});
 
 				inputElement.on('keyup', function(e){
 					var inputValLength = scope.inputModel.displayName.length;
@@ -67,10 +76,16 @@ angular
 				});
 
 				inputElement.on('blur', function(e){
-					if(scope.selectedIndex !== -1){
+					if(scope.selectedIndex !== -1 && !blurKeyCode){
 						scope.loadRecent(scope.selectedIndex);
 					}	
 				});
+
+				scope.clearText = function(){
+					scope.inputModel.displayName = '';
+					scope.inputModel.isPlaceHolder = true;
+					//scope.$apply();
+				}
 			}		
 		}
 	};

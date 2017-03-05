@@ -5,6 +5,8 @@ angular.module('fireTeam.common')
     var currentDeferred;
 	var activityModel;
 	var progress = 0;
+	var activityPromises;
+	var playerInstancePromises;
 
 	const statsToExcludeArray = [
 		'fireTeamId',
@@ -29,9 +31,13 @@ angular.module('fireTeam.common')
 			progress = 0;
 			if(currentDeferred){
 				currentDeferred.resolve({Message: 'user cancelled'});
-				return currentDeferred.promise;
 			}
-			return {Message: 'nothing to resolve'};
+			else{
+				currentDeferred = $q.defer();
+				currentDeferred.resolve({Message: 'nothing to resolve'});
+			}
+
+			return currentDeferred.promise;
 		},
 		clear: clearActivityModel
 	};
@@ -41,14 +47,13 @@ angular.module('fireTeam.common')
 	}
 
 	function getFireTeamActivities(instanceArray) {
-		var deferred = currentDeferred = $q.defer();
-		var activityPromises = [];
+		activityPromises = [];
 
 		angular.forEach(instanceArray, function(Id){
 			activityPromises.push(getPostGameCarnageReport(Id));
 		});
 
-		return activityModel = $q.all(activityPromises);
+	 	return activityModel = $q.all(activityPromises);
 	};
 
     function getPostGameCarnageReport(Id) {
@@ -167,8 +172,7 @@ angular.module('fireTeam.common')
 	};
 
 	function getPlayerInstanceList(fireTeamObject) {
-		var deferred = currentDeferred = $q.defer();
-		var playerInstancePromises = [];	
+		playerInstancePromises = [];	
 
 		angular.forEach(fireTeamObject, function(player){
 			angular.forEach(player.characters, function(character){
