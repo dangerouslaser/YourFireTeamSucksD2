@@ -47,14 +47,14 @@
 				<div class="search-block">
 					<div class="bg"></div>
 					<div class="search-content">
-						<div style="position: relative;">
+						<div>
 							<disabled-div ng-if="m.isLoadingData"></disabled-div>
-							<div class="platform-type-container">
-								<div class="platform-selection" ng-class="{'selected' : m.selectedPlatform.id !== platform.id}" ng-repeat="platform in m.platformTypes track by $index" ng-click="selectPlatform(platform)">
-									{{platform.displayValue}}
+							<div class="platform-dropdown-container">
+								<div class="platform-type-container">
+									<div class="platform-selection" ng-class="{'selected' : m.selectedPlatform.id !== platform.id}" ng-repeat="platform in m.platformTypes track by $index" ng-click="selectPlatform(platform)">
+										{{platform.displayValue}}
+									</div>
 								</div>
-							</div>
-							<div>
 								<drop-down-directive
 									input-model="m.gameModes"
 									on-click="selectMode"
