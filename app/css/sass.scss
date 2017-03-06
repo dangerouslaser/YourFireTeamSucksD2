@@ -611,7 +611,7 @@ span.info-show-button{
 
 #stats-table .stats-main-header-container{
     position: absolute;
-    z-index: 2;
+    z-index: 11;
     top: 0;
     width: 100%;
     left: 0;
@@ -740,6 +740,8 @@ span.info-show-button{
     border-radius: 3px;
     padding-bottom: 3px;
     height: 10000px;
+    z-index: 10;
+    cursor: pointer;
 }
 
 #stats-table .activity-title{
@@ -788,8 +790,16 @@ span.info-show-button{
     }
 }
 
-#stats-table .stat-row.odd .cell{
+#stats-table .stat-row.odd{
     background: #181d25;
+
+    &.rank-category{
+        background: none;
+    }
+}
+
+#stats-table .stat-row.rank-category .cell{
+    border: 3px solid rgba(189, 89, 89, 0.43);
 }
 
 #stats-table .cell.row-value-player.is-greatest{
@@ -834,7 +844,7 @@ span.info-show-button{
 }
 
 .rank-option{
-    position: relative;
+position: relative;
     text-align: left;
     margin: 10px;
     text-overflow: ellipsis;
@@ -842,14 +852,24 @@ span.info-show-button{
     overflow: hidden;
     padding: 10px;
     border-radius: 3px;
+    border: 3px solid rgba(189, 89, 89, 0.43);
+    color: $primary-color;
+    font-weight: bold;
+    width: 25%;
     background: #12171c;
+    display: inline-block;
 }
 
 .rank-option .rank-picker{
     position:relative;
     display:inline-block;
-    width: 50%;
     text-align: left;
+    float: left;
+
+    &.right{
+        float: right;
+        margin-right: 50px;
+    }
 }
 
 .rank-option.newItem{
@@ -874,6 +894,7 @@ span.info-show-button{
     position: relative;
     overflow: hidden;
     border-radius: 3px;
+    box-shadow: 0px 0px 1px 1px #333;
 }
 
 .number-picker-container control-container.is-error{

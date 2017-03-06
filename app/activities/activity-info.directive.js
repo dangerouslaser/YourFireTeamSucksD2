@@ -225,12 +225,6 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 				isUse: true,
 				isNew: true
 			},
-			totalStats: {
-				displayName: 'Total Stats',
-				weight: 1,
-				isUse: true,
-				isNew: true
-			},
 			suicides: {
 				displayName: 'Suicides',
 				weight: -1,
@@ -269,10 +263,12 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 	self.m.calculatePlayerStandings = calculatePlayerStandings;
 	self.m.camelCaseToString = camelCaseToString;
 	self.m.addNewItem = addNewItem;
-	self.m.removeNewItem = removeNewItem;
+	self.m.unMarKNewItem = unMarKNewItem;
 	self.m.selectCell = selectCell;
 	self.m.changedRankValue = changedRankValue;
 	self.m.removeRankValue = removeRankValue;
+	self.m.statsToExcludeArray = ['totalstats'];
+	self.m.activeRankValueArray = [];
 
 	$scope.isShowNonSearchedPlayers = true;
 	$scope.clearTableSelection = clearTableSelection;
@@ -301,18 +297,20 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 
 		self.m.rankingCategories = {};
 		angular.forEach(self.m.chartModel.trueStats, function(val, key){
-			var weight = self.m.suggestedRankingCategories[key] ? self.m.suggestedRankingCategories[key].weight : 0;
-			self.m.rankingCategories[key] = {
-				displayName: val.displayName,
-				weight: weight,
-				isUse: weight === 0 ? false : true,
-				isNew: true
+			if(self.m.statsToExcludeArray.indexOf(key.toLowerCase()) === -1){
+				var weight = self.m.suggestedRankingCategories[key] ? self.m.suggestedRankingCategories[key].weight : 0;
+				self.m.rankingCategories[key] = {
+					displayName: val.displayName,
+					weight: weight,
+					isUse: weight === 0 ? false : true,
+					isNew: true
+				}
 			}
 		});
 	}
 
 	function calculatePlayerStandings(){
-
+		self.m.activeRankValueArray = [];
 		const perfectRank = 5000;
 		var highestScore = 0;
 		var lowestScore = 0;
@@ -325,20 +323,24 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 
 			angular.forEach(self.m.rankingCategories, function(rankVal, rankKey){
 			 	var weight = rankVal.weight;
-			 	var avgValue = self.m.chartModel.trueStats[rankKey].ratingValues.avgVal;
-			 	var playerStatValue = self.m.chartModel.trueStats[rankKey][playerKey].value;
-			 	var differential = playerStatValue - avgValue;			
-			 	var statRankScore = differential * weight;
-
-			 	removeNewItem(rankVal);
 
 			 	if(weight === 0){
-			 		return;
+			 		removeRankValue(rankVal);
 			 	}
 
-			 	self.m.chartModel.trueStats[rankKey].weight = weight;	
-			 	playerVal.rank[rankKey] = statRankScore;		
-		 		playerVal.rank.totalScore += statRankScore;
+			 	if(rankVal.isUse){
+				 	var avgValue = self.m.chartModel.trueStats[rankKey].ratingValues.avgVal;
+				 	var playerStatValue = self.m.chartModel.trueStats[rankKey][playerKey].value;
+				 	var differential = playerStatValue - avgValue;			
+				 	var statRankScore = differential * weight;
+
+				 	self.m.chartModel.trueStats[rankKey].weight = weight;	
+				 	playerVal.rank[rankKey] = statRankScore;		
+			 		playerVal.rank.totalScore += statRankScore;
+
+				 	unMarKNewItem(rankVal);
+				 	self.m.activeRankValueArray.push(rankVal.displayName);
+		 		}
 			});
 
 		 	highestScore = (playerVal.rank.totalScore > highestScore) ? playerVal.rank.totalScore : highestScore;
@@ -401,7 +403,7 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 		return newString;
 	}
 
-	function removeNewItem(rank){
+	function unMarKNewItem(rank){
 		rank.isNew = false;
 	}
 

@@ -21,7 +21,7 @@
 										<div class="rank-picker">
 											<span>{{rank.displayName}}: </span>
 										</div>
-										<div class="rank-picker">
+										<div class="rank-picker right">
 											<number-picker 
 												on-change="ctrl.m.changedRankValue"
 												values-array="ctrl.m.setupValueArray" 
@@ -46,7 +46,7 @@
 									<div class="rank-picker">
 										<span>{{rank.displayName}}: </span>
 									</div>
-									<div class="rank-picker">
+									<div class="rank-picker right">
 										<number-picker
 											on-change="ctrl.m.addNewItem"
 											values-array="ctrl.m.setupValueArray" 
@@ -110,13 +110,14 @@
 					  ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}" >
 					   <div class="selected-column-highlight"
 						 ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index" 
+						 ng-click="ctrl.m.selectCell(null, null, null)"
 						 >
 					</div>
 				</span>
 			</div>
 			<div class="fixed-header-push">
 			</div>
-			<div ng-class="{'odd' : $odd, 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.row === $index}" class="stat-row" ng-repeat="stat in ctrl.m.chartModel.trueStats track by $index">
+			<div ng-class="{'odd' : $odd, 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.row === $index, 'rank-category' : ctrl.m.activeRankValueArray.indexOf(stat.displayName) !== -1}" class="stat-row" ng-repeat="stat in ctrl.m.chartModel.trueStats track by $index">
 				<span class="cell row-title stat-display-name" 
 				ng-click="ctrl.m.selectCell(null, $index, null)"
 				ng-class="{ 'dim': (ctrl.m.isTableCellSelected || ctrl.m.isTableRowSelected) && ctrl.m.tableSelectionObject.selectedCell.row !== $index}"

@@ -48,8 +48,6 @@ router.get('/getMembershipIdByUserName', function(req, res, next){
           res.setHeader('Content-Type', 'application/json');
           res.status(200);
 
-          console.log(res);
-
           try {
             jsonResponse = JSON.parse(body);
           } catch (e) {
