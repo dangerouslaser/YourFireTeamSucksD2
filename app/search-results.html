@@ -1,0 +1,67 @@
+<toggle-section is-open="m.isShowActivityList" section-title="Activity List" ng-if="m.fireTeamActivityResults.length > 0">
+	<div class="section-header">
+		<span>
+			<button id="MoreResults" class="submit more-results" ng-if="!m.isNewSearch && m.fireTeamActivityResults.length > 0 && !m.isLoadingData" ng-click="getMoreResults(); m.matchAttempts = 0;">
+				Search More
+			</button>
+			Displaying {{m.activitiesDisplayed}} of {{m.fireTeamActivityResults.length}} result(s): 
+		</span>
+		<span>
+			<button id="ShowMore" class="link" ng-if="m.fireTeamActivityResults.length > m.activitiesDisplayed" ng-click="showMoreResults(10);">
+				show more
+			</button>
+		</span>
+		<span>
+			<button id="ShowAll" class="link" ng-if="m.fireTeamActivityResults.length > m.activitiesDisplayed" ng-click="showMoreResults(m.fireTeamActivityResults.length);">
+				show all
+			</button>
+		</span>
+	</div>
+
+	<div class="activity-selection-container" ng-if="m.isShowActivityList">
+		<div class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults | limitTo:m.activitiesDisplayed track by $index" ng-click="selectActivity(activity)" ng-mouseover="m.hoveredActivity = activity" ng-mouseout="m.hoveredActivity = null"  ng-class="{'not-selected' : m.hoveredActivity !== activity && m.hoveredActivity !== null}">
+		<div class="spacing">
+			<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activity.definitions.activities[0].pgcrImage}})'}">
+			</div>
+			<div class="activity-title">
+				<img class="activity-icon" src="{{const.bungieRoot}}{{activity.definitions.activityTypes[0].icon}}" />
+				<span class="activity-date">{{activity.dateTime | date:'MM/dd/yyyy'}}</span>
+				<br/>
+				<span>
+					<span ng-if="activity.definitions.activityTypes[0].friendlyUrlId">
+						({{activity.definitions.activityTypes[0].friendlyUrlId}})
+					</span>
+					<span>
+					{{activity.definitions.activityTypes[0].activityTypeName}} : 
+					</span>
+				</span>
+				<span ng-repeat="act in activity.definitions.activities">
+					{{act.activityName}}
+				</span>
+			</div>
+			<div class="activity-info-container" ng-show="m.selectedActivity === activity || m.hoveredActivity === activity">
+				<div class="character-container">
+					<div class="character" ng-repeat="character in activity.playerPostGameCarnageReport track by $index">
+						<img src="{{const.bungieRoot}}{{character.characterInfo.iconPath}}" />
+						<span class="character-class  {{character.characterInfo.characterClass.toLowerCase()}}" data-characterClass="{{character.characterInfo.characterClass}}">
+							[{{character.characterInfo.characterClass}}] : 
+						</span>
+						<span class="player-class" data-playerName="{{character.characterInfo.displayName}}">
+							{{character.characterInfo.displayName}}  
+						</span>
+						<span class="light-level">
+							{{character.characterInfo.lightLevel}} 
+						</span>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+	</div>
+	</toggle-section>
+	<activity-info
+	ng-if="m.selectedActivity"
+	activity-info="m.selectedActivity">
+	</activity-info>
+	</div>

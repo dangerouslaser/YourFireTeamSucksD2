@@ -12,6 +12,19 @@ html, body {
 div {
   position: relative; }
 
+a, a:visited {
+  color: #6d9fea;
+  text-decoration: none; }
+  a:hover, a:visited:hover {
+    color: #d47e52; }
+
+a.about {
+  color: #000;
+  text-decoration: underline; }
+  a.about:hover {
+    color: #000;
+    color: #eee; }
+
 h3.header-text {
   text-align: center;
   font-size: 150%; }
@@ -920,5 +933,15 @@ div.tooltip {
     color: #00ff95; }
   div.tooltip.stat-name {
     color: #eee; }
+
+#disclaimers {
+  bottom: 0;
+  margin: 20px 0px 20px 0px;
+  background: #6796dc;
+  padding: 5px;
+  color: #000; }
+
+.about-info, .about-info div {
+  padding: 10px; }
 
 /*# sourceMappingURL=sass.css.map */

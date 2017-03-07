@@ -11,10 +11,13 @@ angular.module('fireTeam', [
 .config(['$stateProvider', function ($stateProvider) {
 	    'use strict';
 
-	    $stateProvider
-            .state('home', {
-                url: '/:platform?members?mode?instanceId',
-                templateUrl: 'index.html'
+      $stateProvider
+              .state('search', {
+                url: '/search/:platform?members?mode?instanceId',
+                templateUrl: 'search-results.html'
+            }).state('about', {
+                url: '/about',
+                templateUrl: 'about.html'
             });
 	}]);
 

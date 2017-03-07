@@ -51,6 +51,7 @@ angular.module('fireTeam.common')
 		m.matchAttempts = 0;
 		m.hoveredActivity = null;
 		m.currentStateParams = null;
+		m.copyrightYear = getDate();
 
 		$scope.selectPlatform = selectPlatform;
 		$scope.selectActivity = selectActivity;
@@ -67,9 +68,11 @@ angular.module('fireTeam.common')
 
 		$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
 			m.currentStateParams = toParams;
-			var membersArray = toParams.members.split(';');
+			var membersArray = toParams.members ? toParams.members.split(';') : '';
 
-			if(toParams.platform && membersArray.length > 0){
+			m.selectedPlatform = m.platformTypes[toParams.platform] || m.selectedPlatform;
+
+			if(membersArray.length > 0){
 				m.selectedPlatform = m.platformTypes[toParams.platform];
 				if(toParams.mode){
 					angular.forEach(m.gameModes, function(mode){
@@ -102,6 +105,7 @@ angular.module('fireTeam.common')
 
 				updateRecentSearches(recentSearch);
 			}
+			
 		});
 
 		$scope.$watch('m.playersArrays', function(newVal, oldVal){
@@ -141,11 +145,8 @@ angular.module('fireTeam.common')
 				mode: m.selectedGameMode
 			};
 
-			// if(angular.equals(m.searchCriteria, m.lastSuccessSearchCriteria) && m.fireTeamActivityResults.length > 0){
-			// 	m.isNewSearch = false;
-			// 	return;
-			// }
-			// m.isNewSearch = true;
+			m.isNewSearch = !angular.equals(m.searchCriteria, m.lastSuccessSearchCriteria);
+
 			setCookie('searchCriteria', m.searchCriteria);
 		}
 
@@ -325,7 +326,7 @@ angular.module('fireTeam.common')
 				$state.reload();
 			}
 
-			$state.go('home', newSearchParams);
+			$state.go('search', newSearchParams);
 		}
 
 		function getFireTeamModel(){
@@ -639,6 +640,11 @@ angular.module('fireTeam.common')
 				}
 
 			activityModelFactory.clearProgress();
+		}
+
+		function getDate(){
+			var date = new Date();
+			return date.getFullYear();
 		}
 	};
 

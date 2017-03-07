@@ -13,6 +13,7 @@ $row-title-color-selected: #00ff95;
 $highlight-tablerow: #1fb173;
 $rank-option-text: #efff00;
 $rank-option-borders: #fff;
+$primary-blue: #6d9fea;
 
 html, body {
 	position: relative;
@@ -27,6 +28,25 @@ html, body {
 
 div{
     position: relative;
+}
+
+a, a:visited{
+    color: $primary-blue;
+    text-decoration:none;
+
+    &:hover{
+        color: #d47e52;
+    }
+}
+
+a.about{
+    color: #000;
+    text-decoration:underline;
+
+    &:hover{
+        color: #000;
+        color: $primary-color;
+    }
 }
 
 h3.header-text{
@@ -275,9 +295,9 @@ button.tab:hover{
 
 button:hover, button.tab.selected{
     outline:none;
-    border-color:#6d9fea;
-    box-shadow:0 0 10px #6d9fea;
-    background: #6d9fea;
+    border-color:$primary-blue;
+    box-shadow:0 0 10px $primary-blue;
+    background: $primary-blue;
 }
 
 ul, li{
@@ -536,8 +556,8 @@ input.player-input {
     display: inline-block;
     float:left;
     background: #2A333E;
-    border-color:#6d9fea;
-    box-shadow:0 0 2px #6d9fea;
+    border-color:$primary-blue;
+    box-shadow:0 0 2px $primary-blue;
 }
 
 span.info-text{
@@ -1011,7 +1031,7 @@ position: relative;
     padding-bottom: 10px;
     cursor: default;
     box-shadow: 0px 0px 1px 1px #b3b3b3 inset;
-    color:#6d9fea;
+    color:$primary-blue;
     text-shadow: none;
 }
 
@@ -1120,4 +1140,16 @@ div.tooltip{
     &.stat-name{
         color: $row-title-color;
     }
+}
+
+#disclaimers{
+    bottom: 0;
+    margin: 20px 0px 20px 0px;
+    background: #6796dc;
+    padding: 5px;
+    color: #000;
+}
+
+.about-info, .about-info div{
+    padding:10px;
 }
