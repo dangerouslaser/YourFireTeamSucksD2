@@ -108,11 +108,16 @@
 					  ng-hide="!val.isSearchedPlayer && !isShowNonSearchedPlayers"
 					  class="cell row-value-player"
 					  ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index}" >
-					   <div class="selected-column-highlight"
+					  <highlighted-column 
+					  	ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index"  
+					  	selector-id="stats-table"
+					  	on-click="ctrl.m.selectCell(null, null, null)">
+					  </highlighted-column>
+					   <!-- <div class="selected-column-highlight"
 						 ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index" 
 						 ng-click="ctrl.m.selectCell(null, null, null)"
 						 >
-					</div>
+					   </div> -->
 				</span>
 			</div>
 			<div class="fixed-header-push">
