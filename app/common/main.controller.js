@@ -1,9 +1,9 @@
 angular.module('fireTeam.common')
 	.controller('mainCtrl', MainCtrl);
 
-	MainCtrl.$inject = ['$rootScope','$scope', '$state', '$location', 'GameActivityModelFactory', 'FireTeamModelFactory', 'ActivityModelFactory', '$timeout', '$cookies'];
+	MainCtrl.$inject = ['$rootScope','$scope', '$state', '$location', 'GoogleAnalyticsService', 'GameActivityModelFactory', 'FireTeamModelFactory', 'ActivityModelFactory', '$timeout', '$cookies'];
 
-	function MainCtrl($rootScope, $scope, $state, $location, gameActivityModelFactory, fireTeamModelFactory, activityModelFactory, $timeout, $cookies) {
+	function MainCtrl($rootScope, $scope, $state, $location, googleAnalyticsService, gameActivityModelFactory, fireTeamModelFactory, activityModelFactory, $timeout, $cookies) {
 
 		var m = $scope.m = {
 			fireTeamActivityResults: [],
@@ -67,6 +67,7 @@ angular.module('fireTeam.common')
 		$scope.showMoreResults = showMoreResults;
 
 		$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
+			googleAnalyticsService.pageLoad(toState.name, toParams);
 			m.currentStateParams = toParams;
 			var membersArray = toParams.members ? toParams.members.split(';') : '';
 
@@ -325,7 +326,8 @@ angular.module('fireTeam.common')
 			if(angular.equals(newSearchParams, m.currentStateParams)){
 				$state.reload();
 			}
-
+			
+			googleAnalyticsService.eventClick('search button', newSearchParams);
 			$state.go('search', newSearchParams);
 		}
 
