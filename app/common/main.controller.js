@@ -67,7 +67,7 @@ angular.module('fireTeam.common')
 		$scope.showMoreResults = showMoreResults;
 
 		$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
-			googleAnalyticsService.pageLoad(toState.name, toParams);
+			googleAnalyticsService.pageLoad($location.absUrl(), toState.name);
 			m.currentStateParams = toParams;
 			var membersArray = toParams.members ? toParams.members.split(';') : '';
 
@@ -326,8 +326,8 @@ angular.module('fireTeam.common')
 			if(angular.equals(newSearchParams, m.currentStateParams)){
 				$state.reload();
 			}
-			
-			googleAnalyticsService.eventClick('search button', newSearchParams);
+
+			googleAnalyticsService.eventClick('click', 'search');
 			$state.go('search', newSearchParams);
 		}
 
