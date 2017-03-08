@@ -359,6 +359,9 @@ angular.module('fireTeam.common')
 				}
 
 				m.fireTeamMembers = response;
+
+				// console.log(m.fireTeamMembers)
+
 				m.fireTeamMembers.gameMode = m.selectedGameMode.value;
 				m.fireTeamMembers.pageNum = 0;
 
@@ -477,7 +480,7 @@ angular.module('fireTeam.common')
 				});
 			
 				if(remainingLength > 0 && m.isLoadingData){
-					m.activitiesDisplayed = m.activitiesDisplayed < m.fireTeamActivityResults.length ? m.activityLookupPerSearch : m.fireTeamActivityResults.length;
+					m.activitiesDisplayed = m.activitiesDisplayed < m.fireTeamActivityResults.length ? m.activitiesDisplayed : m.fireTeamActivityResults.length;
 					getActiviesPagination(array, amountToProcess);
 					return;
 				}
@@ -630,7 +633,7 @@ angular.module('fireTeam.common')
 				$timeout.cancel(m.pollingTimeout);
 			}
 
-			m.activitiesDisplayed = m.fireTeamActivityResults.length < m.activityLookupPerSearch ? m.fireTeamActivityResults.length : m.activityLookupPerSearch;
+			m.activitiesDisplayed = m.fireTeamActivityResults.length < m.activityLookupPerSearch ? m.fireTeamActivityResults.length : m.activitiesDisplayed;
 			m.matchAttempts = m.maxMatchAttempts;
 			m.showProgressMessage = false;
 			m.activityListProgress = {

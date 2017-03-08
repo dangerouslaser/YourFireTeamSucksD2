@@ -77,12 +77,13 @@ button.tab {
 
 button.submit {
   background: transparent;
-  border: 1px solid #eee;
-  /*border: 1px solid #6796dc;*/
+  border: 1px solid #ffb192;
   padding: 5px;
-  margin: 10px; }
+  margin: 10px;
+  color: #ffb192; }
   button.submit.cancel {
-    border: 1px solid red; }
+    border: 1px solid red;
+    color: red; }
   button.submit.cancel:hover {
     border: 1px solid red;
     background: transparent;
@@ -90,6 +91,10 @@ button.submit {
     box-shadow: 0px 0px 10px 2px red; }
   button.submit.more-results {
     margin: 10px 0px 10px 0px; }
+  button.submit:hover {
+    border: 1px solid #ffb192;
+    box-shadow: 0px 0px 10px 2px;
+    background: transparent; }
 
 button.link {
   text-decoration: underline;
@@ -102,12 +107,6 @@ button.link {
     color: #6796dc;
     border: none;
     box-shadow: none; }
-
-button.submit:hover {
-  border: 1px solid green;
-  color: green;
-  box-shadow: 0px 0px 10px 2px;
-  background: transparent; }
 
 .error {
   color: red; }
@@ -705,7 +704,6 @@ span.info-show-button {
   margin: 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;
   padding: 10px;
   border-radius: 3px;
   border: 3px solid rgba(189, 89, 89, 0.43);
@@ -743,7 +741,7 @@ span.info-show-button {
   border-radius: 3px;
   box-shadow: 0px 0px 1px 1px #333; }
 
-.number-picker-container control-container.is-error {
+.number-picker-container.is-error .control-container {
   border: 1px solid #f73434; }
 
 .number-picker-container .error-message {
@@ -752,7 +750,7 @@ span.info-show-button {
   top: -100%;
   min-width: 200px;
   z-index: 1;
-  padding: 2px;
+  padding: 15px;
   background: #f5a2a2;
   border-radius: 3px;
   border: 1px solid red;

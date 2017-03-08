@@ -37,20 +37,35 @@ angular
 				var inputElement = element.find('input');
 				element = angular.element(element);
 
-				element.on('keyup', function (e) {
-					scope.isErrorMessage = !isValid(inputElement[0].value);
-					var isInRange = (inputElement[0].value <= scope.max && inputElement[0].value >= scope.min);
 
-					if(scope.isErrorMessage || !isInRange){
-						element.addClass('is-error');
-						scope.isErrorMessage = true;
-						scope.$apply();
-						return;
-					};
-										
+				element.on('click', function(e){
+					if(isValid(inputElement[0].value)){
+						element.removeClass('is-error');
+						scope.isErrorMessage = false;
+					}
+				});
+
+				element.on('keypress', function(e){
+					var regex = new RegExp(/^[0-9-]+$/);
+			        var key = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+
+			        if (!regex.test(key)) {
+			           e.preventDefault();
+			        }
+				});
+
+				element.on('keyup', function (e) {
+					
 					element.removeClass('is-error');
 					scope.isErrorMessage = false;
 					scope.$apply();
+
+					if(!isValid(inputElement[0].value)){
+						element.addClass('is-error');
+						scope.isErrorMessage = true;
+						scope.$apply();
+						e.preventDefault();
+					};
 
 					angular.element(element[0].getElementsByClassName('is-selected')).removeClass('is-selected');
 
@@ -74,15 +89,8 @@ angular
 				});
 
 				function isValid(val){
-
-					var reg = new RegExp(/^-?\d*\.?\d+$/);
-
-					if(!val){
-						return true;
-					}
-
-					return reg.test(val);
-				}	
+					return val <= scope.max && val >= scope.min
+				}
 			}	
 		}
 	};
@@ -93,12 +101,18 @@ angular
 		$scope.changeValue = changeValue;
 
 		function changeValue(isIncrease){
-			var newVal = $scope.displayValue;
+
+			var newVal = parseInt($scope.displayValue);
 
 			if(isIncrease){
 				newVal = newVal+=1;
 			}else {
 				newVal = newVal-=1;
+			}
+
+			if($scope.isErrorMessage){
+				newVal = 0;
+				$scope.isErrorMessage = false;
 			}
 
 			$scope.inputModel[$scope.valueKey] = $scope.displayValue = (newVal >= $scope.min) && (newVal <= $scope.max) ? newVal : $scope.displayValue;

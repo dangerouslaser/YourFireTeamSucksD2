@@ -14,7 +14,7 @@
 						<div class="used-ranks" ng-if="!ctrl.m.isShowUnusedRankings">
 							<div>
 								<span class="info-show-button" ng-hide="true"></span>
-								<span class="info-text">-Set your desired rank values, these are just suggested options. <br/> -Weigh your picks on a scale from -10 to 10 (least to most important). <br/>-To remove a rank set it to 0 then click the rank button to recalculate. <br/>-Find more options on the unused tab. <br/>-Newly added or changed ranks will be displayed as blinking, click the rank button again to add these ranks to your results. <br/>-The users rank will be displayed beneath their player name on the stats table.</span>
+								<span class="info-text">-Set your desired rank values, these are just suggested options. <br/> -Weigh your picks on a scale from -10 to 10 (least to most important). <br/>-Find more options on the unused tab. <br/>-Newly added or changed ranks will be displayed as blinking, click the rank button again to add these ranks to your results. <br/>-The users rank will be displayed beneath their player name on the stats table.</span>
 								
 								<ul>
 									<li class="rank-option" ng-repeat="rank in ctrl.m.rankingCategories track by $index" ng-if="rank.isUse" animated-glow is-active="{{rank.isNew}}" delay="1500" >
@@ -79,7 +79,7 @@
 							<span class="activity-title" ng-click="clearTableSelection()">{{activityInfo.definitions.activities[0].activityName}} - {{activityInfo.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="stat-row header-row">
 								<span class="cell">
-									<span style="vertical-align: middle;">Show All:</span>
+									<span style="vertical-align: middle;">Showing All:</span>
 									<input class="checkbox" type="checkbox" ng-model="isShowNonSearchedPlayers"></input>
 									<span style="display: block;">Stat</span>
 									<span class="rank" ng-if="ctrl.m.isRankLoaded">Rank:</span>
@@ -113,11 +113,6 @@
 					  	selector-id="stats-table"
 					  	on-click="ctrl.m.selectCell(null, null, null)">
 					  </highlighted-column>
-					   <!-- <div class="selected-column-highlight"
-						 ng-if="ctrl.m.tableSelectionObject.selectedCell.column === $index" 
-						 ng-click="ctrl.m.selectCell(null, null, null)"
-						 >
-					   </div> -->
 				</span>
 			</div>
 			<div class="fixed-header-push">

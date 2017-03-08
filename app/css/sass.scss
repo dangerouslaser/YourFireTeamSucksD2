@@ -14,6 +14,7 @@ $highlight-tablerow: #1fb173;
 $rank-option-text: #efff00;
 $rank-option-borders: #fff;
 $primary-blue: #6d9fea;
+$primary-orange: #ffb192;
 
 html, body {
 	position: relative;
@@ -110,13 +111,14 @@ button.tab {
 
 button.submit {
     background: transparent;
-    border: 1px solid $row-title-color;
-    /*border: 1px solid #6796dc;*/
+    border: 1px solid $primary-orange;
     padding: 5px;
     margin:10px;
+    color: $primary-orange;
 
     &.cancel{
         border: 1px solid red;
+        color: red;
     }
     &.cancel:hover{
         border: 1px solid red;
@@ -126,6 +128,11 @@ button.submit {
     }
     &.more-results{
         margin: 10px 0px 10px 0px;
+    }
+    &:hover{
+        border: 1px solid $primary-orange;
+        box-shadow: 0px 0px 10px 2px;
+        background: transparent;
     }
 }
 
@@ -142,13 +149,6 @@ button.link{
         border:none;
         box-shadow:none;
     }
-}
-
-button.submit:hover{
-    border: 1px solid green;
-    color: green;
-    box-shadow: 0px 0px 10px 2px;
-    background: transparent;
 }
 
 .error{
@@ -865,12 +865,11 @@ span.info-show-button{
 }
 
 .rank-option{
-position: relative;
+    position: relative;
     text-align: left;
     margin: 10px;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;
     padding: 10px;
     border-radius: 3px;
     border: 3px solid rgba(189, 89, 89, 0.43);
@@ -918,7 +917,7 @@ position: relative;
     box-shadow: 0px 0px 1px 1px #333;
 }
 
-.number-picker-container control-container.is-error{
+.number-picker-container.is-error .control-container{
     border:1px solid #f73434;
 }
 
@@ -928,7 +927,7 @@ position: relative;
     top: -100%;
     min-width: 200px;
     z-index: 1;
-    padding: 2px;
+    padding: 15px;
     background: #f5a2a2;
     border-radius: 3px;
     border: 1px solid red;
