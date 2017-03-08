@@ -16,11 +16,11 @@ angular.module('fireTeam.common')
 			}
 
 			return $http.get(path, config)
-				.success(function(data, status, headers) {
-					
+				.then(function(response) {
+					return response.data;
 				})
-				.error(function(data, status, headers) {
-					
+				.catch(function(response) {
+					return response.data;
 				});
 		}
 	};

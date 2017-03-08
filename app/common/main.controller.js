@@ -280,7 +280,7 @@ angular.module('fireTeam.common')
 		}
 
 		function checkRecentSearches(){
-			var recentSearchCookie = $cookies['recentSearches'];
+			var recentSearchCookie = $cookies.get('recentSearches');
 			if(recentSearchCookie){
 				m.recentSearches = angular.fromJson(recentSearchCookie);
 			}
@@ -627,7 +627,7 @@ angular.module('fireTeam.common')
 		}
 
 		function setCookie(name, val, exp){
-			$cookies[name] = JSON.stringify(val);
+  			$cookies.put(name, JSON.stringify(val));
 		}
 
 		function clearData(){

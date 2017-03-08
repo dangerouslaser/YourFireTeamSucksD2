@@ -32,26 +32,24 @@ angular.module('fireTeam.common')
     function getPlayerData(memberType, userName) {
 		var deferred = $q.defer();
 		playerOptionsService.getMembershipId({memberType: memberType, userName: userName}).then(function (response) {	
-			var membershipModel = response.data;
+			var membershipModel = response;
 
 			if (!membershipModel){
 				var customErrorResponse = {
-					data:{
-						ErrorCode: 101,
-						Error: "An unspecified system error occured! Could not find player: " + userName
-					}
+					ErrorCode: 101,
+					Error: "An unspecified system error occured! Could not find player: " + userName
 				};
 				deferred.resolve(customErrorResponse);
 				return deferred.promise;
 			}
 
-			playerOptionsService.getBaseCharacterInfo({membershipId: response.data.membershipId}).then(function (response) {
-				if(response.data.ErrorCode > 1){
-					deferred.resolve(response.data);
+			playerOptionsService.getBaseCharacterInfo({membershipId: response.membershipId}).then(function (response) {
+				if(response.ErrorCode > 1){
+					deferred.resolve(response);
 					return deferred.promise;
 				}
 
-				response = response.data.Response.data
+				response = response.Response.data
 				response.membershipInfo = membershipModel;
 
 				angular.forEach(response.characters, function(character){
@@ -80,7 +78,7 @@ angular.module('fireTeam.common')
 
 	function getBaseCharacterInfo(membershipId){
 		playerOptionsService.getBaseCharacterInfo({membershipId: membershipId}).then(function (response) {	
-			return response.data.Response.data;
+			return response.Response.data;
 		});
 	};		
 

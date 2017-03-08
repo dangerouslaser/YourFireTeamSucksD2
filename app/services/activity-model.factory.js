@@ -60,16 +60,16 @@ angular.module('fireTeam.common')
 		var deferred = currentDeferred = $q.defer();
 
 		playerOptionsService.getPostGameCarnageReport({instanceId: Id}).then(function (response) {	
-			if(response.data.ErrorCode && response.data.ErrorCode > 1){
-				deferred.resolve(response.data);
+			if(response.ErrorCode && response.ErrorCode > 1){
+				deferred.resolve(response);
 				return deferred.promise;
 			}
 
 			var postGameCarnageReport = {
-				activityDetails: response.data.Response.data.activityDetails,
-				dateTime: response.data.Response.data.period,
-				playerPostGameCarnageReport: buildCarnageReport(response.data.Response.data),
-				definitions: buildActivityDetailsModel(response.data.Response.definitions)
+				activityDetails: response.Response.data.activityDetails,
+				dateTime: response.Response.data.period,
+				playerPostGameCarnageReport: buildCarnageReport(response.Response.data),
+				definitions: buildActivityDetailsModel(response.Response.definitions)
 			}
 			deferred.resolve(postGameCarnageReport);
 			
@@ -213,11 +213,11 @@ angular.module('fireTeam.common')
 		var playerObject = {};
 
 		playerOptionsService.getCharacterActivityHistoryData(request).then(function(response){
-			if(response.data.ErrorCode > 1){
-				deferred.resolve(response.data);
+			if(response.ErrorCode > 1){
+				deferred.resolve(response);
 				return deferred.promise;
 			}
-			var activities = response.data.Response.data.activities;
+			var activities = response.Response.data.activities;
 			angular.forEach(activities, function(event){
 				playerInstanceArray.push(event.activityDetails.instanceId);
 			});

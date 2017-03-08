@@ -18,9 +18,9 @@ angular.module('fireTeam.common')
 		var deferred = $q.defer();
 
 		playerOptionsService.getMembershipId({memberType: memberType, userName: userName}).then(function (response) {	
-			var membershipModel = response.data;
-			playerOptionsService.getBaseCharacterInfo({membershipId: response.data.membershipId}).then(function (response) {	
-				response = response.data.Response.data
+			var membershipModel = response;
+			playerOptionsService.getBaseCharacterInfo({membershipId: response.membershipId}).then(function (response) {	
+				response = response.Response.data
 				response.membershipInfo = membershipModel;
 				playerModel = playerModel || response;
 
@@ -46,7 +46,7 @@ angular.module('fireTeam.common')
 
 	function getBaseCharacterInfo(membershipId){
 		playerOptionsService.getBaseCharacterInfo({membershipId: membershipId}).then(function (response) {	
-			return response.data.Response.data;
+			return response.Response.data;
 		});
 	};		
 	return playerModelObject;
