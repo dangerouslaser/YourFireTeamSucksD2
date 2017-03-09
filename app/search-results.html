@@ -36,7 +36,7 @@
 			<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activity.definitions.activities[0].pgcrImage}})'}">
 			</div>
 			<div class="activity-title">
-				<img class="activity-icon" src="{{const.bungieRoot}}{{activity.definitions.activityTypes[0].icon}}" />
+				<img class="activity-icon" ng-src="{{const.bungieRoot}}{{activity.definitions.activityTypes[0].icon}}" />
 				<span class="activity-date">{{activity.dateTime | date:'MM/dd/yyyy'}}</span>
 				<br/>
 				<span>
@@ -54,7 +54,7 @@
 			<div class="activity-info-container" ng-show="m.selectedActivity === activity || m.hoveredActivity === activity">
 				<div class="character-container">
 					<div class="character" ng-repeat="character in activity.playerPostGameCarnageReport track by $index">
-						<img src="{{const.bungieRoot}}{{character.characterInfo.iconPath}}" />
+						<img ng-src="{{const.bungieRoot}}{{character.characterInfo.iconPath}}" />
 						<span class="character-class  {{character.characterInfo.characterClass.toLowerCase()}}" data-characterClass="{{character.characterInfo.characterClass}}">
 							[{{character.characterInfo.characterClass}}] : 
 						</span>

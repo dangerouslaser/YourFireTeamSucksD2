@@ -1,9 +1,9 @@
 angular.module('fireTeam.common')
 	.controller('mainCtrl', MainCtrl);
 
-	MainCtrl.$inject = ['$rootScope','$scope', '$state', '$location', 'GoogleAnalyticsService', 'GameActivityModelFactory', 'FireTeamModelFactory', 'ActivityModelFactory', '$timeout', '$cookies'];
+	MainCtrl.$inject = ['$rootScope','$scope', '$state', '$location', 'GoogleAnalyticsService', 'FireTeamModelFactory', 'ActivityModelFactory', '$timeout', '$cookies'];
 
-	function MainCtrl($rootScope, $scope, $state, $location, googleAnalyticsService, gameActivityModelFactory, fireTeamModelFactory, activityModelFactory, $timeout, $cookies) {
+	function MainCtrl($rootScope, $scope, $state, $location, googleAnalyticsService, fireTeamModelFactory, activityModelFactory, $timeout, $cookies) {
 
 		var m = $scope.m = {
 			fireTeamActivityResults: [],
@@ -584,12 +584,6 @@ angular.module('fireTeam.common')
 			if(m.activitiesDisplayed > m.fireTeamActivityResults.length){
 				m.activitiesDisplayed = m.fireTeamActivityResults.length;
 			}
-		}
-
-		function getGameActivitiesData(){
-			gameActivityModelFactory.getActivityData().then(function(response){
-				m.gameOptionsModel = response;
-			})
 		}
 
 		function formatDate(inputDate){

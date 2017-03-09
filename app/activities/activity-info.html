@@ -75,7 +75,7 @@
 						</div>
 						<div class="activity-header-content {{activityInfo.definitions.activities[0].activityTypeName.toLowerCase()}}">
 							<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activityInfo.definitions.activities[0].pgcrImage}})'}"></div>
-							<img class="activity-icon" src="{{const.bungieRoot}}{{activityInfo.definitions.activities[0].icon}}" />
+							<img class="activity-icon" ng-src="{{const.bungieRoot}}{{activityInfo.definitions.activities[0].icon}}" />
 							<span class="activity-title" ng-click="clearTableSelection()">{{activityInfo.definitions.activities[0].activityName}} - {{activityInfo.dateTime | date:'MM/dd/yyyy'}}</span>
 							<div class="stat-row header-row">
 								<span class="cell">
@@ -90,7 +90,7 @@
 								      ng-class="{ 'is-selected' : ctrl.m.tableSelectionObject.selectedCell.column === $index, 'dim': ((ctrl.m.isTableCellSelected || ctrl.m.isTableColumnSelected) && ctrl.m.tableSelectionObject.selectedCell.column !== $index)}" 
 								      ng-click="ctrl.m.selectCell($index, null, null)"
 								      yfs-tooltip display-text="{{val.displayName}}" append-classes="player-name">
-								      <img src="{{const.bungieRoot}}{{val.iconPath}}" /> 
+								      <img ng-src="{{const.bungieRoot}}{{val.iconPath}}" /> 
 								      <span>
 								      	{{val.displayName}}
 								      </span>
