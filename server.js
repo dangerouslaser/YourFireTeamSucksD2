@@ -189,7 +189,7 @@ var httpPort = process.env.PORT || 3000;
 //var httpsPort = process.env.PORT || 8000;
 
 // Start the http server
-httpServer.listen(httpPort, "127.0.0.1", function(err) {
+httpServer.listen(httpPort, function(err) {
     console.log(err, httpServer.address());
 }); 
 
