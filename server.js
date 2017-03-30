@@ -10,6 +10,11 @@ var timeout = require('connect-timeout');
 // Create our Express application
 var app = express();
 
+//Set our SSL Credentials
+// const privateKey = fs.readFileSync('./ssl/key.pem', 'utf8');
+// const certificate = fs.readFileSync('./ssl/cert.pem', 'utf8');
+// const passphrase = fs.readFileSync('./ssl/passphrase.txt', 'utf8');
+// const sslOptions = {key:privateKey, cert: certificate, passphrase: passphrase};
 
 // Set view engine to ejs
 app.set('view engine', 'ejs');
@@ -19,9 +24,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-var key = 'b1ccfe5ba9154988b1356d03e85fa735';
-var userName = 'zincbeatr';
-var credentials = {desitnyKey: key, defaultUserName: userName};
+var apiKey = '52cfc245497e4f11b0439d64b610e510';
+var credentials = {destinyKey: apiKey, defaultMemberType: 2};
 
 var platformType = {
   'xBox': 1,
@@ -30,7 +34,7 @@ var platformType = {
 
 var router = express.Router();
 
-//Destiny Host and Base REquest
+//Destiny Host and Base Request
 const HOST = 'http://www.bungie.net/Platform/Destiny/';
 var destinyBaseRequest = request.defaults({headers: {'X-API-Key': credentials.desitnyKey}});
 
@@ -177,13 +181,19 @@ app.get('/', function(req, res) {
 // Register all our routes with /api
 app.use('/api', router);
 
-//create http and https servers
 var httpServer = http.createServer(app);
-//var httpsServer = https.createServer(credentials, app);
+//var httpsServer = https.createServer(sslOptions, app);
 
 // Use environment defined port or 3000
 var httpPort = process.env.PORT || 3000;
-var httpsPort = process.env.PORT || 8000;
+//var httpsPort = process.env.PORT || 8000;
 
-// Start the server
-httpServer.listen(httpPort);
+// Start the http server
+httpServer.listen(httpPort, "127.0.0.1", function(err) {
+    console.log(err, httpServer.address());
+}); 
+
+// Start the https server
+// httpsServer.listen(httpsPort, "127.0.0.1", function(err) {
+//     console.log(err, httpsServer.address());
+// });
