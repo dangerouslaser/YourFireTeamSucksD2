@@ -23,7 +23,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-
+//var key = 'b1ccfe5ba9154988b1356d03e85fa735';
 var apiKey = '52cfc245497e4f11b0439d64b610e510';
 var credentials = {destinyKey: apiKey, defaultMemberType: 2};
 
@@ -36,7 +36,7 @@ var router = express.Router();
 
 //Destiny Host and Base Request
 const HOST = 'http://www.bungie.net/Platform/Destiny/';
-var destinyBaseRequest = request.defaults({headers: {'X-API-Key': credentials.desitnyKey}});
+var destinyBaseRequest = request.defaults({headers: {'X-API-Key': credentials.destinyKey}});
 
 router.get('/getMembershipIdByUserName', function(req, res, next){
     credentials.defaultMemberType = req.query.memberType;
