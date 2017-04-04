@@ -31,7 +31,13 @@
 	</div>
 
 	<div class="activity-selection-container" ng-if="m.isShowActivityList">
-		<div class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" ng-repeat="activity in m.fireTeamActivityResults | limitTo:m.activitiesDisplayed track by $index" ng-click="selectActivity(activity)" ng-mouseover="m.hoveredActivity = activity" ng-mouseout="m.hoveredActivity = null"  ng-class="{'not-selected' : m.hoveredActivity !== activity && m.hoveredActivity !== null}">
+		<div 
+			ng-repeat="activity in m.fireTeamActivityResults | orderBy: orderByDate | limitTo:m.activitiesDisplayed  track by $index" 
+			class="activity-selection {{activity.definitions.activityTypes[0].activityTypeName.toLowerCase()}}" 
+			ng-click="selectActivity(activity)" 
+			ng-mouseover="m.hoveredActivity = activity" 
+			ng-mouseout="m.hoveredActivity = null"  
+			ng-class="{'not-selected' : m.hoveredActivity !== activity && m.hoveredActivity !== null, 'selected': m.selectedActivity === activity}">
 		<div class="spacing">
 			<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activity.definitions.activities[0].pgcrImage}})'}">
 			</div>

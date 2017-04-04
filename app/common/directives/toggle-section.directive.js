@@ -10,11 +10,10 @@ angular
 			scope: {
 				isOpen: '=',
 				sectionTitle: '@'
-
 			},
 			transclude: true,
 			replace: true,
-			template: '<div class="section" ng-class="{\'closed\': !isOpen}">' +
+			template: '<div id="{{id}}" class="section" ng-class="{\'closed\': !isOpen}">' +
 							'<div class="toggle-button-container" ng-click="isOpen = !isOpen">' +
 								'<button class="is-open" ng-hide="isOpen">+</button>' + 
 								'<button class="is-close" ng-show="isOpen">-</button>' + 
@@ -23,7 +22,7 @@ angular
 					  		'<div ng-transclude="" ng-show="isOpen"></div>' + 
 				  		'</div>',
 			link: function(scope, element, attrs){
-
+				scope.id = scope.sectionTitle.split(' ').join('_').toLowerCase();
 			}		
 		}
 	};

@@ -49,7 +49,9 @@ angular
 					scope.activityMembers = {};
 					scope.isLoadingCarnageReport = true;
 					scope.chartModel = createChartModel();
-					scope.scrollToTable();
+					$timeout(function() {
+						scope.calculatePlayerStandings();
+					}, 10);
 				}
 
 				function createChartModel(){
@@ -184,15 +186,16 @@ angular
 		}
 };
 
-activityInfoCtrl.$inject = ['$scope', '$location','$anchorScroll'];
+activityInfoCtrl.$inject = ['$scope','$anchorScroll'];
 
-function activityInfoCtrl($scope, $location, $anchorScroll){
+function activityInfoCtrl($scope, $anchorScroll){
 	var self = this;
 	self.m = $scope;
 	self.m.isRankLoaded = false;
 	self.m.isSticky = false;
 	self.m.isShowUnusedRankings = false;
 	self.m.isRankNeedsUpdate = true;
+	self.m.isExpanded = false;
 
 	self.m.tableSelectionObject = {
 			selectedCell: {},
@@ -273,6 +276,7 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 	$scope.isShowNonSearchedPlayers = true;
 	$scope.clearTableSelection = clearTableSelection;
 	$scope.scrollToTable = scrollToTable;
+	$scope.goToRank = goToRank;
 
 	$scope.$watch('chartModel', function(newVal){
 		if(newVal.trueStats){
@@ -430,8 +434,7 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 	}
 
 	function scrollToTable(){
-		$location.hash('stats-table-container');
-		$anchorScroll();
+		$anchorScroll('stats-table-container');
 	};
 
 	function removeRankValue(rank){
@@ -439,6 +442,11 @@ function activityInfoCtrl($scope, $location, $anchorScroll){
 		rank.isUse = false;
 		rank.isNew = false;
 		self.m.isRankNeedsUpdate = true;
+	}
+
+	function goToRank(){
+		$scope.isShowRankings = true;
+		$anchorScroll('ranks');
 	}
 }
 

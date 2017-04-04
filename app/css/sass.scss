@@ -427,6 +427,20 @@ input.player-input {
     &.not-selected{
         opacity: .3;
     }
+
+    &.selected {
+        z-index: 1;
+        opacity: .9;
+    }
+
+    &.selected .spacing{
+        box-shadow: 0px 0px 5px 2px #eee;
+    }
+
+    &:hover{
+        z-index: 1;
+        opacity: .9;
+    }
 }
 
 .activity-selection-container .activity-selection .spacing{
@@ -593,11 +607,12 @@ span.info-show-button{
     position: relative;
     min-width: 800px;
     margin: 0 auto;
-    background: #101215;
+    color: $stats-table-primary-color;
+
+    /*background: #101215;
     border-radius: 3px;
     border: 1px solid #1e466d;
-    color: $stats-table-primary-color;
-    padding-bottom: 5px;
+    padding-bottom: 5px;*/
 }
 
 #stats-table-container #stats-table{
@@ -631,7 +646,7 @@ span.info-show-button{
 
 #stats-table .stats-main-header-container{
     position: absolute;
-    z-index: 1;
+    z-index: 10;
     top: 0;
     width: 100%;
     left: 0;
@@ -656,7 +671,7 @@ span.info-show-button{
 
 #stats-table .fixed-header-push{
     position: relative; 
-    height: 180px;
+    height: 200px;
 }
 
 #stats-table .stats-main-header-container.is-fixed .stats-main-header-content{
@@ -760,7 +775,7 @@ span.info-show-button{
     border-radius: 3px;
     padding-bottom: 3px;
     height: 10000px;
-    z-index: 10;
+    z-index: 1;
     cursor: pointer;
 }
 
@@ -1151,3 +1166,49 @@ div.tooltip{
 .about-info, .about-info div{
     padding:10px;
 }
+
+.display-stats-button {
+    margin: 0 auto;
+    width: 100%;
+    background: #d0d0d0;
+    /* padding: 10px; */
+    color: #000;
+    text-align: center;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    height: 0px;
+    cursor: pointer;
+    box-shadow: 1px 1px 5px 1px #6796dc;
+    position: absolute;
+    padding-top: 5px;
+    box-shadow: 0px 0px 10px 1px #8a8a8a inset;
+    overflow:hidden;
+
+    &.visible{
+        height:25px;
+        transition: height .5s ease-in-out;
+    }
+
+    &:hover{
+        height:25px;
+        background: #ffb192;
+        box-shadow: 0px 0px 10px 1px #f17e51 inset;
+        transition: height .5s ease-in-out;
+    }
+}
+
+.small-close-button{
+    position: absolute;
+    top: -5px;
+    margin: padding 10px;
+    right: 0;
+    padding: 10px;
+
+    &:hover{
+        color: #fff;
+        text-shadow: 1px 1px 1px #000;
+        cursor: default;
+    }
+}
+
+

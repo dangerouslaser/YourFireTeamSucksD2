@@ -52,6 +52,8 @@ angular.module('fireTeam.common')
 		m.hoveredActivity = null;
 		m.currentStateParams = null;
 		m.copyrightYear = getDate();
+		m.activitySort = 'dateTime';
+		m.isReverse = false;
 
 		$scope.selectPlatform = selectPlatform;
 		$scope.selectActivity = selectActivity;
@@ -65,6 +67,7 @@ angular.module('fireTeam.common')
 		$scope.search = search;
 		$scope.selectMode = selectMode;
 		$scope.showMoreResults = showMoreResults;
+		$scope.orderByDate = orderByDate;
 
 		$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
 			googleAnalyticsService.pageLoad($location.absUrl(), toState.name);
@@ -489,6 +492,7 @@ angular.module('fireTeam.common')
 
 				if(!m.isNewSearch){
 					m.lastSuccessSearchCriteria = m.searchCriteria;
+					console.log(m.fireTeamActivityResults[0]);
 				}
 
 				m.isLoadingData = false;
@@ -645,6 +649,10 @@ angular.module('fireTeam.common')
 			var date = new Date();
 			return date.getFullYear();
 		}
+
+		function orderByDate(item) {
+		    return -new Date(item.dateTime);
+		};
 	};
 
 
