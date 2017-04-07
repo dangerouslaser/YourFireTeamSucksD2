@@ -44,7 +44,6 @@ angular.module('fireTeam.common')
 		m.isNewSearch = true;
 		m.selectedPlatform = m.platformTypes.ps4;
 		m.pageInitialized = false;
-		m.instanceInterval;
 		m.searchCriteria = null;
 		m.lastSuccessSearchCriteria = null;
 		m.maxMatchAttempts = 10;
@@ -576,11 +575,9 @@ angular.module('fireTeam.common')
 		}
 
 		function selectActivity(activity){
-			clearInterval(m.instanceInterval);
 			$location.search('instanceId', activity.activityDetails.instanceId);
 			m.selectedActivity = activity;
 			m.isShowActivityList = false;
-			clearInterval(m.instanceInterval);
 		}
 
 		function showMoreResults(amt){
