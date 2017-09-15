@@ -154,6 +154,44 @@ angular.module('fireTeam.common')
 		}
 
 		function buildGameModeObj(){
+
+			m.d2gameModesEnum = {
+				'None': 0,
+				'Story': 2,
+				'Strike': 3,
+				'Raid': 4,
+				'AllPvP': 5,
+				'Patrol': 6,
+				'AllPvE': 7,
+				'Reserved9': 9,
+				'Control': 10,
+				'Reserved11': 11,
+				'Clash': 12,
+				'Reserved13': 13,
+				'Reserved15': 15,
+				'Nightfall': 16,
+				'HeroicNightfall': 17,
+				'AllStrikes': 18,
+				'IronBanner': 19,
+				'Reserved20': 20,
+				'Reserved21': 21,
+				'Reserved22': 22,
+				'Reserved24': 24,
+				'Reserved25': 25,
+				'Reserved26': 26,
+				'Reserved27': 27,
+				'Reserved28': 28,
+				'Reserved29': 29,
+				'Reserved30': 30,
+				'Supremacy': 31,
+				'Reserved32': 32,
+				'Survival': 37,
+				'Countdown': 38,
+				'TrialsOfTheNine': 39,
+				'Social': 40
+			};
+
+
 			m.gameModes = {
 					generic:[
 						{
@@ -362,24 +400,15 @@ angular.module('fireTeam.common')
 					return;
 				}
 
-				m.fireTeamMembers = response;
-
-				// console.log(m.fireTeamMembers)
-
+				m.fireTeamMembers.players = response;
+				console.log(m.fireTeamMembers.players)
 				m.fireTeamMembers.gameMode = m.selectedGameMode.value;
 				m.fireTeamMembers.pageNum = 0;
 
 				setSearchCriteria();
 				m.isNewSearch = false;
 
-				activityModelFactory.getPlayerInstanceList(m.fireTeamMembers).then(function(response){
-					if(response.length > 0){
-						getFireTeamInstanceData(compareInstances(response));
-					}
-					else{
-						throwError({ErrorCode: 100, Error: 'No matching results found.'});
-					}
-				});
+				getMembersActivitiesMatchList(m.fireTeamMembers);
 			}, function(error){
 				throwError(error);
 			});
@@ -426,20 +455,22 @@ angular.module('fireTeam.common')
 
 			m.isLoadingData = true;
 			m.fireTeamMembers.pageNum += 1;
-			activityModelFactory.getPlayerInstanceList(m.fireTeamMembers).then(function(response){
-				if(response.length > 0){
-					getFireTeamInstanceData(compareInstances(response));
+			getMembersActivitiesMatchList(m.fireTeamMembers);
+		}
+
+		function getMembersActivitiesMatchList(membersOptions){
+			activityModelFactory.getPlayerInstanceList(membersOptions).then(function(response){
+				if(response.ErrorCode){
+					throwError({Error: "An error occured while fetching results"});
 				}
-				else{
-					throwError({Error: 'No matching results found.'});
-				}
+				m.isLoadingData = false;
+				activityResultsValidation(response.Response.activityMatchListResults);
 			});
 		}
 
-		function getFireTeamInstanceData(instanceIdArray){
-			if (instanceIdArray.length < 1){
+		function activityResultsValidation(activityMembersMatchedResults){
+			if (!activityMembersMatchedResults || activityMembersMatchedResults == 'undefined' || activityMembersMatchedResults == undefined || activityMembersMatchedResults.length < 1){
 				m.matchAttempts += 1;
-				m.isLoadingData = false;
 
 				if(m.matchAttempts <= m.maxMatchAttempts){
 					getMoreResults();
@@ -447,66 +478,73 @@ angular.module('fireTeam.common')
 				return;
 			}
 
-			m.activityListProgress = {
-					totalActivities: 0,
-					activitiesLoaded: 0,
-					percentComplete: 0
-				}
-
-			var originalArrayLength = instanceIdArray.length;
-
-			getActiviesPagination(instanceIdArray, m.activityLookupPerSearch);
-
-			startPollingForProgress(100, originalArrayLength);
-		}
-
-		function getActiviesPagination(array, amountToProcess){
-			if(array.length < amountToProcess){
-				amountToProcess = array.length;
-			}
-
-			var arrayToProcess = array.splice(0, amountToProcess);
-			var remainingLength = array.length;
-
-			activityModelFactory.getFireTeamActivities(arrayToProcess).then(function(response){
-				if(response[0].ErrorCode && response[0].ErrorCode > 1){
-					throwError(response[0]);
-					return;
-				}
-				angular.forEach(response, function(activity){
-					angular.forEach(activity.playerPostGameCarnageReport, function(val, key){
-						activity.playerPostGameCarnageReport[key].isSearchedPlayer = isSearchedPlayer(key.toLowerCase());
-					});
-
-					if(!activity.Message){
-						m.fireTeamActivityResults.push(activity);
-					}
-				});
+			//this is the search result list
+			m.fireTeamActivityResults = activityMembersMatchedResults;
+			console.log(m.fireTeamActivityResults)
 			
-				if(remainingLength > 0 && m.isLoadingData){
-					m.activitiesDisplayed = m.activitiesDisplayed < m.fireTeamActivityResults.length ? m.activitiesDisplayed : m.fireTeamActivityResults.length;
-					getActiviesPagination(array, amountToProcess);
-					return;
-				}
+			// m.activityListProgress = {
+			// 		totalActivities: 0,
+			// 		activitiesLoaded: 0,
+			// 		percentComplete: 0
+			// 	}
 
-				if(!m.isNewSearch){
-					m.lastSuccessSearchCriteria = m.searchCriteria;
-					console.log(m.fireTeamActivityResults[0]);
-				}
+			m.activitiesDisplayed = m.fireTeamActivityResults.length < m.activityLookupPerSearch ? m.fireTeamActivityResults.length : m.activityLookupPerSearch;
+			if(!m.isNewSearch){
+				m.lastSuccessSearchCriteria = m.searchCriteria;
+				console.log(m.fireTeamActivityResults[0]);
+			}
+			clearData();
 
-				m.isLoadingData = false;
-				clearData();
-				
-			});
+			//var originalArrayLength = activityMembersMatchedResults.length;
+			//getActivitiesPagination(originalArrayLength, m.activityLookupPerSearch);
+			//startPollingForProgress(100, originalArrayLength);
 		}
 
-		function isSearchedPlayer(lowerCaseNameToCheck){
-			var searchedPlayersLowerCaseStringArray = [];
-			angular.forEach(m.playersArrays, function(searchedPlayer){
-				searchedPlayersLowerCaseStringArray.push(searchedPlayer.displayName.toLowerCase());
-			});
+		function getActivitiesPagination(totalActivityResults, amountToShow){
+			// if(totalActivityResults < amountToShow){
+			// 	m.activitiesDisplayed = totalActivityResults;
+			// }
 
-			return searchedPlayersLowerCaseStringArray.indexOf(lowerCaseNameToCheck) !== -1;
+			// var arrayToProcess = activityMembersMatchedResults.splice(0, amountToProcess);
+			// var remainingLength = activityMembersMatchedResults.length;
+			
+			// if(remainingLength > 0 && m.isLoadingData){
+			// 	m.activitiesDisplayed = m.activitiesDisplayed < m.fireTeamActivityResults.length ? m.activitiesDisplayed : m.fireTeamActivityResults.length;
+			// 	getActiviesPagination(activityMembersMatchedResults, amountToProcess);
+			// 	return;
+			// }
+
+			// if(!m.isNewSearch){
+			// 	m.lastSuccessSearchCriteria = m.searchCriteria;
+			// 	console.log(m.fireTeamActivityResults[0]);
+			// }
+
+			// m.isLoadingData = false;
+			// clearData();
+
+			// //rename to get post game carnage report
+			// activityModelFactory.getFireTeamActivities(arrayToProcess).then(function(response){
+			// 	debugger;
+			// 	if(response[0].ErrorCode && response[0].ErrorCode > 1){
+			// 		throwError(response[0]);
+			// 		return;
+			// 	}
+			// 	m.fireTeamActivityResults = response;
+			
+			// 	if(remainingLength > 0 && m.isLoadingData){
+			// 		m.activitiesDisplayed = m.activitiesDisplayed < m.fireTeamActivityResults.length ? m.activitiesDisplayed : m.fireTeamActivityResults.length;
+			// 		getActiviesPagination(array, amountToProcess);
+			// 		return;
+			// 	}
+
+			// 	if(!m.isNewSearch){
+			// 		m.lastSuccessSearchCriteria = m.searchCriteria;
+			// 		console.log(m.fireTeamActivityResults[0]);
+			// 	}
+
+			// 	m.isLoadingData = false;
+			// 	clearData();
+			// });
 		}
 
 		function loadActivityByIdParameter(id){
@@ -648,7 +686,7 @@ angular.module('fireTeam.common')
 		}
 
 		function orderByDate(item) {
-		    return -new Date(item.dateTime);
+		    return -new Date(item.period);
 		};
 	};
 

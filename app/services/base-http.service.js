@@ -6,6 +6,7 @@ angular.module('fireTeam.common')
 	function baseHttpService($http) {
 		return {
 			get: get,
+			post: post
 		};
 
 		function get(path, model) {
@@ -16,6 +17,21 @@ angular.module('fireTeam.common')
 			}
 
 			return $http.get(path, config)
+				.then(function(response) {
+					return response.data;
+				})
+				.catch(function(response) {
+					return response.data;
+				});
+		}
+
+		function post(path, model) {
+			var config = {};
+
+			if (model) {
+				config.params = model;
+			}
+			return $http.post(path, config)
 				.then(function(response) {
 					return response.data;
 				})

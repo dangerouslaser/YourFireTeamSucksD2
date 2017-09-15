@@ -6,7 +6,8 @@ angular.module('fireTeam.common')
 	var activityModel;
 	var progress = 0;
 	var activityPromises;
-	var playerInstancePromises;
+	var activityMatchModel;
+	var membersActivityMatchPromises;
 
 	const statsToExcludeArray = [
 		'fireTeamId',
@@ -66,10 +67,11 @@ angular.module('fireTeam.common')
 			}
 
 			var postGameCarnageReport = {
-				activityDetails: response.Response.data.activityDetails,
-				dateTime: response.Response.data.period,
-				playerPostGameCarnageReport: buildCarnageReport(response.Response.data),
-				definitions: buildActivityDetailsModel(response.Response.definitions)
+				activityDetails: response.Response.activityDetails,
+				dateTime: response.Response.period,
+				playerPostGameCarnageReport: response.Response
+				//playerPostGameCarnageReport: buildCarnageReport(response.Response),
+				//definitions: buildActivityDetailsModel(response.Response.definitions)
 			}
 			deferred.resolve(postGameCarnageReport);
 			
@@ -172,57 +174,64 @@ angular.module('fireTeam.common')
 	};
 
 	function getPlayerInstanceList(fireTeamObject) {
-		playerInstancePromises = [];	
+		//membersActivityMatchPromises = [];
+		var activitySearchOptions = {
+			mode: null,
+			page: 0,
+			activityMembers: []
+		};
 
-		angular.forEach(fireTeamObject, function(player){
-			angular.forEach(player.characters, function(character){
-				var data = {membershipId: player.membershipId, characterId: character.characterBase.characterId, mode:fireTeamObject.gameMode, page: fireTeamObject.pageNum};
-				playerInstancePromises.push(getPlayerInstance(data));
-			});
-		});
-
-		return $q.all(playerInstancePromises).then(function(response){
-			if(response.ErrorCode > 1){
-				return response;
+		angular.forEach(fireTeamObject.players, function(member){
+			var memberInfo = {
+				membershipId: member.profile.data.userInfo.membershipId,
+				characterIds: member.profile.data.characterIds
 			}
-
-			var resolutionObject = {};
-			var resolutionArray = [];
-
-			angular.forEach(response, function(promise){
-				var key = Object.keys(promise);
-				var valArray = promise[key];
-				if(!resolutionObject[key]){
-					resolutionObject[key] = [];
-				}
-				resolutionObject[key] = resolutionObject[key].concat(valArray);
-			});
-
-			angular.forEach(resolutionObject, function(val, key){
-				resolutionArray.push(val);
-			});
-
-			return resolutionArray;
+			activitySearchOptions.mode = fireTeamObject.gameMode;
+			activitySearchOptions.page = fireTeamObject.pageNum;
+			activitySearchOptions.activityMembers.push(memberInfo);
 		});
+
+		membersActivityMatchPromises = getMembersActivityMatches(activitySearchOptions);
+		return activityMatchModel = $q.resolve(membersActivityMatchPromises);
+
+		// return $q.all(membersActivityMatchPromises).then(function(response){
+		// 	debugger;
+		// 	if(response.ErrorCode > 1){
+		// 		return response;
+		// 	}
+
+		// 	var resolutionObject = {};
+		// 	var resolutionArray = [];
+
+		// 	angular.forEach(response, function(promise){
+		// 		var key = Object.keys(promise);
+		// 		var valArray = promise[key];
+		// 		if(!resolutionObject[key]){
+		// 			resolutionObject[key] = [];
+		// 		}
+		// 		resolutionObject[key] = resolutionObject[key].concat(valArray);
+		// 	});
+
+		// 	angular.forEach(resolutionObject, function(val, key){
+		// 		resolutionArray.push(val);
+		// 	});
+
+		// 	return resolutionArray;
+		// });
 	};
 
 
-    function getPlayerInstance(request) {
+    function getMembersActivityMatches(request) {
 		var deferred = currentDeferred = $q.defer();
 		var playerInstanceArray = [];
 		var playerObject = {};
 
-		playerOptionsService.getCharacterActivityHistoryData(request).then(function(response){
+		playerOptionsService.getCharacterActivityHistoryData({data: request}).then(function(response){
 			if(response.ErrorCode > 1){
 				deferred.resolve(response);
 				return deferred.promise;
 			}
-			var activities = response.Response.data.activities;
-			angular.forEach(activities, function(event){
-				playerInstanceArray.push(event.activityDetails.instanceId);
-			});
-			playerObject[request.membershipId] = playerInstanceArray;
-			deferred.resolve(playerObject);
+			deferred.resolve(response);
 		});	
 		return deferred.promise;
 	};

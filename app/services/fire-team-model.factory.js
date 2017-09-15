@@ -49,24 +49,10 @@ angular.module('fireTeam.common')
 					return deferred.promise;
 				}
 
-				response = response.Response.data
+				response = response.Response;
 				response.membershipInfo = membershipModel;
+				//playerInfo
 
-				angular.forEach(response.characters, function(character){
-					switch(character.characterBase.classType){
-						case 0:
-							character.className = 'Titan';
-							break;
-						case 1:
-							character.className = 'Hunter';
-							break;
-						case 2:
-							character.className = 'Warlock';
-							break;
-						default:
-							character.className = 'Unknown';
-					}
-				});
 				deferred.resolve(response);
 			});
 		}, function (error){

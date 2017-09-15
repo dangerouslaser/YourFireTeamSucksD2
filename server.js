@@ -7,10 +7,14 @@ var bodyParser = require('body-parser');
 var ejs = require('ejs');
 var session = require('express-session');
 var timeout = require('connect-timeout');
+var config = require('./config');
+var manifestService = require('./nodeServices/ManifestService');
+var activityMatch = require('./nodeServices/ActivityMatchService');
 // Create our Express application
 var app = express();
+var destinyBaseRequest = request.defaults({headers: {'X-API-Key': config.default.credentials.apiKey}});
 
-//Set our SSL Credentials
+//Set our SSL config.default.credentials
 // const privateKey = fs.readFileSync('./ssl/key.pem', 'utf8');
 // const certificate = fs.readFileSync('./ssl/cert.pem', 'utf8');
 // const passphrase = fs.readFileSync('./ssl/passphrase.txt', 'utf8');
@@ -20,33 +24,20 @@ var app = express();
 app.set('view engine', 'ejs');
 
 // Use the body-parser package in our application
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
-//var key = 'b1ccfe5ba9154988b1356d03e85fa735';
-var apiKey = '52cfc245497e4f11b0439d64b610e510';
-var credentials = {destinyKey: apiKey, defaultMemberType: 2};
-
-var platformType = {
-  'xBox': 1,
-  'PlayStation': 2
-}
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 var router = express.Router();
 
-//Destiny Host and Base Request
-const HOST = 'http://www.bungie.net/Platform/Destiny/';
-var destinyBaseRequest = request.defaults({headers: {'X-API-Key': credentials.destinyKey}});
-
 router.get('/getMembershipIdByUserName', function(req, res, next){
-    credentials.defaultMemberType = req.query.memberType;
+  config.default.credentials.defaultMemberType = req.query.memberType;
     var user = req.query.userName;
 
     if(user.charAt(0) === '#'){
       user = user.substring(1, user.length-1);
     }
 
-    destinyBaseRequest(HOST + 'SearchDestinyPlayer/' + credentials.defaultMemberType + '/' + user + '/',
+    destinyBaseRequest(config.default.destiny2_host + 'SearchDestinyPlayer/' + config.default.credentials.defaultMemberType + '/' + user + '/',
         function (err, response, body) {
           var jsonResponse, result;
           res.setHeader('Content-Type', 'application/json');
@@ -72,7 +63,7 @@ router.get('/getMembershipIdByUserName', function(req, res, next){
 });
    
 router.get('/getCharacterInfoByMembershipId', function(req, res, next){
-    destinyBaseRequest(HOST + credentials.defaultMemberType + '/Account/' + req.query.membershipId + '/Summary/',
+    destinyBaseRequest(config.default.destiny2_host + config.default.credentials.defaultMemberType + '/Profile/' + req.query.membershipId + '/?components=100,200',
         function (err, response, body) {
           var jsonResponse, result;
           res.setHeader('Content-Type', 'application/json');
@@ -84,7 +75,7 @@ router.get('/getCharacterInfoByMembershipId', function(req, res, next){
 });
 
 router.get('/getCharacterStatsById', function(req, res, next){
-    destinyBaseRequest(HOST + '/Stats/AggregateActivityStats/' + credentials.defaultMemberType+ '/' + req.query.membershipId + '/' + req.query.characterId + '/',
+    destinyBaseRequest(config.default.destiny2_host + '/Stats/AggregateActivityStats/' + config.default.credentials.defaultMemberType+ '/' + req.query.membershipId + '/' + req.query.characterId + '/',
         function (err, response, body) {
           var jsonResponse, result;
           res.setHeader('Content-Type', 'application/json');
@@ -101,30 +92,72 @@ router.get('/getCharacterStatsById', function(req, res, next){
     });
 });
 
-router.get('/getCharacterActivityHistoryData', function(req, res, next){
-    destinyBaseRequest(HOST + '/Stats/ActivityHistory/' + 
-      credentials.defaultMemberType + '/' + 
-      req.query.membershipId + '/' + 
-      req.query.characterId + '/' + 
-      '?mode=' + req.query.mode + '&page=' + req.query.page + '&definitions=true',
-        function (err, response, body) {
-          var jsonResponse, result;
-          res.setHeader('Content-Type', 'application/json');
-          res.status(200);
-
-          try {
-            result = jsonResponse = JSON.parse(body);
-          } catch (e) {
-            res.status(500);
-            result = {ErrorCode: 500, Error: e};
-          }
-
-          res.json(result);
+router.post('/getCharacterActivityHistoryData', function(req, res, next){
+    res.status(200);
+    var activitySearchOptions = req.body.params.data;
+    activityMatch.ActivityMatchService.getActivities(activitySearchOptions, function(err, response){
+      var result = {};
+      if(err){
+        res.status(500);
+        result = {ErrorCode: 500, Error: err};
+      }else{
+        result.Response = response;
+      }
+      res.json(result);
     });
+    // destinyBaseRequest(config.default.destiny2_host + 
+    //   config.default.credentials.defaultMemberType + '/Account/' + 
+    //   req.query.membershipId + '/Character/' + 
+    //   req.query.characterId + '/Stats/Activities/' + 
+    //   '?mode=' + req.query.mode + '&page=' + req.query.page,
+    //     function (err, response, body) {
+    //       var jsonResponse, result;
+    //       res.setHeader('Content-Type', 'application/json');
+    //       res.status(200);
+
+    //       try {
+    //         result = jsonResponse = JSON.parse(body);
+    //       } catch (e) {
+    //         res.status(500);
+    //         result = {ErrorCode: 500, Error: e};
+    //       }
+
+    //       if(res.statusCode == '200' && result.Response.activities){
+    //         var query = "SELECT json FROM DestinyActivityDefinition WHERE json like";
+
+    //         // forEach(result.Response.activities, function(activity){
+    //         //   console.log(activities.activityDetails.referenceId)
+    //         // });
+
+    //         for (var i = 0; i < result.Response.activities.length; i++){
+    //           if(i!=0){
+    //             query+=" OR json LIKE";
+    //           }
+    //           query+= " '%" + result.Response.activities[i].activityDetails.referenceId + "%'";
+    //           console.log(result.Response.activities[i].activityDetails.referenceId)
+    //         }
+
+    //         manifest.ManifestService.queryManifest('world.content', query, function (err, response) {
+    //           for (var i = 0; i < result.Response.activities.length; i++){
+    //             var activity = result.Response.activities[i];
+    //             for (var j = 0; j < response.length; j++){
+    //               var jsonDef = JSON.parse(response[j]);
+    //               if(activity.activityDetails.referenceId === jsonDef.hash){
+    //                 activity.definitions = jsonDef;
+    //               }
+    //             }
+    //           }
+    //           res.json(result);
+    //         });
+    //       }
+    //       else{
+    //         res.json(result);
+    //       }
+    // });
 });
 
 router.get('/getPostGameCarnageReport', function(req, res, next){
-    destinyBaseRequest(HOST + '/Stats/PostGameCarnageReport/' + req.query.instanceId + '/?definitions=true',
+    destinyBaseRequest(config.default.destiny2_host + '/Stats/PostGameCarnageReport/' + req.query.instanceId + '/?definitions=true',
         function (err, response, body) {
           var jsonResponse, result;
           res.setHeader('Content-Type', 'application/json');
@@ -142,7 +175,7 @@ router.get('/getPostGameCarnageReport', function(req, res, next){
 });
 
 router.get('/getWeaponDefinitionById', function(req, res, next){
-      destinyBaseRequest(HOST + credentials.defaultMemberType + '/' + 
+      destinyBaseRequest(config.default.destiny2_host + config.default.credentials.defaultMemberType + '/' + 
         '/Account/' + req.query.membershipId + '/' + 
         'Character/' +
         req.query.characterId + '/' + 
@@ -163,6 +196,16 @@ router.get('/getWeaponDefinitionById', function(req, res, next){
 
           res.json(result);
     });
+});
+
+router.post('/manifest/getActivityDefinitions', function(req, res, next){
+  var query = req.body.sqliteQ;
+  manifestService.ManifestService.queryManifest('world.content', query,
+      function (err, response) {
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200);
+        res.json(response);
+  });
 });
 
 app.use(timeout(120000));
@@ -191,6 +234,7 @@ var httpPort = process.env.PORT || 3000;
 // Start the http server
 httpServer.listen(httpPort, function(err) {
     console.log(err, httpServer.address());
+    manifestService.ManifestService.checkManifestVersion();
 }); 
 
 // Start the https server

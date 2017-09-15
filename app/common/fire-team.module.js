@@ -5,7 +5,7 @@ angular.module('fireTeam', [
 ])
 .run(function ($rootScope) {
   $rootScope.const = {
-	bungieRoot: 'http://www.bungie.net'
+	 bungieRoot: 'http://www.bungie.net'
   }
 })
 .config(['$stateProvider', function ($stateProvider) {
