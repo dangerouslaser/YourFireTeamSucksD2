@@ -486,7 +486,10 @@ input.player-input {
     display: inline-block;
 }
 
-.activity-selection-container .activity-selection .character-container{
+.character-container{
+    float: right;
+    width: 250px;
+    padding-right: 10px;
     position: relative;
     display: block;
 }
@@ -618,6 +621,29 @@ span.info-show-button{
     }
 }
 
+#ActivityContainer .view-bar-container{
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    background: #12171c;
+
+    div{
+        padding: 20px;
+        display: inline-block;
+        border: 1px solid #000;
+        background: #fff;
+        color: #000;
+        cursor: pointer;
+        margin: 5px;
+        min-width: 200px;
+        border-radius: 3px;
+
+        &:hover, &.selected{
+            box-shadow: 1px 1px 10px 1px #000 inset;
+        }
+    }
+}
+
 #PlayerActivityStats .player-stat-container{
     color: #fff;
     font-weight: bold;
@@ -638,58 +664,80 @@ span.info-show-button{
 
 #PlayerActivityStats ul.stats-box{
     padding:10px;
+    text-align: center;
 }
 
 div.medal{
-    border-radius: 3px;
-    padding:5px;
-    position: absolute;
-    top: 0;
-    right: 0;
-    cursor:pointer;
+    border-radius: 20px;
+    padding: 5px;
+    position: relative;
+    float: left;
+    cursor: pointer;
+    width: 20px;
+    margin-right: 10px;
+    height: 20px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 20px;
 
     &.gold{
         border: 1px solid gold;
-        box-shadow: 0px 1px 20px gold inset;
+        box-shadow: 0px 2px 20px #887618 inset;
+        background: gold;
+        text-shadow: 0px 1px 1px #000;
+
         &:hover, .selected{
             background: gold;
-            color: #000;
+           
             box-shadow: 0px 1px 20px gold;
         }
     }
     &.silver{
         border: 1px solid silver;
-        box-shadow: 0px 1px 20px silver inset;
+        box-shadow: 0px 2px 20px #656565 inset;
+        background: silver;
+        text-shadow: 0px 1px 1px #000;
+        
         &:hover, .selected{
             background: silver;
-            color: #000;
+           
             box-shadow: 0px 1px 20px silver;
         }
     }
     &.bronze{
-        border: 1px solid #65461f;
-        box-shadow: 0px 1px 20px #65461f inset;
+        border: 1px solid #f19d33;
+        box-shadow: 0px 2px 20px #6f450f inset;
+        background: #f19d33;
+        text-shadow: 0px 1px 1px #000;
+
         &:hover, .selected{
-            background: #65461f;
-            color: #000;
+            background: #f19d33;
+            
             box-shadow: 0px 1px 20px #65461f;
         }
     }
     &.average{
         border: 1px solid #6c8fff;
-        box-shadow: 0px 1px 20px #6c8fff inset;
+        box-shadow: 0px 2px 20px #243773 inset;
+        background: #6c8fff;
+        text-shadow: 0px 1px 1px #000;
+        
         &:hover, .selected{
             background: #6c8fff;
-            color: #000;
+            
             box-shadow: 0px 1px 20px #6c8fff;
         }
     }
     &.last{
+
         border: 1px solid red;
-        box-shadow: 0px 1px 20px red inset;
+        box-shadow: 0px 2px 20px #711212 inset;
+        background: red;
+        text-shadow: 0px 1px 1px #000;
+
         &:hover, .selected{
             background: red;
-            color: #000;
+           
             box-shadow: 0px 1px 20px red;
         }
     }
@@ -710,36 +758,81 @@ div.medal{
     border: 1px solid #7d7777;
     background: #12171c;
 
-    &:hover{
-        background: #fff;
-        color: #000;
-    }
-
     div.rank-value{
         padding:5px;
     }
 }
 
 #medal-legend-container{
-    width: 250px;
+    width: 25%;
     background: rgba(51, 51, 51, 0.8);
     border: 1px solid #000;
     box-shadow: 1px 1px 10px #000;
     border-radius: 3px;
-    padding: 10px;
-    right: 25px;
-    top: 25px;
+    top: 0;
     position: fixed;
+    z-index: 99;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    margin: 0 auto;
+    text-align: center;
+    height: 100%;
+    padding-top:10px;
+    padding-bottom:10px;
 
     .medal-legend{
         position: relative;
+        overflow: scroll;
+        height: 100%;
+        padding: 10px;
+        text-align: center;
+        
+        .guys{
+            padding: 10px;
+            font-size: 150%;
+            text-align: center;
+            background: #6796dc;
+            margin-bottom: 20px;
+            width: 80%;
+            margin: 0 auto;
+
+            &.bad{
+                background: none;
+
+                &.glow.on {
+                    box-shadow: 0px 1px 20px 5px #ff0000;
+                }
+            }
+
+            &.best{
+                background: none;
+
+                &.glow.on {
+                    box-shadow: 0px 1px 20px 5px #00FF30;
+                }
+            }
+
+        }
 
         .medal-stat-box{
-            position: relative;
             display: inline-block;
             position: relative;
-            width: 100%;
-            margin-bottom:20px;
+            width: 80%;
+            margin-bottom: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            text-align: left;
+
+            .divider{
+                width: 90%;
+                position: relative;
+                margin: 0 auto;
+                text-align: center;
+                border-bottom: 1px solid #fff;
+            }
+           
 
             .medal-description{
                 margin-left: 20px;
@@ -770,6 +863,18 @@ div.medal{
                 display: block;
             }
         }
+    }
+}
+
+@media screen and (max-width: 980px) {
+    #medal-legend-container {
+        width: 50%;
+    }
+}
+
+@media screen and (max-width: 680px) {
+    #medal-legend-container {
+        width: 100%;
     }
 }
 
@@ -1367,18 +1472,43 @@ div.tooltip{
     }
 }
 
+.expand-left-bar{
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 5px;
+    cursor: pointer;
+    z-index: 100;
+    width: 15px;
+    height: 100%;
+    border: 1px solid #000;
+    vertical-align: middle;
+
+    &:hover{
+        background: rgba(125, 119, 119, 0.61);
+    }
+}
+
 .small-close-button{
     position: absolute;
-    top: -5px;
+    top: -20px;
     margin: 10px;
-    right: 0;
-    padding: 10px;
+    right: -20px;
+    padding: 5px;
     cursor: pointer;
+    z-index: 100;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #333;
+    text-align: center;
+    vertical-align: bottom;
+    border: 1px solid #000;
 
     &:hover{
         color: #fff;
         text-shadow: 1px 1px 1px #000;
-        cursor: default;
+        box-shadow: 0px 1px 2px #000;
     }
 }
 

@@ -387,7 +387,10 @@ input.player-input {
   font-size: 20px;
   display: inline-block; }
 
-.activity-selection-container .activity-selection .character-container {
+.character-container {
+  float: right;
+  width: 250px;
+  padding-right: 10px;
   position: relative;
   display: block; }
 
@@ -490,6 +493,24 @@ span.info-show-button {
   #ActivityContainer .character:hover {
     box-shadow: 0px 0px 5px 2px #2eff00; }
 
+#ActivityContainer .view-bar-container {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  background: #12171c; }
+  #ActivityContainer .view-bar-container div {
+    padding: 20px;
+    display: inline-block;
+    border: 1px solid #000;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    margin: 5px;
+    min-width: 200px;
+    border-radius: 3px; }
+    #ActivityContainer .view-bar-container div:hover, #ActivityContainer .view-bar-container div.selected {
+      box-shadow: 1px 1px 10px 1px #000 inset; }
+
 #PlayerActivityStats .player-stat-container {
   color: #fff;
   font-weight: bold;
@@ -505,49 +526,60 @@ span.info-show-button {
   box-shadow: 1px 1px 10px #000; }
 
 #PlayerActivityStats ul.stats-box {
-  padding: 10px; }
+  padding: 10px;
+  text-align: center; }
 
 div.medal {
-  border-radius: 3px;
+  border-radius: 20px;
   padding: 5px;
-  position: absolute;
-  top: 0;
-  right: 0;
-  cursor: pointer; }
+  position: relative;
+  float: left;
+  cursor: pointer;
+  width: 20px;
+  margin-right: 10px;
+  height: 20px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 20px; }
   div.medal.gold {
     border: 1px solid gold;
-    box-shadow: 0px 1px 20px gold inset; }
+    box-shadow: 0px 2px 20px #887618 inset;
+    background: gold;
+    text-shadow: 0px 1px 1px #000; }
     div.medal.gold:hover, div.medal.gold .selected {
       background: gold;
-      color: #000;
       box-shadow: 0px 1px 20px gold; }
   div.medal.silver {
     border: 1px solid silver;
-    box-shadow: 0px 1px 20px silver inset; }
+    box-shadow: 0px 2px 20px #656565 inset;
+    background: silver;
+    text-shadow: 0px 1px 1px #000; }
     div.medal.silver:hover, div.medal.silver .selected {
       background: silver;
-      color: #000;
       box-shadow: 0px 1px 20px silver; }
   div.medal.bronze {
-    border: 1px solid #65461f;
-    box-shadow: 0px 1px 20px #65461f inset; }
+    border: 1px solid #f19d33;
+    box-shadow: 0px 2px 20px #6f450f inset;
+    background: #f19d33;
+    text-shadow: 0px 1px 1px #000; }
     div.medal.bronze:hover, div.medal.bronze .selected {
-      background: #65461f;
-      color: #000;
+      background: #f19d33;
       box-shadow: 0px 1px 20px #65461f; }
   div.medal.average {
     border: 1px solid #6c8fff;
-    box-shadow: 0px 1px 20px #6c8fff inset; }
+    box-shadow: 0px 2px 20px #243773 inset;
+    background: #6c8fff;
+    text-shadow: 0px 1px 1px #000; }
     div.medal.average:hover, div.medal.average .selected {
       background: #6c8fff;
-      color: #000;
       box-shadow: 0px 1px 20px #6c8fff; }
   div.medal.last {
     border: 1px solid red;
-    box-shadow: 0px 1px 20px red inset; }
+    box-shadow: 0px 2px 20px #711212 inset;
+    background: red;
+    text-shadow: 0px 1px 1px #000; }
     div.medal.last:hover, div.medal.last .selected {
       background: red;
-      color: #000;
       box-shadow: 0px 1px 20px red; }
 
 #PlayerActivityStats ul.stats-box li {
@@ -564,30 +596,63 @@ div.medal {
   padding: 10px;
   border: 1px solid #7d7777;
   background: #12171c; }
-  #PlayerActivityStats ul.stats-box li:hover {
-    background: #fff;
-    color: #000; }
   #PlayerActivityStats ul.stats-box li div.rank-value {
     padding: 5px; }
 
 #medal-legend-container {
-  width: 250px;
+  width: 25%;
   background: rgba(51, 51, 51, 0.8);
   border: 1px solid #000;
   box-shadow: 1px 1px 10px #000;
   border-radius: 3px;
-  padding: 10px;
-  right: 25px;
-  top: 25px;
-  position: fixed; }
+  top: 0;
+  position: fixed;
+  z-index: 99;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  margin: 0 auto;
+  text-align: center;
+  height: 100%;
+  padding-top: 10px;
+  padding-bottom: 10px; }
   #medal-legend-container .medal-legend {
-    position: relative; }
+    position: relative;
+    overflow: scroll;
+    height: 100%;
+    padding: 10px;
+    text-align: center; }
+    #medal-legend-container .medal-legend .guys {
+      padding: 10px;
+      font-size: 150%;
+      text-align: center;
+      background: #6796dc;
+      margin-bottom: 20px;
+      width: 80%;
+      margin: 0 auto; }
+      #medal-legend-container .medal-legend .guys.bad {
+        background: none; }
+        #medal-legend-container .medal-legend .guys.bad.glow.on {
+          box-shadow: 0px 1px 20px 5px #ff0000; }
+      #medal-legend-container .medal-legend .guys.best {
+        background: none; }
+        #medal-legend-container .medal-legend .guys.best.glow.on {
+          box-shadow: 0px 1px 20px 5px #00FF30; }
     #medal-legend-container .medal-legend .medal-stat-box {
-      position: relative;
       display: inline-block;
       position: relative;
-      width: 100%;
-      margin-bottom: 20px; }
+      width: 80%;
+      margin-bottom: 10px;
+      margin-top: 10px;
+      padding: 10px;
+      text-align: left; }
+      #medal-legend-container .medal-legend .medal-stat-box .divider {
+        width: 90%;
+        position: relative;
+        margin: 0 auto;
+        text-align: center;
+        border-bottom: 1px solid #fff; }
       #medal-legend-container .medal-legend .medal-stat-box .medal-description {
         margin-left: 20px;
         width: 75%;
@@ -609,6 +674,12 @@ div.medal {
       #medal-legend-container .medal-legend .medal-stat-box .stat-list span {
         display: block; }
 
+@media screen and (max-width: 980px) {
+  #medal-legend-container {
+    width: 50%; } }
+@media screen and (max-width: 680px) {
+  #medal-legend-container {
+    width: 100%; } }
 #stats-table-container {
   position: relative;
   min-width: 800px;
@@ -1105,16 +1176,38 @@ div.tooltip {
     box-shadow: 0px 0px 10px 1px #f17e51 inset;
     transition: height .5s ease-in-out; }
 
+.expand-left-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px;
+  cursor: pointer;
+  z-index: 100;
+  width: 15px;
+  height: 100%;
+  border: 1px solid #000;
+  vertical-align: middle; }
+  .expand-left-bar:hover {
+    background: rgba(125, 119, 119, 0.61); }
+
 .small-close-button {
   position: absolute;
-  top: -5px;
+  top: -20px;
   margin: 10px;
-  right: 0;
-  padding: 10px;
-  cursor: pointer; }
+  right: -20px;
+  padding: 5px;
+  cursor: pointer;
+  z-index: 100;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #333;
+  text-align: center;
+  vertical-align: bottom;
+  border: 1px solid #000; }
   .small-close-button:hover {
     color: #fff;
     text-shadow: 1px 1px 1px #000;
-    cursor: default; }
+    box-shadow: 0px 1px 2px #000; }
 
 /*# sourceMappingURL=sass.css.map */

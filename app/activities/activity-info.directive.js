@@ -18,11 +18,12 @@ angular
 			replace: true,
 			link: function(scope, element, attrs, ctrl){
 				scope.isLoadingCarnageReport = false;
+				scope.showLegand = false;
 
 				angular.element($window).on('click', function(e){
-					if(scope.tableClickEvnt){
+					if(scope.legandIsOpen){
 						e.stopPropagation();
-						scope.tableClickEvnt = null;
+						scope.toggleLegend();
 						return;
 					}
 					scope.$apply();
@@ -30,7 +31,6 @@ angular
 
 				scope.$watch('activityInfo', function(newVal){
 					if(newVal){
-						console.log(newVal);
 						getFireTeam();
 					}
 				});
@@ -39,6 +39,10 @@ angular
 					scope.activityMembers = {};
 					scope.isLoadingCarnageReport = true;
 					generateStatRanks();
+					updateActivityInfoWithOrderedValues(scope.activityInfo.playerStatsByOrderedList);
+					scope.activityInfo.medalLegend = buildMedalLegend(scope.activityInfo);
+					console.log('scope log')
+					console.log(scope.activityInfo);
 				}
 
 				function generateStatRanks(){
@@ -51,79 +55,94 @@ angular
 							if(!statsObject[statKey]){
 								statsObject[statKey] = [];
 							}
-
 							var playerValue = {
 								characterId: entryValue.characterId,
-								value: statValue.basic.value
+								destinyUserInfo: entryValue.player.destinyUserInfo,
+								basic: {
+									value: statValue.basic.value,
+									rank: 0,
+									displayName: capitalizeFirstLetter(statKey),
+									displayValue: statValue.basic.displayValue,
+								}
 							}
 							statsObject[statKey].push(playerValue);
 						});
 					});
-					angular.forEach(statsObject, function(item){
-						item.ordered = $filter('orderBy')(item, 'value');
-					});					
-					function checkOrder(statsObject){
-						angular.forEach(statsObject, function(item){
-							item.hasMedal = false;
-							var allTheSame = true;
-							var prevCheck = null;
-							angular.forEach(item.ordered, function(ordered){
-								if(prevCheck == null){
-									prevCheck = ordered.value;
-								}
-								item.hasMedal = prevCheck != ordered.value;
-							});
-						});
 
-						return statsObject;
-					}
-					
-					updateActivityInfoWithOrderedValues(checkOrder(statsObject), function(updatedActivityInfo){
-						scope.isLoadingCarnageReport = false;
-						//console.log(scope.activityInfo.entries);
-						scope.medalLegend = buildMedalLegend(updatedActivityInfo);
-					});
+					scope.activityInfo.playerStatsByOrderedList = orderStats(statsObject);
 				}
 
-				function updateActivityInfoWithOrderedValues(orderedStatsObject, nextFn){
-					var totalMembers = scope.activityInfo.entries.length;
+				function orderStats(unOrderedStatRanksObject){
+					var orderedList = {};
+					angular.forEach(unOrderedStatRanksObject, function(val, key){
+						if(isReverseOrder(key)){
+							val.ordered = $filter('orderBy')(val, 'basic.value');
+						}else{
+							val.ordered = $filter('orderBy')(val, '-basic.value');
+						}
+						val = buildOrderedObject(val);
+					});	
 
+					return unOrderedStatRanksObject;
+				}
+
+				function buildOrderedObject(entriesObject){
+					var rankIndex = 1;
+					var totalMembers = entriesObject.ordered.length;
+					var prevValue = null;
+					entriesObject.hasMedal = false;
+					angular.forEach(entriesObject.ordered, function(player){
+						player.basic.rank = rankIndex;
+						player.basic.outOf = totalMembers;
+						player.basic.className = scope.getDisplayValue(rankIndex, totalMembers)
+						rankIndex++;
+						prevValue = prevValue == null ? player.basic.value : prevValue;
+						if(entriesObject.hasMedal === false){
+							entriesObject.hasMedal = !areSameValues(prevValue, player.basic.value)
+						}
+						prevValue = player.basic.value;
+					});
+					return entriesObject;
+
+					function areSameValues(check1, check2){
+						return check1 == check2;
+					}
+				}
+
+				function updateActivityInfoWithOrderedValues(orderedStatsObject){
 					angular.forEach(scope.activityInfo.entries, function(entry){
 						var currentCharacterId = entry.characterId;
 						angular.forEach(entry.values, function(entryValue, entryKey){
 							angular.forEach(orderedStatsObject, function(statValue, statKey){
-								if(entryKey === statKey){
-									entryValue.basic.displayName = capitalizeFirstLetter(statKey);
-									entryValue.basic.className = '';
+								if(entryKey.toLowerCase() === statKey.toLowerCase()){
 									entryValue.hasMedal = statValue.hasMedal;
-									var rankOrderReverse = statKey == 'deaths' ? totalMembers : null;
-									if(statValue.hasMedal){
-										for (var i = 0; i < statValue.ordered.length; i++){
-											if(rankOrderReverse){
-												rankOrderReverse--;
-											}
-											if(currentCharacterId == statValue.ordered[i].characterId){
-												entryValue.basic.rank = !rankOrderReverse ? (i+1) : rankOrderReverse;
-												entryValue.basic.outOf = totalMembers;
-												entryValue.basic.className = scope.getDisplayValue(statKey, entryValue.basic.rank, totalMembers);
-											}
+									angular.forEach(statValue.ordered, function(player){
+										if(currentCharacterId == player.characterId){
+											angular.extend(entryValue.basic, player.basic);
 										}
-									}
+									});
 								}
 							});
 						});
 					});
-					nextFn(scope.activityInfo);
+					console.log('updateActivityInfoWithOrderedValues')
+				}
 
-					function capitalizeFirstLetter(string) {
-						return string.charAt(0).toUpperCase() + string.slice(1);
-					}
+				function isReverseOrder(val){
+					var comparisonEnum = [
+						'deaths'
+					]
+
+					return comparisonEnum.indexOf(val.toLowerCase()) != -1;
+				}
+
+				function capitalizeFirstLetter(string) {
+					return string.charAt(0).toUpperCase() + string.slice(1);
 				}
 
 				function buildMedalLegend(activityInfoObj){
 					var medalLegend = [];
 					angular.forEach(activityInfoObj.entries, function(playerEntry){
-						console.log(playerEntry.player.destinyUserInfo.displayName)
 						var characterObject = {
 							player: playerEntry.player.destinyUserInfo.displayName,
 							medals:{
@@ -148,22 +167,26 @@ angular
 
 						angular.forEach(playerEntry.values, function(statValue){
 							if(statValue.hasMedal){
+								var statObject = {
+									displayName: statValue.basic.displayName,
+									value: statValue.basic.displayValue
+								}
 								switch(statValue.basic.rank){
 									case 1:
 										characterObject.medals.gold.count += 1;
-										characterObject.medals.gold.stats.push(statValue.basic.displayName);
+										characterObject.medals.gold.stats.push(statObject);
 									break;
 									case 2:
 										characterObject.medals.silver.count += 1;
-										characterObject.medals.silver.stats.push(statValue.basic.displayName);
+										characterObject.medals.silver.stats.push(statObject);
 									break;
 									case 3:
 										characterObject.medals.bronze.count += 1;
-										characterObject.medals.bronze.stats.push(statValue.basic.displayName);
+										characterObject.medals.bronze.stats.push(statObject);
 									break;
 									case (activityInfoObj.entries.length):
 										characterObject.medals.last.count += 1;
-										characterObject.medals.bronze.stats.push(statValue.basic.displayName);
+										characterObject.medals.last.stats.push(statObject);
 									break;
 									default:
 								}
@@ -209,12 +232,14 @@ function activityInfoCtrl($scope, $anchorScroll){
 	var self = this;
 	self.m = $scope;
 	self.m.selectedStat = null;
-	self.m.showLegend = true;
+	self.m.selectedView = 'stats';
+	self.m.showLegend = false;
 	$scope.goToPlayer = goToPlayer;
 	$scope.getDisplayValue = getDisplayValue;
 	$scope.orderByRank = orderByRank;
 	$scope.selectStat = selectStat;
 	$scope.toggleLegend = toggleLegend;
+	$scope.selectView = selectView;
 	
 	function toggleLegend(){
 		self.m.showLegend = !self.m.showLegend;
@@ -232,7 +257,11 @@ function activityInfoCtrl($scope, $anchorScroll){
 		self.m.selectedStat = statIndex; 
 	}
 
-	function getDisplayValue(statKey, rank, total){
+	function selectView(view){
+		self.m.selectedView = view;
+	}
+
+	function getDisplayValue(rank, total){
 	
 		switch(rank){
 			case 1:
