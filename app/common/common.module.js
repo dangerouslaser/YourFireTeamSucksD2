@@ -1,3 +1,4 @@
 angular.module('fireTeam.common', [
-	'ngCookies'
+	'ngCookies',
+	'angular-toArrayFilter'
 ]);

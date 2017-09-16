@@ -15,19 +15,19 @@ angular.module('fireTeam.common')
 	]
 
 	var activityModelObject = {
-		getFireTeamActivities: function(instanceArray) {
-			//return $q.when(activityModel || getFireTeamActivities(instanceArray));
-			return getFireTeamActivities(instanceArray);
-		},
+		// getFireTeamActivities: function(instanceArray) {
+		// 	//return $q.when(activityModel || getFireTeamActivities(instanceArray));
+		// 	return getFireTeamActivities(instanceArray);
+		// },
 		getPlayerInstanceList: function(fireTeamObject) {
 			return getPlayerInstanceList(fireTeamObject);
 		},
-		getProgress: function(){
-			return progress;
-		},
-		clearProgress: function(){
-			progress = 0;
-		},
+		// getProgress: function(){
+		// 	return progress;
+		// },
+		// clearProgress: function(){
+		// 	progress = 0;
+		// },
 		cancelAllPromises: function(){
 			progress = 0;
 			if(currentDeferred){
@@ -47,131 +47,131 @@ angular.module('fireTeam.common')
 		activityModel = null;
 	}
 
-	function getFireTeamActivities(instanceArray) {
-		activityPromises = [];
+	// function getFireTeamActivities(instanceArray) {
+	// 	activityPromises = [];
 
-		angular.forEach(instanceArray, function(Id){
-			activityPromises.push(getPostGameCarnageReport(Id));
-		});
+	// 	angular.forEach(instanceArray, function(Id){
+	// 		activityPromises.push(getPostGameCarnageReport(Id));
+	// 	});
 
-	 	return activityModel = $q.all(activityPromises);
-	};
+	//  	return activityModel = $q.all(activityPromises);
+	// };
 
-    function getPostGameCarnageReport(Id) {
-		var deferred = currentDeferred = $q.defer();
+    // function getPostGameCarnageReport(Id) {
+	// 	var deferred = currentDeferred = $q.defer();
 
-		playerOptionsService.getPostGameCarnageReport({instanceId: Id}).then(function (response) {	
-			if(response.ErrorCode && response.ErrorCode > 1){
-				deferred.resolve(response);
-				return deferred.promise;
-			}
+	// 	playerOptionsService.getPostGameCarnageReport({instanceId: Id}).then(function (response) {	
+	// 		if(response.ErrorCode && response.ErrorCode > 1){
+	// 			deferred.resolve(response);
+	// 			return deferred.promise;
+	// 		}
 
-			var postGameCarnageReport = {
-				activityDetails: response.Response.activityDetails,
-				dateTime: response.Response.period,
-				playerPostGameCarnageReport: response.Response
-				//playerPostGameCarnageReport: buildCarnageReport(response.Response),
-				//definitions: buildActivityDetailsModel(response.Response.definitions)
-			}
-			deferred.resolve(postGameCarnageReport);
+	// 		var postGameCarnageReport = {
+	// 			activityDetails: response.Response.activityDetails,
+	// 			dateTime: response.Response.period,
+	// 			playerPostGameCarnageReport: response.Response
+	// 			//playerPostGameCarnageReport: buildCarnageReport(response.Response),
+	// 			//definitions: buildActivityDetailsModel(response.Response.definitions)
+	// 		}
+	// 		deferred.resolve(postGameCarnageReport);
 			
-		});
-		return deferred.promise;
-	};	
+	// 	});
+	// 	return deferred.promise;
+	// };	
 
-	function buildActivityDetailsModel(data){
-		angular.forEach(data, function(activityVal, activityKey){
-			var tempModel = [];
+	// function buildActivityDetailsModel(data){
+	// 	angular.forEach(data, function(activityVal, activityKey){
+	// 		var tempModel = [];
 
-			angular.forEach(data[activityKey], function(activityDetail){
-				tempModel.push(activityDetail);
-			});
+	// 		angular.forEach(data[activityKey], function(activityDetail){
+	// 			tempModel.push(activityDetail);
+	// 		});
 
-			data[activityKey] = tempModel;
-		});
-		progress +=1;
-		return data;
-	}
+	// 		data[activityKey] = tempModel;
+	// 	});
+	// 	progress +=1;
+	// 	return data;
+	// }
 
-	function buildCarnageReport(data){
-		var playerPostGameCarnageReport = {};
+	// function buildCarnageReport(data){
+	// 	var playerPostGameCarnageReport = {};
 
-		angular.forEach(data.entries, function(entry){
-			var trueStatsObj = entry.values;
-			var eventStatsObj = entry.extended ? entry.extended.values : undefined;
-			var weaponStatsObj = entry.extended ? entry.extended.weapons : undefined;
-			angular.extend(trueStatsObj, eventStatsObj);
+	// 	angular.forEach(data.entries, function(entry){
+	// 		var trueStatsObj = entry.values;
+	// 		var eventStatsObj = entry.extended ? entry.extended.values : undefined;
+	// 		var weaponStatsObj = entry.extended ? entry.extended.weapons : undefined;
+	// 		angular.extend(trueStatsObj, eventStatsObj);
 
-			playerPostGameCarnageReport[entry.player.destinyUserInfo.displayName] = {
-				playerInfo: {
-					membershipId: entry.player.destinyUserInfo.membershipId
-				},
-				characterInfo: {
-					characterId: entry.characterId,
-					displayName: entry.player.destinyUserInfo.displayName,
-					characterClass: entry.player.characterClass,
-					characterLevel: entry.player.characterLevel,
-					lightLevel: entry.player.lightLevel,
-					iconPath: entry.player.destinyUserInfo.iconPath
-				},
-				trueStats: getStats(trueStatsObj),
-				extendedWeaponsStats: getEventWeaponStats(weaponStatsObj)
-			}			
-		});
+	// 		playerPostGameCarnageReport[entry.player.destinyUserInfo.displayName] = {
+	// 			playerInfo: {
+	// 				membershipId: entry.player.destinyUserInfo.membershipId
+	// 			},
+	// 			characterInfo: {
+	// 				characterId: entry.characterId,
+	// 				displayName: entry.player.destinyUserInfo.displayName,
+	// 				characterClass: entry.player.characterClass,
+	// 				characterLevel: entry.player.characterLevel,
+	// 				lightLevel: entry.player.lightLevel,
+	// 				iconPath: entry.player.destinyUserInfo.iconPath
+	// 			},
+	// 			trueStats: getStats(trueStatsObj),
+	// 			extendedWeaponsStats: getEventWeaponStats(weaponStatsObj)
+	// 		}			
+	// 	});
 
-		function getStats(statsObject){
-			var statsDisplayObject = {};
-			if(statsObject){
-				var count = 0;
-				angular.forEach(statsObject, function(val, key){
-					if(statsToExcludeArray.indexOf(key) === -1){
-						count++;
-						statsDisplayObject[key] = {
-							displayValue: val.basic.displayValue,
-							value: val.basic.value
-						};
-					}
-				});
-				statsDisplayObject.totalStats = {
-						displayValue: count,
-						value: count
-					};
-			}
-			return statsDisplayObject;
-		}
+	// 	function getStats(statsObject){
+	// 		var statsDisplayObject = {};
+	// 		if(statsObject){
+	// 			var count = 0;
+	// 			angular.forEach(statsObject, function(val, key){
+	// 				if(statsToExcludeArray.indexOf(key) === -1){
+	// 					count++;
+	// 					statsDisplayObject[key] = {
+	// 						displayValue: val.basic.displayValue,
+	// 						value: val.basic.value
+	// 					};
+	// 				}
+	// 			});
+	// 			statsDisplayObject.totalStats = {
+	// 					displayValue: count,
+	// 					value: count
+	// 				};
+	// 		}
+	// 		return statsDisplayObject;
+	// 	}
 
-		function getEventWeaponStats(statsObject){
-			var statsDisplayObject = {};
-			if(statsObject){
-				var count = 0;
-				angular.forEach(statsObject, function(item){
-					angular.forEach(item.values, function(val, key){
-						count++;
-						statsDisplayObject[key] = {
-							displayValue: val.basic.displayValue,
-							value: val.basic.value
-						};
-					});
-					statsDisplayObject.totalStats = {
-						displayValue: count,
-						value: count
-					};
-				});
-			}
-			return statsDisplayObject;
-		}
+	// 	function getEventWeaponStats(statsObject){
+	// 		var statsDisplayObject = {};
+	// 		if(statsObject){
+	// 			var count = 0;
+	// 			angular.forEach(statsObject, function(item){
+	// 				angular.forEach(item.values, function(val, key){
+	// 					count++;
+	// 					statsDisplayObject[key] = {
+	// 						displayValue: val.basic.displayValue,
+	// 						value: val.basic.value
+	// 					};
+	// 				});
+	// 				statsDisplayObject.totalStats = {
+	// 					displayValue: count,
+	// 					value: count
+	// 				};
+	// 			});
+	// 		}
+	// 		return statsDisplayObject;
+	// 	}
 
-		return playerPostGameCarnageReport;
-	}
+	// 	return playerPostGameCarnageReport;
+	// }
 
-	function getWeaponDefinitionById(referenceId) {
-		var deferred = $q.defer();
+	// function getWeaponDefinitionById(referenceId) {
+	// 	var deferred = $q.defer();
 
-		playerOptionsService.getWeaponDefinitionById({referenceId: referenceId}).then(function(response){
-			deferred.resolve(response);
-		});	
-		return deferred.promise;
-	};
+	// 	playerOptionsService.getWeaponDefinitionById({referenceId: referenceId}).then(function(response){
+	// 		deferred.resolve(response);
+	// 	});	
+	// 	return deferred.promise;
+	// };
 
 	function getPlayerInstanceList(fireTeamObject) {
 		//membersActivityMatchPromises = [];

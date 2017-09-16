@@ -54,16 +54,21 @@
 				<div class="character-container">
 					<div class="character" ng-repeat="character in activity.entries track by $index">
 						<img ng-src="{{const.bungieRoot}}{{character.player.destinyUserInfo.iconPath}}" />
-						<span class="character-class  {{character.player.characterClass.toLowerCase()}}" data-characterClass="{{character.player.characterClass}}">
-							[{{character.player.characterClass}}] : 
-						</span>
-						<span class="player-class" data-playerName="{{character.characterInfo.displayName}}">
-							{{character.player.destinyUserInfo.displayName}}  
-						</span>
-						<span class="light-level">
-							{{character.player.lightLevel}} 
-						</span>
-						
+						<div class="title-bar">
+							<div>
+								<span class="player-class" data-playerName="{{character.characterInfo.displayName}}">
+									{{character.player.destinyUserInfo.displayName}}
+								</span>
+							</div>
+							<div class="class-info">
+								<span class="character-class {{character.player.characterClass.toLowerCase()}}" data-characterClass="{{character.player.characterClass}}">
+									[{{character.player.characterClass}}]
+								</span>
+								<span class="light-level">
+									{{character.player.lightLevel}} 
+								</span>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

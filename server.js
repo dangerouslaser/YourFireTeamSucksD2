@@ -50,7 +50,7 @@ router.get('/getMembershipIdByUserName', function(req, res, next){
             result = {ErrorCode: 500, Error: e};
           }
 
-          if(jsonResponse.Response){
+          if(jsonResponse && jsonResponse.Response){
             result = jsonResponse.Response[0];
           }
           else if(jsonResponse.ErrorCode){

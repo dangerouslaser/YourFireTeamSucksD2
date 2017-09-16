@@ -3,9 +3,9 @@ angular
 	.controller('activityInfoCtrl', activityInfoCtrl)
 	.directive('activityInfo', activityInfo);
 
-	activityInfo.$inject = ['$rootScope', '$timeout', '$window'];
+	activityInfo.$inject = ['$rootScope', '$timeout', '$window','$filter'];
 
-	function activityInfo($rootScope, $timeout, $window) {
+	function activityInfo($rootScope, $timeout, $window, $filter) {
 		return {
 			restrict: 'E',
 			scope: {
@@ -18,12 +18,6 @@ angular
 			replace: true,
 			link: function(scope, element, attrs, ctrl){
 				scope.isLoadingCarnageReport = false;
-				scope.chartModel = {};
-				scope.activityMembers = {};
-				scope.isShowRankings = true;
-				scope.isShowTable = true;
-				scope.const = $rootScope.const;
-				scope.tableClickEvnt = null;
 
 				angular.element($window).on('click', function(e){
 					if(scope.tableClickEvnt){
@@ -31,16 +25,12 @@ angular
 						scope.tableClickEvnt = null;
 						return;
 					}
-					scope.clearTableSelection();
 					scope.$apply();
-				});
-
-				angular.element(element).on('click', function(e){
-					scope.tableClickEvnt = e;
 				});
 
 				scope.$watch('activityInfo', function(newVal){
 					if(newVal){
+						console.log(newVal);
 						getFireTeam();
 					}
 				});
@@ -48,142 +38,169 @@ angular
 				function getFireTeam(){
 					scope.activityMembers = {};
 					scope.isLoadingCarnageReport = true;
-					scope.chartModel = createChartModel();
-					$timeout(function() {
-						scope.calculatePlayerStandings();
-					}, 10);
+					generateStatRanks();
 				}
 
-				function createChartModel(){
-					var tableObj = {};
-					var activityMembers = Object.keys(scope.activityInfo.playerPostGameCarnageReport);
+				function generateStatRanks(){
+					//console.log(JSON.stringify(scope.activityInfo));
+					var entriesArray = scope.activityInfo.entries;
+					var statsObject = {};
 
-					angular.forEach(activityMembers, function(player){
-						var object = scope.activityInfo.playerPostGameCarnageReport[player].characterInfo;
-						object.isSearchedPlayer = scope.activityInfo.playerPostGameCarnageReport[player].isSearchedPlayer;
-						angular.extend(object, scope.activityInfo.playerPostGameCarnageReport[player].playerInfo)
-						scope.activityMembers[player] = object;
-					});
-
-					angular.forEach(scope.activityInfo.playerPostGameCarnageReport, function(player){
-						angular.forEach(player, function(statTopicVal, statTopicKey){
-							if(statTopicKey !== 'playerInfo' && statTopicKey !== 'characterInfo'){
-								if(!tableObj[statTopicKey]){
-									tableObj[statTopicKey] = {};
-								}
-								angular.forEach(statTopicVal, function(val, key){
-									if(!tableObj[statTopicKey][key]){
-										tableObj[statTopicKey][key] = {};
-									}
-									tableObj[statTopicKey][key][player.characterInfo.displayName] = {
-										displayValue: val.displayValue,
-										value: val.value
-									};
-									tableObj[statTopicKey][key].displayName = ctrl.m.camelCaseToString(key);
-								});
+					angular.forEach(entriesArray, function(entryValue, entryKey){
+						angular.forEach(entryValue.values, function(statValue, statKey){
+							if(!statsObject[statKey]){
+								statsObject[statKey] = [];
 							}
+
+							var playerValue = {
+								characterId: entryValue.characterId,
+								value: statValue.basic.value
+							}
+							statsObject[statKey].push(playerValue);
 						});
 					});
+					angular.forEach(statsObject, function(item){
+						item.ordered = $filter('orderBy')(item, 'value');
+					});					
+					function checkOrder(statsObject){
+						angular.forEach(statsObject, function(item){
+							item.hasMedal = false;
+							var allTheSame = true;
+							var prevCheck = null;
+							angular.forEach(item.ordered, function(ordered){
+								if(prevCheck == null){
+									prevCheck = ordered.value;
+								}
+								item.hasMedal = prevCheck != ordered.value;
+							});
+						});
 
-					angular.forEach(scope.activityMembers, function(val, key){
-						angular.forEach(tableObj, function(statObj){
-							angular.forEach(statObj, function(stat){
-								if (!stat.hasOwnProperty(key)){
-									stat[key] = {
-										displayValue: null,
-										value: null
-									};
+						return statsObject;
+					}
+					
+					updateActivityInfoWithOrderedValues(checkOrder(statsObject), function(updatedActivityInfo){
+						scope.isLoadingCarnageReport = false;
+						//console.log(scope.activityInfo.entries);
+						scope.medalLegend = buildMedalLegend(updatedActivityInfo);
+					});
+				}
+
+				function updateActivityInfoWithOrderedValues(orderedStatsObject, nextFn){
+					var totalMembers = scope.activityInfo.entries.length;
+
+					angular.forEach(scope.activityInfo.entries, function(entry){
+						var currentCharacterId = entry.characterId;
+						angular.forEach(entry.values, function(entryValue, entryKey){
+							angular.forEach(orderedStatsObject, function(statValue, statKey){
+								if(entryKey === statKey){
+									entryValue.basic.displayName = capitalizeFirstLetter(statKey);
+									entryValue.basic.className = '';
+									entryValue.hasMedal = statValue.hasMedal;
+									var rankOrderReverse = statKey == 'deaths' ? totalMembers : null;
+									if(statValue.hasMedal){
+										for (var i = 0; i < statValue.ordered.length; i++){
+											if(rankOrderReverse){
+												rankOrderReverse--;
+											}
+											if(currentCharacterId == statValue.ordered[i].characterId){
+												entryValue.basic.rank = !rankOrderReverse ? (i+1) : rankOrderReverse;
+												entryValue.basic.outOf = totalMembers;
+												entryValue.basic.className = scope.getDisplayValue(statKey, entryValue.basic.rank, totalMembers);
+											}
+										}
+									}
 								}
 							});
 						});
 					});
+					nextFn(scope.activityInfo);
 
-					return calculateRatingValues(tableObj);
-				};
-			
-				function calculateRatingValues(modelObj){
-					angular.forEach(modelObj, function(statObj){
-						angular.forEach(statObj, function(stat){
-							stat.ratingValues = {};
-							var highestVal = 0;
-							var lowestVal = null;
-							var statArray = [];
-
-							angular.forEach(stat, function(playerValue, playerKey){
-								var floatDisplayVal = parseFloat(playerValue.value);
-								highestVal = floatDisplayVal > highestVal ? floatDisplayVal : highestVal;
-								lowestVal = (floatDisplayVal < lowestVal || !lowestVal) ? floatDisplayVal : lowestVal;
-
-								if(floatDisplayVal){
-									statArray.push(floatDisplayVal);
-								}
-							});	
-
-							stat.ratingValues.highestVal = isNaN(highestVal) ? 0 : highestVal;
-							stat.ratingValues.lowestVal = isNaN(lowestVal) ? 0 : lowestVal;
-							stat.ratingValues.avgVal = getAvg(statArray);
-
-						});
-					});
-
-					return calculatePlayerRatings(modelObj);
+					function capitalizeFirstLetter(string) {
+						return string.charAt(0).toUpperCase() + string.slice(1);
+					}
 				}
 
-				function calculatePlayerRatings(ratingObj){
-
-					angular.forEach(ratingObj, function(statCat){
-						angular.forEach(statCat, function(stat){
-							var leastDifferential = null;
-							var avgPlayer;
-							angular.forEach(stat, function(playerVal, playerKey){
-								var floatDisplayVal = parseFloat(stat[playerKey].value);
-								var avgDifferential = Math.abs(stat.ratingValues.avgVal - floatDisplayVal);
-
-								if(!isNaN(stat[playerKey].displayValue)){
-									leastDifferential = (avgDifferential < leastDifferential || !leastDifferential) ? avgDifferential : leastDifferential;
-
-									if (floatDisplayVal === stat.ratingValues.highestVal && stat.ratingValues.highestVal !== stat.ratingValues.avgVal){
-									 	playerVal.isGreatest = true;
-									}
-
-									if (floatDisplayVal === stat.ratingValues.lowestVal && stat.ratingValues.lowestVal !== stat.ratingValues.avgVal){
-									 	playerVal.isLeast = true;
-									}
-						
-									if (avgDifferential === leastDifferential && stat.ratingValues.avgVal !== 0){
-										avgPlayer = playerKey;
-									}
-								}	
-							});
-
-							if(avgPlayer){
-								stat[avgPlayer].isMostAvg = true;
+				function buildMedalLegend(activityInfoObj){
+					var medalLegend = [];
+					angular.forEach(activityInfoObj.entries, function(playerEntry){
+						console.log(playerEntry.player.destinyUserInfo.displayName)
+						var characterObject = {
+							player: playerEntry.player.destinyUserInfo.displayName,
+							medals:{
+								gold: {
+									count: 0,
+									stats: []
+								},
+								silver: {
+									count: 0,
+									stats: []
+								},
+								bronze: {
+									count: 0,
+									stats: []
+								},
+								last: {
+									count: 0,
+									stats: []
+								},
 							}
+						}
 
-							stat.ratingValues.highestVal = stat.ratingValues.highestVal.toFixed(2);
-							stat.ratingValues.lowestVal = stat.ratingValues.lowestVal.toFixed(2);
-							stat.ratingValues.avgVal = stat.ratingValues.avgVal.toFixed(2);
+						angular.forEach(playerEntry.values, function(statValue){
+							if(statValue.hasMedal){
+								switch(statValue.basic.rank){
+									case 1:
+										characterObject.medals.gold.count += 1;
+										characterObject.medals.gold.stats.push(statValue.basic.displayName);
+									break;
+									case 2:
+										characterObject.medals.silver.count += 1;
+										characterObject.medals.silver.stats.push(statValue.basic.displayName);
+									break;
+									case 3:
+										characterObject.medals.bronze.count += 1;
+										characterObject.medals.bronze.stats.push(statValue.basic.displayName);
+									break;
+									case (activityInfoObj.entries.length):
+										characterObject.medals.last.count += 1;
+										characterObject.medals.bronze.stats.push(statValue.basic.displayName);
+									break;
+									default:
+								}
+							}
 						});
+						medalLegend.push(characterObject);
+					});
+					
+					var topMedalList = [];
+					var medalEnum = [
+						'gold', 'silver', 'bronze', 'last'
+					];
+
+					var index = 0;
+					angular.forEach(medalEnum, function(medalType){
+						index++;
+						var newMedalObject = {
+							name: medalType,
+							playerName: null,
+							stats:[],
+							displayValue: index
+						}
+						var highestMedalTypeCount = 0;
+						angular.forEach(medalLegend, function(playerMedals){
+							if(playerMedals.medals[medalType].count > highestMedalTypeCount){
+								highestMedalTypeCount = playerMedals.medals[medalType].count;
+								newMedalObject.playerName = playerMedals.player;
+								newMedalObject.stats = playerMedals.medals[medalType].stats;
+							}
+						});
+						topMedalList.push(newMedalObject);
 					});
 
-					scope.isLoadingCarnageReport = false;
-					return ratingObj;
+					return topMedalList;
 				}
 			}
 		};
-
-		function getAvg(array){
-			var avg = 0;
-			var sum = 0;
-
-			angular.forEach(array, function(item){
-				sum += item;
-			});
-
-			avg = sum / array.length;
-
-			return isNaN(avg) ? 0 : Math.round(avg * 100) / 100;
-		}
 };
 
 activityInfoCtrl.$inject = ['$scope','$anchorScroll'];
@@ -191,262 +208,42 @@ activityInfoCtrl.$inject = ['$scope','$anchorScroll'];
 function activityInfoCtrl($scope, $anchorScroll){
 	var self = this;
 	self.m = $scope;
-	self.m.isRankLoaded = false;
-	self.m.isSticky = false;
-	self.m.isShowUnusedRankings = false;
-	self.m.isRankNeedsUpdate = true;
-	self.m.isExpanded = false;
-
-	self.m.tableSelectionObject = {
-			selectedCell: {},
-			selectedRow: null,
-			selectedColumn: null
-	}
-	self.m.rankingCategories = {};
-	self.m.suggestedRankingCategories = {
-			kills: {
-				displayName: 'Kills',
-				weight: 9,
-				isUse: true,
-				isNew: true
-			},
-			assists: {
-				displayName: 'Assists',
-				weight: 8,
-				isUse: true,
-				isNew: true
-			},
-			precisionKills: {
-				displayName: 'Precision Kills',
-				weight: 10,
-				isUse: true,
-				isNew: true
-			},
-			averageLifespan: {
-				displayName: 'Average Lifespan',
-				weight: 7,
-				isUse: true,
-				isNew: true
-			},
-			suicides: {
-				displayName: 'Suicides',
-				weight: -1,
-				isUse: true,
-				isNew: true
-			},
-			deaths: {
-				displayName: 'Deaths',
-				weight: -8,
-				isUse: true,
-				isNew: true
-			},
-			longestKillSpree: {
-				displayName: 'Longest Kill Spree',
-				weight: 10,
-				isUse: true,
-				isNew: true
-			},
-			resurrectionsPerformed: {
-				displayName: 'Resurrections Performed',
-				weight: 3,
-				isUse: true,
-				isNew: true
-			},
-			longestSingleLife: {
-				displayName: 'Longest Single Life',
-				weight: 5,
-				isUse: true,
-				isNew: true
-			}
-	};
-	self.m.isTableCellSelected = false;
-	self.m.isTableRowSelected = false;
-	self.m.isTableColumnSelected = false;
-	self.m.setupValueArray = setupValueArray();
-	self.m.calculatePlayerStandings = calculatePlayerStandings;
-	self.m.camelCaseToString = camelCaseToString;
-	self.m.addNewItem = addNewItem;
-	self.m.unMarKNewItem = unMarKNewItem;
-	self.m.selectCell = selectCell;
-	self.m.changedRankValue = changedRankValue;
-	self.m.removeRankValue = removeRankValue;
-	self.m.statsToExcludeArray = ['totalstats'];
-	self.m.activeRankValueArray = [];
-
-	$scope.isShowNonSearchedPlayers = true;
-	$scope.clearTableSelection = clearTableSelection;
-	$scope.scrollToTable = scrollToTable;
-	$scope.goToRank = goToRank;
-
-	$scope.$watch('chartModel', function(newVal){
-		if(newVal.trueStats){
-			activate();
-		}
-	});
-
-	function activate(){
-		getPossibleRankingOptions();
+	self.m.selectedStat = null;
+	$scope.goToPlayer = goToPlayer;
+	$scope.getDisplayValue = getDisplayValue;
+	$scope.orderByRank = orderByRank;
+	$scope.selectStat = selectStat;
+	
+	function goToPlayer(val){
+		$anchorScroll(val);
 	}
 
-	function setupValueArray(){
-		var array = [];
-		for (var i = -10; i <= 10; i++){
-			array.push(i);
-		}
-
-		return array;
-	}
-
-	function getPossibleRankingOptions(){
-
-		self.m.rankingCategories = {};
-		angular.forEach(self.m.chartModel.trueStats, function(val, key){
-			if(self.m.statsToExcludeArray.indexOf(key.toLowerCase()) === -1){
-				var weight = self.m.suggestedRankingCategories[key] ? self.m.suggestedRankingCategories[key].weight : 0;
-				self.m.rankingCategories[key] = {
-					displayName: val.displayName,
-					weight: weight,
-					isUse: weight === 0 ? false : true,
-					isNew: true
-				}
-			}
-		});
-	}
-
-	function calculatePlayerStandings(){
-		self.m.activeRankValueArray = [];
-		const perfectRank = 5000;
-		var highestScore = 0;
-		var lowestScore = 0;
-
-		angular.forEach(self.m.activityMembers, function(playerVal, playerKey){
-			playerVal.rank = {
-				totalScore: 0,
-				trueRank: null,
-			};
-
-			angular.forEach(self.m.rankingCategories, function(rankVal, rankKey){
-			 	var weight = rankVal.weight;
-
-			 	if(weight === 0){
-			 		removeRankValue(rankVal);
-			 	}
-
-			 	if(rankVal.isUse){
-				 	var avgValue = self.m.chartModel.trueStats[rankKey].ratingValues.avgVal;
-				 	var playerStatValue = self.m.chartModel.trueStats[rankKey][playerKey].value;
-				 	var differential = playerStatValue - avgValue;			
-				 	var statRankScore = differential * weight;
-
-				 	self.m.chartModel.trueStats[rankKey].weight = weight;	
-				 	playerVal.rank[rankKey] = statRankScore;		
-			 		playerVal.rank.totalScore += statRankScore;
-
-				 	unMarKNewItem(rankVal);
-				 	self.m.activeRankValueArray.push(rankVal.displayName);
-		 		}
-			});
-
-		 	highestScore = (playerVal.rank.totalScore > highestScore) ? playerVal.rank.totalScore : highestScore;
-			lowestScore = (playerVal.rank.totalScore < lowestScore) ? playerVal.rank.totalScore : lowestScore;
-
-		 	var maxActivityDuration = self.m.chartModel.trueStats.secondsPlayed.ratingValues.highestVal;
-		 	var thisPlayerActivityDuration = self.m.chartModel.trueStats.secondsPlayed[playerKey].value;
-		 	var timePlayedPercentage = thisPlayerActivityDuration / maxActivityDuration;
-		 	var finalRankScore = (timePlayedPercentage * playerVal.rank.totalScore) / 100;
-
-		 	playerVal.rank.timePlayedPercentage = timePlayedPercentage;
-		 	//playerVal.rank.totalScore = Math.round(finalRankScore * 100) / 100;
-		});		
-
-		//Scale the new rank
-		var absLowest = Math.abs(lowestScore);
-		var scaledHighestScore = highestScore + absLowest;
-
-		angular.forEach(self.m.activityMembers, function(playerVal, playerKey){
-			var scaledPercent = (playerVal.rank.totalScore + absLowest) / scaledHighestScore;
-		 	playerVal.rank.trueRank = Math.round(scaledPercent * perfectRank);
-		});
-
-		self.m.isRankLoaded = true;
-		self.m.isRankNeedsUpdate = false;
-		$scope.isShowRankings = false;
-		scrollToTable();
-	}
-
-	function selectCell(columnIndex, rowIndex, cellValue){
-		if((columnIndex && rowIndex && !cellValue) || checkTableSelectionObject(columnIndex, rowIndex)){
-			clearTableSelection();
-			return;
-		}
-
-		self.m.tableSelectionObject.selectedCell = {
-			row: rowIndex,
-			column: columnIndex
-		};
-
-		self.m.isTableCellSelected = columnIndex !== null && rowIndex !== null;
-		self.m.isTableColumnSelected = columnIndex !== null && rowIndex == null;
-		self.m.isTableRowSelected = columnIndex === null && rowIndex !== null;
-	}
-
-	function checkTableSelectionObject(columnIndex, rowIndex){
-		var tempObj = {
-			row: rowIndex,
-			column: columnIndex
-		}
-
-		return angular.equals(tempObj, self.m.tableSelectionObject.selectedCell);
-	}
-
-	function camelCaseToString(val){
-		var newString = val.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ 
-			return str.toUpperCase(); 
-		});
-
-		return newString;
-	}
-
-	function unMarKNewItem(rank){
-		rank.isNew = false;
-	}
-
-	function changedRankValue(rank){
-		rank.isNew = true;
-		self.m.isRankNeedsUpdate = true;
-	}
-
-	function addNewItem(rank){
-		rank.isNew = false;
-		rank.isUse = true;
-		rank.isNew = true;
-		self.m.isRankLoaded = false;
-	}
-
-	function clearTableSelection(){
-		self.m.tableSelectionObject.selectedCell = {
-			row: null,
-			column: null
-		};
-		self.m.isTableRowSelected = false;
-		self.m.isTableColumnSelected = false;
-		self.m.isTableCellSelected = false;
-	}
-
-	function scrollToTable(){
-		$anchorScroll('stats-table-container');
+	function orderByRank(item) {
+		return item.basic.rank;
 	};
 
-	function removeRankValue(rank){
-		rank.weight = 0;
-		rank.isUse = false;
-		rank.isNew = false;
-		self.m.isRankNeedsUpdate = true;
+	function selectStat(statIndex){
+		self.m.selectedStat = statIndex; 
 	}
 
-	function goToRank(){
-		$scope.isShowRankings = true;
-		$anchorScroll('ranks');
+	function getDisplayValue(statKey, rank, total){
+	
+		switch(rank){
+			case 1:
+				return 'gold';
+			break;
+			case 2:
+				return 'silver';
+			break;
+			case 3:
+				return 'bronze';
+			break;
+			case total:
+				return 'last';
+			break;
+			default:
+				return 'average'
+		}
 	}
 }
 

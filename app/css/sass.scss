@@ -446,6 +446,7 @@ input.player-input {
     position: relative;
     padding: 10px;
     border: 1px solid $primary-color;
+    overflow: hidden;
 }
 
 .activity-selection-container .activity-selection:hover{
@@ -463,8 +464,7 @@ input.player-input {
     position: absolute; 
     top:0; 
     left: 0; 
-    opacity: .8;
-    z-index: -1;
+    opacity: .5;    
 }
 
 .activity-selection-container .activity-selection .bg{
@@ -475,25 +475,14 @@ input.player-input {
     opacity: .8;
 } 
 
-.activity-selection-container .activity-selection .activity-date{
-    
-}
-
 .activity-selection-container .activity-selection .activity-info-container{
-    display: inline-block;
-    margin-left: 46px;
-    padding-top: 10px;
-    width: 90%;
+    float: right;
+    width: 250px;
+    padding-right: 10px;
 }
 
 .activity-selection-container .activity-selection .activity-title{
     font-size: 20px;
-    display: inline-block;
-}
-
-.activity-selection-container .activity-selection .activity-info-container{
-    position: relative;
-    height: auto;
     display: inline-block;
 }
 
@@ -502,57 +491,48 @@ input.player-input {
     display: block;
 }
 
-.activity-selection-container .activity-selection .character-container .character{
+.character{
     display: inline-block;
     padding: 5px;
-    width:25%;
-    background: rgba(255, 255, 255, 0.2);
+    width: 250px;;
+    /*background: rgba(255, 255, 255, 0.2);*/
+    background: #424242;
     margin-right: 5px;
     margin-top: 5px;
     box-shadow: 1px 1px 1px #000;
-}
 
-.activity-selection-container .activity-selection .character-container .character .character-class{
-
-    &.titan{
-        color: #ff60ff;
+    img{
+        width: 30px;
+        vertical-align: middle;
+        box-shadow: 0px 1px 1px #000;
     }
-    &.hunter{
-        color: #ffff00;
+
+    .title-bar{
+        width: 84%;
+        display: inline-block;
+        position: relative;
+        margin-left: 5px;
+        vertical-align: middle;
+        text-align: left;
     }
-    &.warlock{
-        color: #72d7ff;
+
+    .character-class{
+        &.titan{
+            color: #ff60ff;
+        }
+        &.hunter{
+            color: #ffaf8e;
+        }
+        &.warlock{
+            color: #72d7ff;
+        }
     }
-}
 
-.activity-selection-container .activity-selection .character-container .character img{
-    width: 25px;
-    height:25px;
-    vertical-align: middle;
-    box-shadow: 0px 1px 1px #000;
-}
-
-.activity-selection-container .activity-selection .character-container .character .light-level{
-    font-size: 10px;
-    color: yellow;
-    vertical-align: top;
-    margin-left: 10px;
-}
-
-.character-level-container{
-	float: right;
-	text-align: right;
-}
-
-.character-level-container .base-level{
-	font-size:25px;
-}
-.character-level-container .light-level{
-	font-size:14px;
-}
-
-.character-level-container span{
-	display: block;
+    .light-level{
+        font-size: 10px;
+        color: yellow;
+        vertical-align: top;
+    }
 }
 
 .main-container{
@@ -607,6 +587,172 @@ span.info-show-button{
 
 #ActivityContainer {
     position: relative;
+    vertical-align: middle;
+}
+
+#ActivityContainer .activity-title{
+    text-shadow: 1px 1px 1px #000;
+    width: 80%;
+    display: inline-block;
+    vertical-align: top;
+    font-size: 2em;
+    margin-top: 10px;
+    text-align: center;
+}
+
+#ActivityContainer .activity-icon{
+    position: relative;
+}
+
+#ActivityContainer .members-header{
+    width: 100%;
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+#ActivityContainer .character {
+    cursor: pointer;
+
+    &:hover{
+        box-shadow: 0px 0px 5px 2px #2eff00;
+    }
+}
+
+#PlayerActivityStats .player-stat-container{
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px #000;
+    
+    &.odd{
+        background: rgba(0, 0, 0, 0.37);
+    }
+}
+
+#PlayerActivityStats .player-stat-container .player-title-bar{
+    padding: 10px;
+    background: #7d7777;
+    text-align: center;
+    font-size: 150%;
+    box-shadow: 1px 1px 10px #000;
+}
+
+#PlayerActivityStats ul.stats-box{
+    padding:10px;
+}
+
+div.medal{
+    border-radius: 3px;
+    padding:5px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor:pointer;
+
+    &.gold{
+        border: 1px solid gold;
+        box-shadow: 0px 1px 20px gold inset;
+        &:hover, .selected{
+            background: gold;
+            color: #000;
+            box-shadow: 0px 1px 20px gold;
+        }
+    }
+    &.silver{
+        border: 1px solid silver;
+        box-shadow: 0px 1px 20px silver inset;
+        &:hover, .selected{
+            background: silver;
+            color: #000;
+            box-shadow: 0px 1px 20px silver;
+        }
+    }
+    &.bronze{
+        border: 1px solid #65461f;
+        box-shadow: 0px 1px 20px #65461f inset;
+        &:hover, .selected{
+            background: #65461f;
+            color: #000;
+            box-shadow: 0px 1px 20px #65461f;
+        }
+    }
+    &.average{
+        border: 1px solid #6c8fff;
+        box-shadow: 0px 1px 20px #6c8fff inset;
+        &:hover, .selected{
+            background: #6c8fff;
+            color: #000;
+            box-shadow: 0px 1px 20px #6c8fff;
+        }
+    }
+    &.last{
+        border: 1px solid red;
+        box-shadow: 0px 1px 20px red inset;
+        &:hover, .selected{
+            background: red;
+            color: #000;
+            box-shadow: 0px 1px 20px red;
+        }
+    }
+}
+
+#PlayerActivityStats ul.stats-box li{
+    display: inline-block;
+    margin: 10px;
+    width: 300px;
+    display: inline-block;
+    text-align: left;
+    box-shadow: 0px 1px 2px #000;
+    border-radius: 3px;
+    color: #fff;
+    text-shadow: none;
+    border-radius: 3px;
+    padding: 10px;
+    border: 1px solid #7d7777;
+    background: #12171c;
+
+    &:hover{
+        background: #fff;
+        color: #000;
+    }
+
+    div.rank-value{
+        padding:5px;
+    }
+}
+
+#medal-legend-container{
+    width:100%;
+    background: #333;
+    border: 1px solid #000;
+    box-shadow: 1px 1px 10px #000;
+    border-radius: 3px;
+    padding:10px;
+    
+    .medal-legend{
+        position: relative;
+
+        .medal-stat-box{
+            display: bock;
+            position: relative;
+
+            div.medal{
+                position: relative;
+                display: inline-block;
+                top: 0;
+                left: 0;
+                float:left;
+            }
+
+            .stat-list{
+                position: relative;
+                display: inline-block;
+                float:left;
+            }
+            .stat-list span{
+                display: block;
+            }
+        }
+    }
 }
 
 #stats-table-container{

@@ -137,17 +137,19 @@ class ActivityMatchService {
     }
 
     getActivityDefinitions(activityMatchList, nextFn){
-        if(activityMatchList.length < 1){
+        if(!activityMatchList || activityMatchList == undefined || activityMatchList == 'undefined' || activityMatchList.length < 1){
             nextFn(null, activityMatchList); return;
         };
 
         var queryString = "SELECT DISTINCT json FROM DestinyActivityDefinition WHERE json";
         for (var i =0; i < activityMatchList.length; i++){
-            if(i === 0){
-                queryString += " LIKE '%" + activityMatchList[i].activityDetails.referenceId + "%'";
-            }
-            else{
-                queryString += " OR json LIKE '%" + activityMatchList[i].activityDetails.referenceId + "%'";
+            if(activityMatchList[i].activityDetails){
+                if(i === 0){
+                    queryString += " LIKE '%" + activityMatchList[i].activityDetails.referenceId + "%'";
+                }
+                else{
+                    queryString += " OR json LIKE '%" + activityMatchList[i].activityDetails.referenceId + "%'";
+                }
             }
         };
         manifestService.ManifestService.queryManifest('world.content', queryString, function(err, activityDetailsResults){

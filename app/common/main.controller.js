@@ -94,7 +94,7 @@ angular.module('fireTeam.common')
 				});
 
 				if(toParams.instanceId){
-					loadActivityByIdParameter(toParams.instanceId);
+					loadActivityByInstanceId(toParams.instanceId);
 				}
 				$timeout(function(){
 					getFireTeamModel();
@@ -401,7 +401,6 @@ angular.module('fireTeam.common')
 				}
 
 				m.fireTeamMembers.players = response;
-				console.log(m.fireTeamMembers.players)
 				m.fireTeamMembers.gameMode = m.selectedGameMode.value;
 				m.fireTeamMembers.pageNum = 0;
 
@@ -478,16 +477,7 @@ angular.module('fireTeam.common')
 				return;
 			}
 
-			//this is the search result list
-			m.fireTeamActivityResults = activityMembersMatchedResults;
-			console.log(m.fireTeamActivityResults)
-			
-			// m.activityListProgress = {
-			// 		totalActivities: 0,
-			// 		activitiesLoaded: 0,
-			// 		percentComplete: 0
-			// 	}
-
+			angular.extend(m.fireTeamActivityResults, activityMembersMatchedResults);
 			m.activitiesDisplayed = m.fireTeamActivityResults.length < m.activityLookupPerSearch ? m.fireTeamActivityResults.length : m.activityLookupPerSearch;
 			if(!m.isNewSearch){
 				m.lastSuccessSearchCriteria = m.searchCriteria;
@@ -500,7 +490,7 @@ angular.module('fireTeam.common')
 			//startPollingForProgress(100, originalArrayLength);
 		}
 
-		function getActivitiesPagination(totalActivityResults, amountToShow){
+		//function getActivitiesPagination(totalActivityResults, amountToShow){
 			// if(totalActivityResults < amountToShow){
 			// 	m.activitiesDisplayed = totalActivityResults;
 			// }
@@ -545,72 +535,74 @@ angular.module('fireTeam.common')
 			// 	m.isLoadingData = false;
 			// 	clearData();
 			// });
-		}
+		//}
 
-		function loadActivityByIdParameter(id){
+		function loadActivityByInstanceId(id){
 			var array = [id];
 
-			activityModelFactory.getFireTeamActivities(array).then(function(response){
-				if(response[0].ErrorCode && response[0].ErrorCode > 1){
-					throwError(response[0]);
-					return;
-				}
-				var activity = response[0];
-				angular.forEach(activity.playerPostGameCarnageReport, function(val, key){
-					activity.playerPostGameCarnageReport[key].isSearchedPlayer = isSearchedPlayer(key.toLowerCase());
-				});
-				m.fireTeamActivityResults.push(activity);
-				selectActivity(activity);
-			})
+			//***** Just call the postgame carnage endpoint *****
+
+			// activityModelFactory.getFireTeamActivities(array).then(function(response){
+			// 	if(response[0].ErrorCode && response[0].ErrorCode > 1){
+			// 		throwError(response[0]);
+			// 		return;
+			// 	}
+			// 	var activity = response[0];
+			// 	angular.forEach(activity.playerPostGameCarnageReport, function(val, key){
+			// 		activity.playerPostGameCarnageReport[key].isSearchedPlayer = isSearchedPlayer(key.toLowerCase());
+			// 	});
+			// 	m.fireTeamActivityResults.push(activity);
+			// 	selectActivity(activity);
+			// })
 		}
 
-		function startPollingForProgress(delay, matches){
-			if(delay < 500){
-				delay += (delay * .2);
-			}
-			m.activityListProgress.totalActivities = matches;
-			m.pollingTimeout = $timeout(function() {
-				var progress = activityModelFactory.getProgress();
-				m.activityListProgress = {
-					totalActivities: matches,
-					activitiesLoaded: progress,
-					percentComplete: Math.round((progress / matches) * 100)
-				}
-				m.showProgressMessage = m.activityListProgress.percentComplete > 0 || m.activityListProgress.percentComplete < 100 ? true : false;
-				if(m.isLoadingData){
-					startPollingForProgress(delay, matches);
-				}
-			}, delay);
-		}
+		// function startPollingForProgress(delay, matches){
+		// 	if(delay < 500){
+		// 		delay += (delay * .2);
+		// 	}
+		// 	m.activityListProgress.totalActivities = matches;
+		// 	m.pollingTimeout = $timeout(function() {
+		// 		var progress = activityModelFactory.getProgress();
+		// 		m.activityListProgress = {
+		// 			totalActivities: matches,
+		// 			activitiesLoaded: progress,
+		// 			percentComplete: Math.round((progress / matches) * 100)
+		// 		}
+		// 		m.showProgressMessage = m.activityListProgress.percentComplete > 0 || m.activityListProgress.percentComplete < 100 ? true : false;
+		// 		if(m.isLoadingData){
+		// 			startPollingForProgress(delay, matches);
+		// 		}
+		// 	}, delay);
+		// }
 
-		function compareInstances(charactersInstanceArrays){
-			var checkArray = charactersInstanceArrays[0];
-			var matchArray = [];
+		// function compareInstances(charactersInstanceArrays){
+		// 	var checkArray = charactersInstanceArrays[0];
+		// 	var matchArray = [];
 
-			for (var i = 0; i < checkArray.length; i++){
-				var instanceId = checkArray[i];
-				var instanceExistsInAll = true;
-				for (var j = 1; j < charactersInstanceArrays.length; j++){
-					instanceExistsInAll = recursiveInstanceMatch(instanceId, charactersInstanceArrays[j]);
-				}
-				if(instanceExistsInAll){
-					matchArray.push(instanceId);
-				}
-			}
+		// 	for (var i = 0; i < checkArray.length; i++){
+		// 		var instanceId = checkArray[i];
+		// 		var instanceExistsInAll = true;
+		// 		for (var j = 1; j < charactersInstanceArrays.length; j++){
+		// 			instanceExistsInAll = recursiveInstanceMatch(instanceId, charactersInstanceArrays[j]);
+		// 		}
+		// 		if(instanceExistsInAll){
+		// 			matchArray.push(instanceId);
+		// 		}
+		// 	}
 
-			return matchArray;
-		}
+		// 	return matchArray;
+		// }
 
-		function recursiveInstanceMatch(val, array){
-			var exists = false;
+		// function recursiveInstanceMatch(val, array){
+		// 	var exists = false;
 
-			for (var i = 0; i <= array.length; i++){
-				if(array[i] === val){
-					exists = true;
-				}
-			}
-			return exists;
-		}
+		// 	for (var i = 0; i <= array.length; i++){
+		// 		if(array[i] === val){
+		// 			exists = true;
+		// 		}
+		// 	}
+		// 	return exists;
+		// }
 
 		function selectActivity(activity){
 			$location.search('instanceId', activity.activityDetails.instanceId);
@@ -670,14 +662,14 @@ angular.module('fireTeam.common')
 
 			m.activitiesDisplayed = m.fireTeamActivityResults.length < m.activityLookupPerSearch ? m.fireTeamActivityResults.length : m.activitiesDisplayed;
 			m.matchAttempts = m.maxMatchAttempts;
-			m.showProgressMessage = false;
-			m.activityListProgress = {
-					totalActivities: 0,
-					activitiesLoaded: 0,
-					percentComplete: 0
-				}
+			// m.showProgressMessage = false;
+			// m.activityListProgress = {
+			// 		totalActivities: 0,
+			// 		activitiesLoaded: 0,
+			// 		percentComplete: 0
+			// 	}
 
-			activityModelFactory.clearProgress();
+			// activityModelFactory.clearProgress();
 		}
 
 		function getDate(){
