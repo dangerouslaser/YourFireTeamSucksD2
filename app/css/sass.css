@@ -571,17 +571,31 @@ div.medal {
     padding: 5px; }
 
 #medal-legend-container {
-  width: 100%;
-  background: #333;
+  width: 250px;
+  background: rgba(51, 51, 51, 0.8);
   border: 1px solid #000;
   box-shadow: 1px 1px 10px #000;
   border-radius: 3px;
-  padding: 10px; }
+  padding: 10px;
+  right: 25px;
+  top: 25px;
+  position: fixed; }
   #medal-legend-container .medal-legend {
     position: relative; }
     #medal-legend-container .medal-legend .medal-stat-box {
-      display: bock;
-      position: relative; }
+      position: relative;
+      display: inline-block;
+      position: relative;
+      width: 100%;
+      margin-bottom: 20px; }
+      #medal-legend-container .medal-legend .medal-stat-box .medal-description {
+        margin-left: 20px;
+        width: 75%;
+        display: inline-block; }
+        #medal-legend-container .medal-legend .medal-stat-box .medal-description .medal-player {
+          font-size: 150%;
+          padding-bottom: 5px;
+          text-decoration: italic; }
       #medal-legend-container .medal-legend .medal-stat-box div.medal {
         position: relative;
         display: inline-block;
@@ -1094,9 +1108,10 @@ div.tooltip {
 .small-close-button {
   position: absolute;
   top: -5px;
-  margin: padding 10px;
+  margin: 10px;
   right: 0;
-  padding: 10px; }
+  padding: 10px;
+  cursor: pointer; }
   .small-close-button:hover {
     color: #fff;
     text-shadow: 1px 1px 1px #000;

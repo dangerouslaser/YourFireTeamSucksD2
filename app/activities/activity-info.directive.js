@@ -209,11 +209,17 @@ function activityInfoCtrl($scope, $anchorScroll){
 	var self = this;
 	self.m = $scope;
 	self.m.selectedStat = null;
+	self.m.showLegend = true;
 	$scope.goToPlayer = goToPlayer;
 	$scope.getDisplayValue = getDisplayValue;
 	$scope.orderByRank = orderByRank;
 	$scope.selectStat = selectStat;
+	$scope.toggleLegend = toggleLegend;
 	
+	function toggleLegend(){
+		self.m.showLegend = !self.m.showLegend;
+	}
+
 	function goToPlayer(val){
 		$anchorScroll(val);
 	}

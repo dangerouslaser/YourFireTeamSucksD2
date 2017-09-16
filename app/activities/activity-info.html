@@ -42,6 +42,7 @@
 					ng-click="selectStat($index)">
 					<div class="rank-value">
 						<div class="medal {{stat.basic.className.toLowerCase()}}" 
+							 ng-click="toggleLegend()"
 							 ng-class="{'selected' : ctrl.m.selectedStat == $index}"
 							 ng-if="stat.hasMedal">
 							 <span>#{{stat.basic.rank}}</span>
@@ -52,16 +53,22 @@
 			</ul>
 		</div>
 	</div>
-	<div id="medal-legend-container">
+	<div id="medal-legend-container" ng-if="ctrl.m.showLegend">
+		<div class="small-close-button" ng-click="toggleLegend()">X</div>
 		<div class="medal-legend">
 			<div ng-repeat="medal in medalLegend track by $index"
-					class="medal-stat-box" ng-if="medal.name != 'last'">
-				<div class="medal {{medal.name}}" >
-					<span>#{{medal.displayValue}}</span>
+					class="medal-stat-box">
+				<div class="medal {{medal.name}}">
+					<span ng-if="medal.name != 'last'">#{{medal.displayValue}}</span>
+					<span ng-if="medal.name == 'last'">#{{activityInfo.entries.length}}</span>
 				</div>
-				<span>{{medal.playerName}}</span>
-				<div class="stat-list">
-					<span ng-repeat="stat in medal.stats track by $index">{{stat}}</span>
+				<div class="medal-description">
+					<div class="medal-player">
+						<span>{{medal.playerName}}</span>
+					</div>
+					<div class="stat-list">
+						<span ng-repeat="stat in medal.stats track by $index">{{stat}}</span>
+					</div>
 				</div>
 			</div>
 		</div>
