@@ -15,12 +15,11 @@ angular.module('fireTeam.common')
 	]
 
 	var activityModelObject = {
-		// getFireTeamActivities: function(instanceArray) {
-		// 	//return $q.when(activityModel || getFireTeamActivities(instanceArray));
-		// 	return getFireTeamActivities(instanceArray);
-		// },
-		getPlayerInstanceList: function(fireTeamObject) {
-			return getPlayerInstanceList(fireTeamObject);
+		getPostGameCarnageReportForActivityById: function(instanceId) {
+			return getPostGameCarnageReportForActivityById(instanceId);
+		},
+		getPostGameCarnageReportActivitiesForFireteam: function(fireTeamObject) {
+			return getPostGameCarnageReportActivitiesForFireteam(fireTeamObject);
 		},
 		// getProgress: function(){
 		// 	return progress;
@@ -46,6 +45,22 @@ angular.module('fireTeam.common')
 	function clearActivityModel() {
 		activityModel = null;
 	}
+
+	 function getPostGameCarnageReportForActivityById(Id) {
+		var deferred = currentDeferred = $q.defer();
+
+		playerOptionsService.getPostGameCarnageReport({instanceId: Id}).then(function (response) {	
+			if(response.ErrorCode && response.ErrorCode > 1){
+				deferred.resolve(response);
+				return deferred.promise;
+			}
+
+			var postGameCarnageReport = response;
+			deferred.resolve(postGameCarnageReport);
+			
+		});
+		return deferred.promise;
+	};	
 
 	// function getFireTeamActivities(instanceArray) {
 	// 	activityPromises = [];
@@ -173,7 +188,7 @@ angular.module('fireTeam.common')
 	// 	return deferred.promise;
 	// };
 
-	function getPlayerInstanceList(fireTeamObject) {
+	function getPostGameCarnageReportActivitiesForFireteam(fireTeamObject) {
 		//membersActivityMatchPromises = [];
 		var activitySearchOptions = {
 			mode: null,

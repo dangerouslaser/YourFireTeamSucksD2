@@ -65,8 +65,8 @@ input{
 
 input.text {
     position: relative;
-    padding: 3%;
-    width: 94%;
+    padding: 15px;
+    width: 90%;
     outline: none;
     border: none;
     background: #000;
@@ -107,6 +107,25 @@ button.tab {
     border: 1px solid #24374a;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
+}
+
+
+div.btn-mobile-default{
+    padding: 20px;
+    display: inline-block;
+    border: 1px solid #000;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    margin: 5px;
+    min-width: 200px;
+    border-radius: 3px;
+    text-align: center;
+    font-size: 150%;
+
+    &:hover, &.selected{
+        box-shadow: 1px 1px 10px 1px #000 inset;
+    }
 }
 
 button.submit {
@@ -178,11 +197,12 @@ button.link{
     border: 1px solid #6796dc;
     border-radius: 3px;
     background: #000;
-    padding: 10px;
-    width: 70%;
+    padding: 15px;
+    width: 90%;
     cursor: pointer;
-    float: right;
+    /* float: left; */
     display: inline-block;
+    margin-top: 10px;
 }
 
 .dropdown-container .dropdown-button{
@@ -349,20 +369,31 @@ input.player-input {
 
 .search-content{
     position: relative;
-    width: 40%;
     margin: 0 auto;
     text-align: center;
+    max-width: 500px;
+}
+
+.input-options{
+    position: relative;
+    display: inline-block;
+}
+
+.input-content{
+    max-width: 500px;
 }
 
 .search-container .input-container{
     position: relative;
+    display: inline-block;
+    width: 100%;
 }
 
 .input-container .clear-text-button, .exit-button{
     position: absolute;
     top: 0;
     right: 0;
-    margin: 16px 8px 0px 0px;
+    margin: 15px 15px 0px 0px;
     cursor: pointer;
     background: rgba(51, 51, 51, 0.91);
     padding: 2px;
@@ -394,6 +425,7 @@ input.player-input {
 
 .section-header{
     padding: 10px 0px 10px 10px;
+    display: inline-block;
 }
 
 .section.closed{
@@ -591,6 +623,15 @@ span.info-show-button{
 #ActivityContainer {
     position: relative;
     vertical-align: middle;
+
+    .activity-selection-container {
+        padding: 0px;
+
+        .activity-selection{
+            opacity: 1;   
+            z-index: 1;         
+        }
+    }
 }
 
 #ActivityContainer .activity-title{
@@ -626,22 +667,6 @@ span.info-show-button{
     width: 100%;
     text-align: center;
     background: #12171c;
-
-    div{
-        padding: 20px;
-        display: inline-block;
-        border: 1px solid #000;
-        background: #fff;
-        color: #000;
-        cursor: pointer;
-        margin: 5px;
-        min-width: 200px;
-        border-radius: 3px;
-
-        &:hover, &.selected{
-            box-shadow: 1px 1px 10px 1px #000 inset;
-        }
-    }
 }
 
 #PlayerActivityStats .player-stat-container{
@@ -1308,26 +1333,25 @@ div.medal{
 }
 
 .platform-type-container {
-    width: 24%;
+    width: 90%;
     position: relative;
     display: inline-block;
     border-radius: 3px;
     overflow: hidden;
     background: #fff;
-    float: left;
     box-shadow: 0px 1px 5px 1px #333;
 }
 
 .platform-type-container .platform-selection{
-    position:relative;
+    position: relative;
     display: inline-block;
     width: 50%;
     text-align: center;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
     cursor: default;
     box-shadow: 0px 0px 1px 1px #b3b3b3 inset;
-    color:$primary-blue;
+    color: #6d9fea;
     text-shadow: none;
 }
 
@@ -1519,5 +1543,3 @@ div.tooltip{
         box-shadow: 0px 1px 2px #000;
     }
 }
-
-

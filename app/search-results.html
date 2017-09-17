@@ -18,9 +18,12 @@
 			show all
 		</button>
 		<br/>
-		<button id="MoreResults" class="submit more-results" ng-if="!m.isNewSearch && m.fireTeamActivityResults.length > 0 && !m.isLoadingData" ng-click="getMoreResults(); m.matchAttempts = 0;">
+	</div>
+
+	<div>
+		<div id="MoreResults" class="btn-mobile-default" ng-if="!m.isNewSearch && m.fireTeamActivityResults.length > 0 && !m.isLoadingData" ng-click="getMoreResults(); m.matchAttempts = 0;">
 			Search More
-		</button>
+		</div>
 	</div>
 
 	<div class="activity-selection-container" ng-if="m.isShowActivityList">

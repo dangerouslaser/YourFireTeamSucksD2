@@ -42,14 +42,13 @@
 				<div class="search-block">
 					<div class="bg"></div>
 					<div class="search-content">
-						<div>
-							<disabled-div ng-if="m.isLoadingData"></disabled-div>
-							<div class="platform-dropdown-container">
-								<div class="platform-type-container">
-									<div class="platform-selection" ng-class="{'selected' : m.selectedPlatform.id !== platform.id}" ng-repeat="platform in m.platformTypes track by $index" ng-click="selectPlatform(platform)">
-										{{platform.displayValue}}
-									</div>
+						<disabled-div ng-if="m.isLoadingData"></disabled-div>
+							<div class="platform-type-container">
+								<div class="platform-selection" ng-class="{'selected' : m.selectedPlatform.id !== platform.id}" ng-repeat="platform in m.platformTypes track by $index" ng-click="selectPlatform(platform)">
+									{{platform.displayValue}}
 								</div>
+							</div>
+							<div class="platform-dropdown-container">
 								<drop-down-directive
 									input-model="m.gameModes"
 									on-click="selectMode"
@@ -58,25 +57,16 @@
 									selected-item="m.selectedGameMode.displayName">
 								</drop-down-directive>
 							</div>
-							<div>
-								<input-directive 
-									ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
-									ng-repeat="member in m.playersArrays track by $index"
-									input-model="member"
-									recent-search="m.recentSearches"
-									on-click="loadRecentSearch"
-									tab-index="{{$index + 1}}"
-									ng-keydown="keyDownEvt($event)">
-								</input-directive>
-							</div>
-						</div>
+							<input-directive 
+								ng-if="(!m.hidePlaceHolder || !member.isPlaceHolder)"
+								ng-repeat="member in m.playersArrays track by $index"
+								input-model="member"
+								recent-search="m.recentSearches"
+								on-click="loadRecentSearch"
+								tab-index="{{$index + 1}}"
+								ng-keydown="keyDownEvt($event)">
+							</input-directive>
 						<span class="error" ng-if="m.errorMessage">{{m.errorMessage}}</span>
-
-						<div ng-if="!m.isLoadingData">
-							<button id="PlayerSearch" class="submit search" tabindex="8" class="button" ng-click="search()">
-								Search
-							</button>
-						</div>
 
 						<div class="loading-overlay" ng-if="m.isLoadingData">
 							<span ng-hide="m.activityListProgress.totalActivities">
@@ -91,7 +81,15 @@
 								<span>({{m.activityListProgress.percentComplete}}%)</span>
 							</span>
 							<br/>
-							<button class="submit cancel" ng-click="cancelSearch()">cancel</button>
+							<!--<div class="btn-mobile-default" ng-click="cancelSearch()">Cancel</div>-->
+						</div>
+						<div>
+							<div ng-if="!m.isLoadingData && m.isNewSearch" id="PlayerSearch" class="btn-mobile-default" tabindex="8" class="button" ng-click="search()">
+								Search
+							</div>
+							<div ng-if="!m.isLoadingData && !m.isNewSearch" id="MoreResults" class="btn-mobile-default" ng-click="getMoreResults(); m.matchAttempts = 0;">
+								Search More
+							</div>
 						</div>
 
 					</div>

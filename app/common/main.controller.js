@@ -458,7 +458,7 @@ angular.module('fireTeam.common')
 		}
 
 		function getMembersActivitiesMatchList(membersOptions){
-			activityModelFactory.getPlayerInstanceList(membersOptions).then(function(response){
+			activityModelFactory.getPostGameCarnageReportActivitiesForFireteam(membersOptions).then(function(response){
 				if(response.ErrorCode){
 					throwError({Error: "An error occured while fetching results"});
 				}
@@ -484,125 +484,18 @@ angular.module('fireTeam.common')
 				console.log(m.fireTeamActivityResults[0]);
 			}
 			clearData();
-
-			//var originalArrayLength = activityMembersMatchedResults.length;
-			//getActivitiesPagination(originalArrayLength, m.activityLookupPerSearch);
-			//startPollingForProgress(100, originalArrayLength);
 		}
-
-		//function getActivitiesPagination(totalActivityResults, amountToShow){
-			// if(totalActivityResults < amountToShow){
-			// 	m.activitiesDisplayed = totalActivityResults;
-			// }
-
-			// var arrayToProcess = activityMembersMatchedResults.splice(0, amountToProcess);
-			// var remainingLength = activityMembersMatchedResults.length;
-			
-			// if(remainingLength > 0 && m.isLoadingData){
-			// 	m.activitiesDisplayed = m.activitiesDisplayed < m.fireTeamActivityResults.length ? m.activitiesDisplayed : m.fireTeamActivityResults.length;
-			// 	getActiviesPagination(activityMembersMatchedResults, amountToProcess);
-			// 	return;
-			// }
-
-			// if(!m.isNewSearch){
-			// 	m.lastSuccessSearchCriteria = m.searchCriteria;
-			// 	console.log(m.fireTeamActivityResults[0]);
-			// }
-
-			// m.isLoadingData = false;
-			// clearData();
-
-			// //rename to get post game carnage report
-			// activityModelFactory.getFireTeamActivities(arrayToProcess).then(function(response){
-			// 	debugger;
-			// 	if(response[0].ErrorCode && response[0].ErrorCode > 1){
-			// 		throwError(response[0]);
-			// 		return;
-			// 	}
-			// 	m.fireTeamActivityResults = response;
-			
-			// 	if(remainingLength > 0 && m.isLoadingData){
-			// 		m.activitiesDisplayed = m.activitiesDisplayed < m.fireTeamActivityResults.length ? m.activitiesDisplayed : m.fireTeamActivityResults.length;
-			// 		getActiviesPagination(array, amountToProcess);
-			// 		return;
-			// 	}
-
-			// 	if(!m.isNewSearch){
-			// 		m.lastSuccessSearchCriteria = m.searchCriteria;
-			// 		console.log(m.fireTeamActivityResults[0]);
-			// 	}
-
-			// 	m.isLoadingData = false;
-			// 	clearData();
-			// });
-		//}
 
 		function loadActivityByInstanceId(id){
-			var array = [id];
-
-			//***** Just call the postgame carnage endpoint *****
-
-			// activityModelFactory.getFireTeamActivities(array).then(function(response){
-			// 	if(response[0].ErrorCode && response[0].ErrorCode > 1){
-			// 		throwError(response[0]);
-			// 		return;
-			// 	}
-			// 	var activity = response[0];
-			// 	angular.forEach(activity.playerPostGameCarnageReport, function(val, key){
-			// 		activity.playerPostGameCarnageReport[key].isSearchedPlayer = isSearchedPlayer(key.toLowerCase());
-			// 	});
-			// 	m.fireTeamActivityResults.push(activity);
-			// 	selectActivity(activity);
-			// })
+			activityModelFactory.getPostGameCarnageReportForActivityById(id).then(function(response){
+				if(response.ErrorCode > 1){
+					throwError({Error: "An error occured while fetching results"});
+				}
+				m.isLoadingData = false;
+				selectActivity(response.Response);
+				activityResultsValidation(response.Response);
+			});
 		}
-
-		// function startPollingForProgress(delay, matches){
-		// 	if(delay < 500){
-		// 		delay += (delay * .2);
-		// 	}
-		// 	m.activityListProgress.totalActivities = matches;
-		// 	m.pollingTimeout = $timeout(function() {
-		// 		var progress = activityModelFactory.getProgress();
-		// 		m.activityListProgress = {
-		// 			totalActivities: matches,
-		// 			activitiesLoaded: progress,
-		// 			percentComplete: Math.round((progress / matches) * 100)
-		// 		}
-		// 		m.showProgressMessage = m.activityListProgress.percentComplete > 0 || m.activityListProgress.percentComplete < 100 ? true : false;
-		// 		if(m.isLoadingData){
-		// 			startPollingForProgress(delay, matches);
-		// 		}
-		// 	}, delay);
-		// }
-
-		// function compareInstances(charactersInstanceArrays){
-		// 	var checkArray = charactersInstanceArrays[0];
-		// 	var matchArray = [];
-
-		// 	for (var i = 0; i < checkArray.length; i++){
-		// 		var instanceId = checkArray[i];
-		// 		var instanceExistsInAll = true;
-		// 		for (var j = 1; j < charactersInstanceArrays.length; j++){
-		// 			instanceExistsInAll = recursiveInstanceMatch(instanceId, charactersInstanceArrays[j]);
-		// 		}
-		// 		if(instanceExistsInAll){
-		// 			matchArray.push(instanceId);
-		// 		}
-		// 	}
-
-		// 	return matchArray;
-		// }
-
-		// function recursiveInstanceMatch(val, array){
-		// 	var exists = false;
-
-		// 	for (var i = 0; i <= array.length; i++){
-		// 		if(array[i] === val){
-		// 			exists = true;
-		// 		}
-		// 	}
-		// 	return exists;
-		// }
 
 		function selectActivity(activity){
 			$location.search('instanceId', activity.activityDetails.instanceId);

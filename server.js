@@ -105,59 +105,10 @@ router.post('/getCharacterActivityHistoryData', function(req, res, next){
       }
       res.json(result);
     });
-    // destinyBaseRequest(config.default.destiny2_host + 
-    //   config.default.credentials.defaultMemberType + '/Account/' + 
-    //   req.query.membershipId + '/Character/' + 
-    //   req.query.characterId + '/Stats/Activities/' + 
-    //   '?mode=' + req.query.mode + '&page=' + req.query.page,
-    //     function (err, response, body) {
-    //       var jsonResponse, result;
-    //       res.setHeader('Content-Type', 'application/json');
-    //       res.status(200);
-
-    //       try {
-    //         result = jsonResponse = JSON.parse(body);
-    //       } catch (e) {
-    //         res.status(500);
-    //         result = {ErrorCode: 500, Error: e};
-    //       }
-
-    //       if(res.statusCode == '200' && result.Response.activities){
-    //         var query = "SELECT json FROM DestinyActivityDefinition WHERE json like";
-
-    //         // forEach(result.Response.activities, function(activity){
-    //         //   console.log(activities.activityDetails.referenceId)
-    //         // });
-
-    //         for (var i = 0; i < result.Response.activities.length; i++){
-    //           if(i!=0){
-    //             query+=" OR json LIKE";
-    //           }
-    //           query+= " '%" + result.Response.activities[i].activityDetails.referenceId + "%'";
-    //           console.log(result.Response.activities[i].activityDetails.referenceId)
-    //         }
-
-    //         manifest.ManifestService.queryManifest('world.content', query, function (err, response) {
-    //           for (var i = 0; i < result.Response.activities.length; i++){
-    //             var activity = result.Response.activities[i];
-    //             for (var j = 0; j < response.length; j++){
-    //               var jsonDef = JSON.parse(response[j]);
-    //               if(activity.activityDetails.referenceId === jsonDef.hash){
-    //                 activity.definitions = jsonDef;
-    //               }
-    //             }
-    //           }
-    //           res.json(result);
-    //         });
-    //       }
-    //       else{
-    //         res.json(result);
-    //       }
-    // });
 });
 
 router.get('/getPostGameCarnageReport', function(req, res, next){
-    destinyBaseRequest(config.default.destiny2_host + '/Stats/PostGameCarnageReport/' + req.query.instanceId + '/?definitions=true',
+    destinyBaseRequest(config.default.destiny2_host + '/Stats/PostGameCarnageReport/' + req.query.instanceId,
         function (err, response, body) {
           var jsonResponse, result;
           res.setHeader('Content-Type', 'application/json');
@@ -170,7 +121,18 @@ router.get('/getPostGameCarnageReport', function(req, res, next){
             result = {ErrorCode: 500, Error: e};
           }
 
-          res.json(result);
+          if(jsonResponse){
+            var queryString = "SELECT DISTINCT json FROM DestinyActivityDefinition WHERE json like '%" + jsonResponse.Response.activityDetails.referenceId + "%'";
+            manifestService.ManifestService.queryManifest('world.content', queryString, function(err, activityDefinition){
+              var parsedDef = JSON.parse(activityDefinition);
+              jsonResponse.Response.definitions = parsedDef;
+              res.json(jsonResponse);
+            });
+          }
+          else{
+            res.json(result);
+          }
+          
     });
 });
 

@@ -1,5 +1,52 @@
 <div id="ActivityContainer">
-	<div class="activity-header-content {{activityInfo.definitions.directActivityModeHash}}">
+	<div class="activity-selection-container">
+		<div class="activity-selection-container activity-selection">
+			<div class="spacing">
+				<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activityInfo.definitions.pgcrImage}})'}">
+				</div>
+				<div class="activity-icon-container" style="position: relative; height: 100%; left: 0;">
+						<img class="activity-icon" ng-src="{{const.bungieRoot}}{{activityInfo.definitions.displayProperties.icon}}" />
+					</div>
+				<div class="activity-title">
+					<span class="activity-date">{{activityInfo.period | date:'MM/dd/yyyy'}}</span>
+					<br/>
+					<span>
+						<span>
+						{{activityInfo.definitions.displayProperties.name}} : 
+						</span>
+						<br>
+						<span>
+							{{activityInfo.definitions.displayProperties.description}} 
+						</span>
+					</span>
+				</div>
+				<div class="activity-info-container">
+					<div class="character-container">
+						<div class="character" ng-repeat="character in activityInfo.entries track by $index">
+							<img ng-src="{{const.bungieRoot}}{{character.player.destinyUserInfo.iconPath}}" />
+							<div class="title-bar">
+								<div>
+									<span class="player-class" data-playerName="{{character.characterInfo.displayName}}">
+										{{character.player.destinyUserInfo.displayName}}
+									</span>
+								</div>
+								<div class="class-info">
+									<span class="character-class {{character.player.characterClass.toLowerCase()}}" data-characterClass="{{character.player.characterClass}}">
+										[{{character.player.characterClass}}]
+									</span>
+									<span class="light-level">
+										{{character.player.lightLevel}} 
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- <div class="activity-header-content" id="{{activityInfo.definitions.directActivityModeHash}}">
 		<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activityInfo.definitions.pgcrImage}})'}"></div>
 		<img class="activity-icon" ng-src="{{const.bungieRoot}}{{activityInfo.definitions.displayProperties.icon}}" />
 		<div class="activity-title">	
@@ -29,16 +76,15 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="view-bar-container">
-			<div ng-click="selectView('player')" ng-class="{'selected': ctrl.m.selectedView == 'player'}">Player View</div>
-			<div ng-click="selectView('stats')" ng-class="{'selected': ctrl.m.selectedView == 'stats'}">Stats View</div>
+		<div>
+			<div ng-click="selectView('player')" class="btn-mobile-default" ng-class="{'selected': ctrl.m.selectedView == 'player'}">Player View</div>
+			<div ng-click="selectView('stats')" class="btn-mobile-default" ng-class="{'selected': ctrl.m.selectedView == 'stats'}">Stats View</div>
 		</div>
+	</div> -->
 
-	<div>
-	<div ng-show="m.isLoadingCarnageReport">Gathering activity informaton, please wait...</div>
 	<div id="PlayerActivityStats">
-
+		<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activityInfo.definitions.pgcrImage}})'}">
+		<div ng-show="m.isLoadingCarnageReport">Gathering activity informaton, please wait...</div>
 		<div id="SortByStatName" ng-show="ctrl.m.selectedView == 'stats'">
 			<div ng-repeat="orderedStat in activityInfo.playerStatsByOrderedList track by $index"
 				ng-if="orderedStat.hasMedal"
@@ -91,22 +137,21 @@
 				</ul>
 			</div>
 		</div>
-
 	</div>
 
 	<div id="medal-legend-container" ng-if="ctrl.m.showLegend">
 		<div class="medal-legend">
 			<div class="guys best glow on">Best Guys</div>
 			<div ng-repeat="player in activityInfo.topMedalList | orderBy: -playersMedalScore | limitTo: 3 track by $index"
-				 class="medal-stat-box">
+					class="medal-stat-box">
 				<div class="medal-description">
 					<div class="medal-player">
 						<span>{{player.playerName}}</span>
 					</div>
 					<div class="stat-list">
 						<div ng-repeat="medal in player.medals | toArray | orderBy: '-weight' track by $index"
-							 class="medal {{medal.className}}">
-							 <span>{{medal.count}}</span>
+								class="medal {{medal.className}}">
+								<span>{{medal.count}}</span>
 						</div>
 					</div>
 				</div>
@@ -121,7 +166,7 @@
 						<div ng-repeat="medal in activityInfo.topMedalList[activityInfo.topMedalList.length-1].medals | toArray | orderBy: '-weight' track by $index"
 							class="medal {{medal.className}}">
 							<span>{{medal.count}}</span>
-					   </div>
+						</div>
 					</div>
 				</div>
 			</div>
