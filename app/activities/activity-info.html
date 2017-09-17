@@ -44,18 +44,20 @@
 				ng-if="orderedStat.hasMedal"
 				class="player-stat-container"
 				ng-class-odd="'odd'">
-				<div class="player-title-bar">
+				<div class="player-title-bar character-name">
 					<span>{{orderedStat[0].basic.displayName}}</span>
 				</div>
 				<ul class="stats-box">
-					<li ng-repeat="character in orderedStat.ordered | toArray | orderBy: orderByRank track by $index">
+					<li ng-repeat="character in orderedStat.ordered | toArray | orderBy: 'basic.rank' track by $index">
 						<div class="rank-value">
 							<div class="medal {{character.basic.className.toLowerCase()}}" 
 								ng-click="toggleLegend()"
 								ng-class="{'selected' : ctrl.m.selectedStat == $index}">
-								<span>#{{character.basic.rank}}</span>
+								<div>
+									<span>#{{character.basic.rank}}</span>
+								</div>
 							</div>
-							<span>{{character.destinyUserInfo.displayName}}</span><br/>
+							<span class="character-name">{{character.destinyUserInfo.displayName}}</span><br/>
 							<span>Total:<span><span> {{character.basic.displayValue}}<span>
 						</div>
 					</li>
@@ -68,18 +70,20 @@
 				ng-repeat="character in activityInfo.entries track by $index" 
 				class="player-stat-container"
 				ng-class-odd="'odd'">
-				<div class="player-title-bar">
+				<div class="player-title-bar character-name">
 					<span>{{character.player.destinyUserInfo.displayName}}</span>
 				</div>
 				<ul class="stats-box">
-					<li ng-repeat="stat in character.values | toArray | orderBy: orderByRank track by $index"
+					<li ng-repeat="stat in character.values | toArray | orderBy: 'basic.rank' track by $index"
 						ng-click="selectStat($index)"
 						ng-if="stat.hasMedal">
 						<div class="rank-value">
 							<div class="medal {{stat.basic.className.toLowerCase()}}" 
 								ng-click="toggleLegend()"
 								ng-class="{'selected' : ctrl.m.selectedStat == $index}">
-								<span>#{{stat.basic.rank}}</span>
+								<div>
+									<span>#{{stat.basic.rank}}</span>
+								</div>
 							</div>
 							<span>{{stat.basic.displayName}}:<span><span> {{stat.basic.displayValue}}<span>
 						</div>
@@ -93,36 +97,31 @@
 	<div id="medal-legend-container" ng-if="ctrl.m.showLegend">
 		<div class="medal-legend">
 			<div class="guys best glow on">Best Guys</div>
-			<div ng-repeat="medal in activityInfo.medalLegend | limitTo: 3 track by $index"
+			<div ng-repeat="player in activityInfo.topMedalList | orderBy: -playersMedalScore | limitTo: 3 track by $index"
 				 class="medal-stat-box">
-				<div class="medal {{medal.name}}">
-					<span ng-if="medal.name != 'last'">#{{medal.displayValue}}</span>
-					<span ng-if="medal.name == 'last'">#{{activityInfo.entries.length}}</span>
-				</div>
 				<div class="medal-description">
 					<div class="medal-player">
-						<span>{{medal.playerName}}</span>
+						<span>{{player.playerName}}</span>
 					</div>
 					<div class="stat-list">
-						<span ng-repeat="stat in medal.stats track by $index">
-							{{stat.displayName}}: {{stat.value}}
-						</span>
+						<div ng-repeat="medal in player.medals | toArray | orderBy: '-weight' track by $index"
+							 class="medal {{medal.className}}">
+							 <span>{{medal.count}}</span>
+						</div>
 					</div>
 				</div>
 			</div>
 			<div class="guys bad glow on" animated-glow is-active="true" delay="1000">Worst Guy</div>
 			<div class="medal-stat-box">
-				 <div class="medal {{activityInfo.medalLegend[activityInfo.medalLegend.length-1].name}}">
-					<span>#{{activityInfo.entries.length}}</span>
-				</div>
 				<div class="medal-description">
 					<div class="medal-player">
-						<span>{{activityInfo.medalLegend[activityInfo.medalLegend.length-1].playerName}}</span>
+						<span>{{activityInfo.topMedalList[activityInfo.topMedalList.length-1].playerName}}</span>
 					</div>
 					<div class="stat-list">
-						<span ng-repeat="stat in activityInfo.medalLegend[activityInfo.medalLegend.length-1].stats track by $index">
-							{{stat.displayName}}: {{stat.value}}
-						</span>
+						<div ng-repeat="medal in activityInfo.topMedalList[activityInfo.topMedalList.length-1].medals | toArray | orderBy: '-weight' track by $index"
+							class="medal {{medal.className}}">
+							<span>{{medal.count}}</span>
+					   </div>
 					</div>
 				</div>
 			</div>

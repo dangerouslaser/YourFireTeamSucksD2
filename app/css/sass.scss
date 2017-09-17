@@ -648,6 +648,10 @@ span.info-show-button{
     color: #fff;
     font-weight: bold;
     text-shadow: 1px 1px 1px #000;
+
+    .character-name {
+        color: #00f300;
+    }
     
     &.odd{
         background: rgba(0, 0, 0, 0.37);
@@ -863,6 +867,10 @@ div.medal{
                 display: block;
             }
         }
+    }
+
+    &:hover{
+        background: #333333;
     }
 }
 

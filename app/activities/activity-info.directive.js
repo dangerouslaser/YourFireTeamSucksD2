@@ -41,8 +41,8 @@ angular
 					generateStatRanks();
 					updateActivityInfoWithOrderedValues(scope.activityInfo.playerStatsByOrderedList);
 					scope.activityInfo.medalLegend = buildMedalLegend(scope.activityInfo);
-					console.log('scope log')
-					console.log(scope.activityInfo);
+					scope.activityInfo.topMedalList = bestPlayerAlgorithm(scope.activityInfo.medalLegend);
+					console.log(scope.activityInfo.topMedalList);
 				}
 
 				function generateStatRanks(){
@@ -144,21 +144,29 @@ angular
 					var medalLegend = [];
 					angular.forEach(activityInfoObj.entries, function(playerEntry){
 						var characterObject = {
-							player: playerEntry.player.destinyUserInfo.displayName,
+							playerName: playerEntry.player.destinyUserInfo.displayName,
 							medals:{
 								gold: {
+									className: 'gold',
+									weight: 5,
 									count: 0,
 									stats: []
 								},
 								silver: {
+									className: 'silver',
+									weight: 2,
 									count: 0,
 									stats: []
 								},
 								bronze: {
+									className: 'bronze',
+									weight: 1,
 									count: 0,
 									stats: []
 								},
 								last: {
+									className: 'last',
+									weight: -1,
 									count: 0,
 									stats: []
 								},
@@ -195,32 +203,44 @@ angular
 						medalLegend.push(characterObject);
 					});
 					
-					var topMedalList = [];
-					var medalEnum = [
-						'gold', 'silver', 'bronze', 'last'
-					];
+					// var topMedalList = [];
+					// var medalEnum = [
+					// 	'gold', 'silver', 'bronze', 'last'
+					// ];
 
-					var index = 0;
-					angular.forEach(medalEnum, function(medalType){
-						index++;
-						var newMedalObject = {
-							name: medalType,
-							playerName: null,
-							stats:[],
-							displayValue: index
-						}
-						var highestMedalTypeCount = 0;
-						angular.forEach(medalLegend, function(playerMedals){
-							if(playerMedals.medals[medalType].count > highestMedalTypeCount){
-								highestMedalTypeCount = playerMedals.medals[medalType].count;
-								newMedalObject.playerName = playerMedals.player;
-								newMedalObject.stats = playerMedals.medals[medalType].stats;
-							}
+					// var index = 0;
+					// angular.forEach(medalEnum, function(medalType){
+					// 	index++;
+					// 	var newMedalObject = {
+					// 		name: medalType,
+					// 		playerName: null,
+					// 		stats:[],
+					// 		displayValue: index
+					// 	}
+					// 	var highestMedalTypeCount = 0;
+					// 	angular.forEach(medalLegend, function(playerMedals){
+					// 		if(playerMedals.medals[medalType].count > highestMedalTypeCount){
+					// 			highestMedalTypeCount = playerMedals.medals[medalType].count;
+					// 			newMedalObject.playerName = playerMedals.player;
+					// 			newMedalObject.stats = playerMedals.medals[medalType].stats;
+					// 		}
+					// 	});
+					// 	topMedalList.push(newMedalObject);
+					// });
+					return medalLegend;
+				}
+
+				function bestPlayerAlgorithm(medalLegend){
+					angular.forEach(medalLegend, function(playerMedals){
+						var playersMedalScore = 0;
+						angular.forEach(playerMedals.medals, function(medal){
+							playersMedalScore += (medal.count * medal.weight);
 						});
-						topMedalList.push(newMedalObject);
+						playerMedals.playersMedalScore = playersMedalScore < 0 ? 0 : playersMedalScore;
 					});
 
-					return topMedalList;
+					medalLegend = $filter('orderBy')(medalLegend, '-playersMedalScore');
+					return medalLegend;
 				}
 			}
 		};
@@ -236,7 +256,6 @@ function activityInfoCtrl($scope, $anchorScroll){
 	self.m.showLegend = false;
 	$scope.goToPlayer = goToPlayer;
 	$scope.getDisplayValue = getDisplayValue;
-	$scope.orderByRank = orderByRank;
 	$scope.selectStat = selectStat;
 	$scope.toggleLegend = toggleLegend;
 	$scope.selectView = selectView;
@@ -248,10 +267,6 @@ function activityInfoCtrl($scope, $anchorScroll){
 	function goToPlayer(val){
 		$anchorScroll(val);
 	}
-
-	function orderByRank(item) {
-		return item.basic.rank;
-	};
 
 	function selectStat(statIndex){
 		self.m.selectedStat = statIndex; 

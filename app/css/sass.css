@@ -515,6 +515,8 @@ span.info-show-button {
   color: #fff;
   font-weight: bold;
   text-shadow: 1px 1px 1px #000; }
+  #PlayerActivityStats .player-stat-container .character-name {
+    color: #00f300; }
   #PlayerActivityStats .player-stat-container.odd {
     background: rgba(0, 0, 0, 0.37); }
 
@@ -673,6 +675,8 @@ div.medal {
         float: left; }
       #medal-legend-container .medal-legend .medal-stat-box .stat-list span {
         display: block; }
+  #medal-legend-container:hover {
+    background: #333333; }
 
 @media screen and (max-width: 980px) {
   #medal-legend-container {
