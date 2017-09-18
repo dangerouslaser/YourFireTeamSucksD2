@@ -73,7 +73,7 @@ class ManifestService {
 
             zip.on('ready', function(){
                 zip.extract(en_path, './manifests/world.content', function(err, count){
-                    if(err) console.log(err);
+                    if(err)
                     doneFn(err, {success: 'Manifests up-to-date'});
                 });
             });

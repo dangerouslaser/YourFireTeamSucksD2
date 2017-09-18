@@ -2,22 +2,33 @@ angular.module('fireTeam.common')
 	.factory('FireTeamModelFactory', ['$q','PlayerOptionsService', function ($q, playerOptionsService) {
     'use strict';
 
-	var fireTeamModel, playerPromises;
+	var fireTeamModel, playerPromises, currentDeferred;
 
 	var fireTeamModelObject = {
 		getFireTeam: function(memberType, userNames) {
 			return $q.when(fireTeamModel || playerPromises || getFireTeamMembers(memberType, userNames));
 		},
-		clear: clear
+		clear: clear,
+		cancelAllPromises: function(){
+			if(currentDeferred){
+				currentDeferred.resolve({Message: 'user cancelled'});
+			}
+			else{
+				currentDeferred = $q.defer();
+				currentDeferred.resolve({Message: 'nothing to resolve'});
+			}
+
+			return currentDeferred.promise;
+		},
 	};	
 
 	function clear() {
-			fireTeamModel = null;
-			playerPromises = null;
-		}
+		fireTeamModel = null;
+		playerPromises = null;
+	}
 
 	function getFireTeamMembers(memberType, userNames) {
-		var deferred = $q.defer();
+		var deferred = currentDeferred = $q.defer();
 		var playerPromises = [];
 
 		angular.forEach(userNames, function(user){
@@ -30,7 +41,7 @@ angular.module('fireTeam.common')
 	};
 
     function getPlayerData(memberType, userName) {
-		var deferred = $q.defer();
+		var deferred = currentDeferred = $q.defer();
 		playerOptionsService.getMembershipId({memberType: memberType, userName: userName}).then(function (response) {	
 			var membershipModel = response;
 

@@ -25,7 +25,6 @@ angular.module('fireTeam.common')
 			return getUpdatedManifest();
 		},
 		cancelAllPromises: function(){
-			progress = 0;
 			if(currentDeferred){
 				currentDeferred.resolve({Message: 'user cancelled'});
 			}
@@ -95,7 +94,7 @@ angular.module('fireTeam.common')
 		var playerObject = {};
 
 		playerOptionsService.getCharacterActivityHistoryData({data: request}).then(function(response){
-			if(response.ErrorCode > 1){
+			if(response && response.ErrorCode > 1){
 				deferred.resolve(response);
 				return deferred.promise;
 			}

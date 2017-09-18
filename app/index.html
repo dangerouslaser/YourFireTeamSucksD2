@@ -71,19 +71,11 @@
 							tab-index="{{$index + 1}}"
 							ng-keydown="keyDownEvt($event)">
 						</input-directive>
-						<span class="error" ng-if="m.errorMessage">{{m.errorMessage}}</span>
-						<span ng-if="m.showWarningMessage">{{m.warningMessage}}</span>
-						<div class="loading-overlay" ng-if="m.isLoadingData">
-							<!-- <span ng-hide="m.activityListProgress.totalActivities">
-								Finding activity matches...
-							</span>
-							<span ng-show="m.activityListProgress.totalActivities">
-								{{m.activityListProgress.totalActivities}} matches found.
-							</span> -->
+						<div class="loading-overlay">
 							<div>
+								<span class="error" ng-if="m.errorMessage">{{m.errorMessage}}</span>
+								<span ng-if="m.showWarningMessage">{{m.warningMessage}}</span>
 								<span ng-if="m.showLoadingStatusMessages">{{m.loadingStatusMessage}}</span>
-								<!-- <span>{{m.activityListProgress.activitiesLoaded}} / {{m.activityListProgress.totalActivities}}</span>
-								<span>({{m.activityListProgress.percentComplete}}%)</span> -->
 							</div>
 						</div>
 						<div>

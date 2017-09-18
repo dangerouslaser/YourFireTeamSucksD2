@@ -34,6 +34,7 @@ router.get('/getUpdatedManifest', function(req, res, next){
       var result = response;
       res.status(200);
       if(err){
+        console.log(err);
         res.status(500);
         result = {ErrorCode: 500};
       }
