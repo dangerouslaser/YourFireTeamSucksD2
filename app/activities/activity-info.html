@@ -21,8 +21,8 @@
 					</span>
 				</div>
 				<div class="activity-info-container">
-					<div class="character-container">
-						<div class="character" ng-repeat="character in activityInfo.entries track by $index">
+					<div class="character-container" ng-repeat="character in activityInfo.entries track by $index">
+						<div class="character">
 							<img ng-src="{{const.bungieRoot}}{{character.player.destinyUserInfo.iconPath}}" />
 							<div class="title-bar">
 								<div>
@@ -41,46 +41,14 @@
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- <div class="activity-header-content" id="{{activityInfo.definitions.directActivityModeHash}}">
-		<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activityInfo.definitions.pgcrImage}})'}"></div>
-		<img class="activity-icon" ng-src="{{const.bungieRoot}}{{activityInfo.definitions.displayProperties.icon}}" />
-		<div class="activity-title">	
-			<span>{{activityInfo.definitions.displayProperties.name}} - {{activityInfo.period | date:'MM/dd/yyyy'}}</span>
-			<br/>
-			<span>{{activityInfo.definitions.displayProperties.description}}</span>
-		</div>
-		<div class="members-header">
-			<div class="character-container">
-				<div class="character" ng-click="goToPlayer(character.player.destinyUserInfo.displayName);" ng-repeat="character in activityInfo.entries track by $index">
-					<img ng-src="{{const.bungieRoot}}{{character.player.destinyUserInfo.iconPath}}" />
-					<div class="title-bar">
-						<div>
-							<span class="player-class" data-playerName="{{character.characterInfo.displayName}}">
-								{{character.player.destinyUserInfo.displayName}}  
-							</span>
-						</div>
-						<div class="class-info">
-							<span class="character-class {{character.player.characterClass.toLowerCase()}}" data-characterClass="{{character.player.characterClass}}">
-									[{{character.player.characterClass}}]
-							</span>
-							<span class="light-level">
-								{{character.player.lightLevel}} 
-							</span>
-						</div>
+					<div class="button-container">
+						<div ng-click="selectView('player')" class="btn-mobile-default" ng-class="{'selected': ctrl.m.selectedView == 'player'}">Player View</div>
+						<div ng-click="selectView('stats')" class="btn-mobile-default" ng-class="{'selected': ctrl.m.selectedView == 'stats'}">Stats View</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div>
-			<div ng-click="selectView('player')" class="btn-mobile-default" ng-class="{'selected': ctrl.m.selectedView == 'player'}">Player View</div>
-			<div ng-click="selectView('stats')" class="btn-mobile-default" ng-class="{'selected': ctrl.m.selectedView == 'stats'}">Stats View</div>
-		</div>
-	</div> -->
+	</div>
 
 	<div id="PlayerActivityStats">
 		<div class="bg" ng-style="{'background-image':'url(http://www.bungie.net{{activityInfo.definitions.pgcrImage}})'}">

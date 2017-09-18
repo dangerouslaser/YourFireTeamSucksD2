@@ -20,12 +20,6 @@
 		<br/>
 	</div>
 
-	<div>
-		<div id="MoreResults" class="btn-mobile-default" ng-if="!m.isNewSearch && m.fireTeamActivityResults.length > 0 && !m.isLoadingData" ng-click="getMoreResults(); m.matchAttempts = 0;">
-			Search More
-		</div>
-	</div>
-
 	<div class="activity-selection-container" ng-if="m.isShowActivityList">
 		<div 
 			ng-repeat="activity in m.fireTeamActivityResults | orderBy: orderByDate | limitTo:m.activitiesDisplayed  track by $index" 
@@ -54,8 +48,8 @@
 				</span>
 			</div>
 			<div class="activity-info-container" ng-show="m.selectedActivity === activity || m.hoveredActivity === activity">
-				<div class="character-container">
-					<div class="character" ng-repeat="character in activity.entries track by $index">
+				<div class="character-container" ng-repeat="character in activity.entries track by $index">
+					<div class="character">
 						<img ng-src="{{const.bungieRoot}}{{character.player.destinyUserInfo.iconPath}}" />
 						<div class="title-bar">
 							<div>

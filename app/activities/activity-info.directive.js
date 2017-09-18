@@ -31,7 +31,6 @@ angular
 
 				scope.$watch('activityInfo', function(newVal){
 					if(newVal){
-						debugger;
 						getFireTeam();
 					}
 				});

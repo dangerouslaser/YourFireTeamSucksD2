@@ -52,7 +52,10 @@ angular.module('fireTeam.common')
 		m.currentStateParams = null;
 		m.copyrightYear = getDate();
 		m.activitySort = 'dateTime';
-		m.isReverse = false;
+		m.loadingStatusMessage = '';
+		m.warningMessage = '';
+		m.showWarningMessage = false;
+		m.showLoadingStatusMessages = false;
 
 		$scope.selectPlatform = selectPlatform;
 		$scope.selectActivity = selectActivity;
@@ -458,12 +461,25 @@ angular.module('fireTeam.common')
 		}
 
 		function getMembersActivitiesMatchList(membersOptions){
-			activityModelFactory.getPostGameCarnageReportActivitiesForFireteam(membersOptions).then(function(response){
+			m.showLoadingStatusMessages = true;
+			m.showWarningMessage = false;
+			m.loadingStatusMessage = 'Checking for updates to the Destiny manifest...:';
+			activityModelFactory.getUpdatedManifest().then(function(response){
+				m.loadingStatusMessage = 'Loading activity match results...';
 				if(response.ErrorCode){
-					throwError({Error: "An error occured while fetching results"});
+					m.warningMessage = 'Unable to get current Destiny manifests.';
+					m.showWarningMessage = true;
 				}
-				m.isLoadingData = false;
-				activityResultsValidation(response.Response.activityMatchListResults);
+				activityModelFactory.getPostGameCarnageReportActivitiesForFireteam(membersOptions).then(function(response){
+					m.loadingStatusMessage = '';
+					m.showLoadingStatusMessages = false;
+					m.isLoadingData = false;
+					if(response.ErrorCode){
+						throwError({Error: "An error occured while fetching results"});
+					}else{
+						activityResultsValidation(response.Response.activityMatchListResults);
+					}
+				});
 			});
 		}
 

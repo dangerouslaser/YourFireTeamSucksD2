@@ -29,6 +29,20 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 var router = express.Router();
 
+router.get('/getUpdatedManifest', function(req, res, next){
+  manifestService.ManifestService.checkManifestVersion(function(err, response){
+      var result = response;
+      res.status(200);
+      if(err){
+        res.status(500);
+        result = {ErrorCode: 500};
+      }
+
+      res.json(result);
+  });
+});
+
+
 router.get('/getMembershipIdByUserName', function(req, res, next){
   config.default.credentials.defaultMemberType = req.query.memberType;
     var user = req.query.userName;
@@ -196,7 +210,6 @@ var httpPort = process.env.PORT || 3000;
 // Start the http server
 httpServer.listen(httpPort, function(err) {
     console.log(err, httpServer.address());
-    manifestService.ManifestService.checkManifestVersion();
 }); 
 
 // Start the https server

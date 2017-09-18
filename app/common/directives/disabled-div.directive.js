@@ -6,7 +6,7 @@ angular
 
 	function disabledDiv() {
 		return {
-			restrict: 'E',
+			restrict: 'A',
 			scope: {},
 			replace: true,
 			template: '<div class="disabled-div"></div>',

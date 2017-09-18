@@ -133,9 +133,15 @@ button.link {
   top: 0;
   left: 0;
   z-index: 1000;
-  background: #333;
-  border: 1px solid #333;
-  opacity: .6; }
+  border: 1px solid #333; }
+  .disabled-div .disabled-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: #000;
+    opacity: .6; }
 
 .platform-dropdown-container {
   position: relative;
@@ -280,7 +286,7 @@ input.player-input {
 .search-container .search-block {
   position: relative;
   margin-bottom: 10px;
-  padding: 10px 0px 10px 0px; }
+  padding: 10px; }
 
 .search-container .search-block .bg {
   width: 100%;
@@ -362,17 +368,15 @@ input.player-input {
   padding: 10px 0px 0px 0px;
   background: #12171c;
   cursor: pointer;
-  opacity: .7;
-  /*box-shadow: 1px 1px 20px 0px #fff inset;*/
-  text-shadow: 0px 1px 1px #000;
-  /*margin-top: 10px;*/ }
+  opacity: .7; }
   .activity-selection-container .activity-selection.not-selected {
     opacity: .3; }
   .activity-selection-container .activity-selection.selected {
     z-index: 1;
     opacity: .9; }
   .activity-selection-container .activity-selection.selected .spacing {
-    box-shadow: 0px 0px 5px 2px #eee; }
+    box-shadow: 0px 0px 5px 2px #eee;
+    text-shadow: 0px 1px 1px #000; }
   .activity-selection-container .activity-selection:hover {
     z-index: 1;
     opacity: .9; }
@@ -406,35 +410,25 @@ input.player-input {
 
 .activity-selection-container .activity-selection .activity-info-container {
   float: right;
-  width: 250px;
-  padding-right: 10px; }
+  width: 275px; }
 
 .activity-selection-container .activity-selection .activity-title {
   font-size: 20px;
   display: inline-block; }
 
-.character-container {
-  float: right;
-  width: 250px;
-  padding-right: 10px;
-  position: relative;
-  display: block; }
-
-.character {
-  display: inline-block;
-  padding: 5px;
-  width: 250px;
-  /*background: rgba(255, 255, 255, 0.2);*/
+.activity-selection-container .activity-selection .character-container {
+  width: 100%;
   background: #424242;
-  margin-right: 5px;
   margin-top: 5px;
   box-shadow: 1px 1px 1px #000; }
+
+.character {
+  padding: 5px; }
   .character img {
     width: 30px;
     vertical-align: middle;
     box-shadow: 0px 1px 1px #000; }
   .character .title-bar {
-    width: 84%;
     display: inline-block;
     position: relative;
     margin-left: 5px;
@@ -501,6 +495,9 @@ span.info-show-button {
     #ActivityContainer .activity-selection-container .activity-selection {
       opacity: 1;
       z-index: 1; }
+  #ActivityContainer .button-container {
+    margin: 10px;
+    text-align: center; }
 
 #ActivityContainer .activity-title {
   text-shadow: 1px 1px 1px #000;
@@ -606,7 +603,7 @@ div.medal {
 #PlayerActivityStats ul.stats-box li {
   display: inline-block;
   margin: 10px;
-  width: 300px;
+  width: 275px;
   display: inline-block;
   text-align: left;
   box-shadow: 0px 1px 2px #000;
@@ -667,7 +664,8 @@ div.medal {
       margin-bottom: 10px;
       margin-top: 10px;
       padding: 10px;
-      text-align: left; }
+      text-align: left;
+      background: rgba(0, 0, 0, 0.33); }
       #medal-legend-container .medal-legend .medal-stat-box .divider {
         width: 90%;
         position: relative;
@@ -699,10 +697,17 @@ div.medal {
 
 @media screen and (max-width: 980px) {
   #medal-legend-container {
-    width: 50%; } }
+    width: 50%; }
+
+  .activity-selection-container .activity-selection .activity-info-container {
+    float: none;
+    margin: 0 auto; } }
 @media screen and (max-width: 680px) {
   #medal-legend-container {
-    width: 100%; } }
+    width: 100%; }
+
+  #medal-legend-container {
+    background: #333333; } }
 #stats-table-container {
   position: relative;
   min-width: 800px;

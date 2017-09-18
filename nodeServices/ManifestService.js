@@ -13,7 +13,7 @@ class ManifestService {
     //@manifest.zip: this is the compressed manifest downloaded from the destiny man endpoint
     //@manifest.content: uncompressed manifest sqlite file which can be queried
 
-    checkManifestVersion(){
+    checkManifestVersion(doneFn){
         var options = {
             url: 'https://www.bungie.net/Platform/Destiny2/Manifest',
             port: 443,
@@ -29,15 +29,16 @@ class ManifestService {
             var jsonBody = JSON.parse(body);
             if(manifestConfig.default.version != jsonBody.Response.version){
                 manifestConfig.default = jsonBody.Response;
-                this.getManifests();
+                this.getManifests(function(err, response){
+                    doneFn(err, response);
+                });
             }else{
-                console.log("Manifests up-to-date");
+                doneFn(err, {success: 'Manifests up-to-date'});
             }
-           
         });
     }
 
-    getManifests(){
+    getManifests(doneFn){
         var instance = this;
         //the urls are hard coded for simplicity's sake
         var man = 'https://www.bungie.net/';
@@ -73,11 +74,7 @@ class ManifestService {
             zip.on('ready', function(){
                 zip.extract(en_path, './manifests/world.content', function(err, count){
                     if(err) console.log(err);
-                    //var query = "SELECT DISTINCT json FROM DestinyActivityDefinition WHERE json like '%3368226533%' OR json LIKE '%474380713%'";
-                    console.log('manifests up to date');
-                    // instance.queryManifest('world.content', query, function(response){
-                    //     console.log(response);
-                    // });
+                    doneFn(err, {success: 'Manifests up-to-date'});
                 });
             });
         });

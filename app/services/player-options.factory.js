@@ -3,6 +3,7 @@ angular.module('fireTeam.common')
     'use strict';
 
     return {
+        getUpdatedManifest: baseHttpService.get.bind(this, '../api/getUpdatedManifest'),
         getMembershipId: baseHttpService.get.bind(this, '../api/getMembershipIdByUserName'),
         getBaseCharacterInfo: baseHttpService.get.bind(this, '../api/getCharacterInfoByMembershipId'),
         getCharacterStatsData: baseHttpService.get.bind(this, '../api/getCharacterStatsById'),
