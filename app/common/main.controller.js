@@ -56,6 +56,7 @@ angular.module('fireTeam.common')
 		m.warningMessage = '';
 		m.showWarningMessage = false;
 		m.showLoadingStatusMessages = false;
+		m.showErrorMessage = false;
 
 		$scope.selectPlatform = selectPlatform;
 		$scope.selectActivity = selectActivity;
@@ -151,6 +152,8 @@ angular.module('fireTeam.common')
 				mode: m.selectedGameMode
 			};
 
+			m.errorMessage = '';
+			m.showErrorMessage = false;
 			m.isNewSearch = !angular.equals(m.searchCriteria, m.lastSuccessSearchCriteria);
 
 			setCookie('searchCriteria', m.searchCriteria);
@@ -386,15 +389,19 @@ angular.module('fireTeam.common')
 			fireTeamModelFactory.clear();
 
 			m.isShowActivityList = true;
-			m.errorMessage = null;
+			m.errorMessage = '';
+			m.showErrorMessage = false;
 			m.fireTeamActivityResults = [];
 			m.isLoadingData = true;
+			m.warningMessage = '';
+			m.showWarningMessage = false;
+
 			fireTeamModelFactory.getFireTeam(m.selectedPlatform.id, m.playersArrays).then(function(response){
 				var playerResponseError = false;
 				angular.forEach(response, function(playerResponse){
-					if((playerResponse.status && playerResponse.status !== 200) || (playerResponse.data && playerResponse.data.ErrorCode)){
+					if((playerResponse.Error)){
 						playerResponseError = true;
-						throwError(playerResponse.data);
+						throwError(playerResponse);
 					}
 				});
 
@@ -453,6 +460,7 @@ angular.module('fireTeam.common')
 			}
 
 			m.errorMessage = data.Error;
+			m.showErrorMessage = true;
 			m.isLoadingData = false;	
 			m.isNewSearch = true;
 			clearData();
@@ -472,13 +480,16 @@ angular.module('fireTeam.common')
 			m.showLoadingStatusMessages = true;
 			m.showWarningMessage = false;
 			m.loadingStatusMessage = 'Checking for updates to the Destiny manifest...';
-			console.log('getMembersActivitiesMatchList')
+		
 			activityModelFactory.getUpdatedManifest().then(function(response){
+
 				m.loadingStatusMessage = 'Getting activity match results...';
+
 				if(response.ErrorCode){
 					m.warningMessage = 'Unable to get current Destiny manifests.';
 					m.showWarningMessage = true;
 				}
+
 				activityModelFactory.getPostGameCarnageReportActivitiesForFireteam(membersOptions).then(function(response){
 					m.loadingStatusMessage = '';
 					m.showLoadingStatusMessages = false;

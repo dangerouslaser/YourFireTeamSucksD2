@@ -86,7 +86,8 @@ div.btn-mobile-default {
   min-width: 200px;
   border-radius: 3px;
   text-align: center;
-  font-size: 150%; }
+  font-size: 150%;
+  box-shadow: 1px 1px 1px #000; }
   div.btn-mobile-default:hover, div.btn-mobile-default.selected {
     box-shadow: 1px 1px 10px 1px #000 inset; }
 
@@ -295,8 +296,7 @@ input.player-input {
   left: 0;
   position: absolute;
   background-image: url("http://www.bungie.net/img/theme/destiny/bgs/pgcrs/story_moon_1.jpg");
-  opacity: .5;
-  border: 1px solid #757575; }
+  opacity: .5; }
 
 .search-content {
   position: relative;
@@ -341,8 +341,6 @@ input.player-input {
 .section {
   position: relative;
   display: block;
-  padding: 8px;
-  border: 1px solid #757575;
   margin-top: 10px; }
 
 .section-header {
@@ -350,11 +348,13 @@ input.player-input {
   display: inline-block; }
 
 .section.closed {
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+  background: #253344;
+  padding: 10px; }
 
 .activity-selection-container {
   position: relative;
-  padding: 10px; }
+  margin: 10px 0px 10px 0px; }
 
 .activity-selection-container img.activity-icon {
   float: left;
@@ -492,21 +492,27 @@ span.info-show-button {
   vertical-align: middle; }
   #ActivityContainer .activity-selection-container {
     padding: 0px; }
+    #ActivityContainer .activity-selection-container img.activity-icon {
+      width: auto; }
     #ActivityContainer .activity-selection-container .activity-selection {
       opacity: 1;
-      z-index: 1; }
+      z-index: 1;
+      cursor: default; }
+      #ActivityContainer .activity-selection-container .activity-selection .activity-container-information {
+        width: 100%;
+        display: inline-block; }
   #ActivityContainer .button-container {
     margin: 10px;
     text-align: center; }
 
 #ActivityContainer .activity-title {
   text-shadow: 1px 1px 1px #000;
-  width: 80%;
+  width: 60%;
   display: inline-block;
   vertical-align: top;
   font-size: 2em;
   margin-top: 10px;
-  text-align: center; }
+  text-align: left; }
 
 #ActivityContainer .activity-icon {
   position: relative; }
@@ -634,7 +640,8 @@ div.medal {
   text-align: center;
   height: 100%;
   padding-top: 10px;
-  padding-bottom: 10px; }
+  padding-bottom: 10px;
+  overflow: scroll; }
   #medal-legend-container .medal-legend {
     position: relative;
     overflow: scroll;

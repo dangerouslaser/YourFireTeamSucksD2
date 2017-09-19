@@ -122,6 +122,7 @@ div.btn-mobile-default{
     border-radius: 3px;
     text-align: center;
     font-size: 150%;
+    box-shadow: 1px 1px 1px #000;
 
     &:hover, &.selected{
         box-shadow: 1px 1px 10px 1px #000 inset;
@@ -372,7 +373,6 @@ input.player-input {
     position: absolute;
     background-image: url('http://www.bungie.net/img/theme/destiny/bgs/pgcrs/story_moon_1.jpg');
     opacity: .5;
-    border: 1px solid $primary-border-color;
 }
 
 .search-content{
@@ -426,8 +426,6 @@ input.player-input {
 .section{
     position: relative;
     display: block;
-    padding: 8px;
-    border: 1px solid $primary-border-color;
     margin-top:10px;
 }
 
@@ -438,11 +436,13 @@ input.player-input {
 
 .section.closed{
     margin-bottom: 10px;
+    background: #253344;
+    padding:10px;
 }
 
 .activity-selection-container{
 	position: relative;
-	padding: 10px;
+	margin: 10px 0px 10px 0px;
 }
 
 .activity-selection-container img.activity-icon{
@@ -623,10 +623,19 @@ span.info-show-button{
     .activity-selection-container {
         padding: 0px;
 
+        img.activity-icon{
+            width: auto;
+        }
+
         .activity-selection{
             opacity: 1;   
             z-index: 1;      
-            
+            cursor: default;
+
+            .activity-container-information{
+                width: 100%;
+                display: inline-block;
+            }
         }
     }
 
@@ -638,12 +647,12 @@ span.info-show-button{
 
 #ActivityContainer .activity-title{
     text-shadow: 1px 1px 1px #000;
-    width: 80%;
+    width: 60%;
     display: inline-block;
     vertical-align: top;
     font-size: 2em;
     margin-top: 10px;
-    text-align: center;
+    text-align: left;
 }
 
 #ActivityContainer .activity-icon{
@@ -812,6 +821,7 @@ div.medal{
     height: 100%;
     padding-top:10px;
     padding-bottom:10px;
+    overflow: scroll;
 
     .medal-legend{
         position: relative;

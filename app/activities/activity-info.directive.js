@@ -42,16 +42,21 @@ angular
 					updateActivityInfoWithOrderedValues(scope.activityInfo.playerStatsByOrderedList);
 					scope.activityInfo.medalLegend = buildMedalLegend(scope.activityInfo);
 					scope.activityInfo.topMedalList = bestPlayerAlgorithm(scope.activityInfo.medalLegend);
-					console.log(scope.activityInfo.topMedalList);
+					updateEntryPropWithScore();
 				}
 
 				function generateStatRanks(){
-					//console.log(JSON.stringify(scope.activityInfo));
 					var entriesArray = scope.activityInfo.entries;
 					var statsObject = {};
 
 					angular.forEach(entriesArray, function(entryValue, entryKey){
-						angular.forEach(entryValue.values, function(statValue, statKey){
+						buildStatsObject(entryValue, entryValue.values);
+						buildStatsObject(entryValue, entryValue.extended.values);
+					});
+					scope.activityInfo.playerStatsByOrderedList = orderStats(statsObject);
+
+					function buildStatsObject(entryValue, statsArray){						
+						angular.forEach(statsArray, function(statValue, statKey){
 							if(!statsObject[statKey]){
 								statsObject[statKey] = [];
 							}
@@ -61,15 +66,13 @@ angular
 								basic: {
 									value: statValue.basic.value,
 									rank: 0,
-									displayName: capitalizeFirstLetter(statKey),
+									displayName: statStringDisplayFormat(statKey),
 									displayValue: statValue.basic.displayValue,
 								}
 							}
 							statsObject[statKey].push(playerValue);
 						});
-					});
-
-					scope.activityInfo.playerStatsByOrderedList = orderStats(statsObject);
+					}
 				}
 
 				function orderStats(unOrderedStatRanksObject){
@@ -112,40 +115,44 @@ angular
 				function updateActivityInfoWithOrderedValues(orderedStatsObject){
 					angular.forEach(scope.activityInfo.entries, function(entry){
 						var currentCharacterId = entry.characterId;
-						angular.forEach(entry.values, function(entryValue, entryKey){
+						extendOrderedStats(entry.values, orderedStatsObject, currentCharacterId);
+						extendOrderedStats(entry.extended.values, orderedStatsObject, currentCharacterId);
+					});
+
+					function extendOrderedStats(entriesArray, orderedStatsObject, currentCharacterId){
+						angular.forEach(entriesArray, function(entryValue, entryKey){
 							angular.forEach(orderedStatsObject, function(statValue, statKey){
 								if(entryKey.toLowerCase() === statKey.toLowerCase()){
 									entryValue.hasMedal = statValue.hasMedal;
 									angular.forEach(statValue.ordered, function(player){
 										if(currentCharacterId == player.characterId){
-											angular.extend(entryValue.basic, player.basic);
+											angular.extend(entryValue.basic = player.basic);
 										}
 									});
 								}
 							});
 						});
-					});
-					console.log('updateActivityInfoWithOrderedValues')
+					}
 				}
 
 				function isReverseOrder(val){
-					var comparisonEnum = [
-						'deaths'
-					]
+					var comparisonEnum = ['deaths'];
 
 					return comparisonEnum.indexOf(val.toLowerCase()) != -1;
 				}
 
-				function capitalizeFirstLetter(string) {
-					return string.charAt(0).toUpperCase() + string.slice(1);
+				function statStringDisplayFormat(string) {
+					return string.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase();});
 				}
 
 				function buildMedalLegend(activityInfoObj){
 					var medalLegend = [];
+
 					angular.forEach(activityInfoObj.entries, function(playerEntry){
 						var characterObject = {
 							playerName: playerEntry.player.destinyUserInfo.displayName,
-							medals:{
+							characterId: playerEntry.characterId,
+							medals: {
 								gold: {
 									className: 'gold',
 									weight: 5,
@@ -172,8 +179,13 @@ angular
 								},
 							}
 						}
-
-						angular.forEach(playerEntry.values, function(statValue){
+						angular.extend(characterObject, countMedals(playerEntry.values, characterObject));
+						angular.extend(characterObject, countMedals(playerEntry.extended.values, characterObject));
+						medalLegend.push(characterObject);
+					});
+					
+					function countMedals(statsArray, charObj){
+						angular.forEach(statsArray, function(statValue){
 							if(statValue.hasMedal){
 								var statObject = {
 									displayName: statValue.basic.displayName,
@@ -181,52 +193,27 @@ angular
 								}
 								switch(statValue.basic.rank){
 									case 1:
-										characterObject.medals.gold.count += 1;
-										characterObject.medals.gold.stats.push(statObject);
+										charObj.medals.gold.count += 1;
+										charObj.medals.gold.stats.push(statObject);
 									break;
 									case 2:
-										characterObject.medals.silver.count += 1;
-										characterObject.medals.silver.stats.push(statObject);
+										charObj.medals.silver.count += 1;
+										charObj.medals.silver.stats.push(statObject);
 									break;
 									case 3:
-										characterObject.medals.bronze.count += 1;
-										characterObject.medals.bronze.stats.push(statObject);
+										charObj.medals.bronze.count += 1;
+										charObj.medals.bronze.stats.push(statObject);
 									break;
 									case (activityInfoObj.entries.length):
-										characterObject.medals.last.count += 1;
-										characterObject.medals.last.stats.push(statObject);
+										charObj.medals.last.count += 1;
+										charObj.medals.last.stats.push(statObject);
 									break;
 									default:
 								}
 							}
 						});
-						medalLegend.push(characterObject);
-					});
-					
-					// var topMedalList = [];
-					// var medalEnum = [
-					// 	'gold', 'silver', 'bronze', 'last'
-					// ];
-
-					// var index = 0;
-					// angular.forEach(medalEnum, function(medalType){
-					// 	index++;
-					// 	var newMedalObject = {
-					// 		name: medalType,
-					// 		playerName: null,
-					// 		stats:[],
-					// 		displayValue: index
-					// 	}
-					// 	var highestMedalTypeCount = 0;
-					// 	angular.forEach(medalLegend, function(playerMedals){
-					// 		if(playerMedals.medals[medalType].count > highestMedalTypeCount){
-					// 			highestMedalTypeCount = playerMedals.medals[medalType].count;
-					// 			newMedalObject.playerName = playerMedals.player;
-					// 			newMedalObject.stats = playerMedals.medals[medalType].stats;
-					// 		}
-					// 	});
-					// 	topMedalList.push(newMedalObject);
-					// });
+						return charObj;
+					}
 					return medalLegend;
 				}
 
@@ -242,6 +229,19 @@ angular
 					medalLegend = $filter('orderBy')(medalLegend, '-playersMedalScore');
 					return medalLegend;
 				}
+
+				function updateEntryPropWithScore(){ 
+					var index = 1;
+					angular.forEach(scope.activityInfo.topMedalList, function(topMedal){
+						angular.forEach(scope.activityInfo.entries, function(player){
+							if (topMedal.characterId === player.characterId){
+								player.rankOrder = index;
+								player.rankClassName = scope.getDisplayValue(index, scope.activityInfo.topMedalList.length)
+							} 
+						});
+						index++;
+					});
+				}
 			}
 		};
 };
@@ -252,7 +252,7 @@ function activityInfoCtrl($scope, $anchorScroll){
 	var self = this;
 	self.m = $scope;
 	self.m.selectedStat = null;
-	self.m.selectedView = 'stats';
+	self.m.selectedView = 'player';
 	self.m.showLegend = false;
 	$scope.goToPlayer = goToPlayer;
 	$scope.getDisplayValue = getDisplayValue;

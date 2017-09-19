@@ -48,7 +48,7 @@ angular.module('fireTeam.common')
 			if (!membershipModel){
 				var customErrorResponse = {
 					ErrorCode: 101,
-					Error: "An unspecified system error occured! Could not find player: " + userName
+					Error: "Could not find player: " + userName
 				};
 				deferred.resolve(customErrorResponse);
 				return deferred.promise;
