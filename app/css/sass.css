@@ -296,6 +296,8 @@ input.player-input {
   left: 0;
   position: absolute;
   background-image: url("http://www.bungie.net/img/theme/destiny/bgs/pgcrs/story_moon_1.jpg");
+  background-size: cover;
+  background-position: center;
   opacity: .5; }
 
 .search-content {
